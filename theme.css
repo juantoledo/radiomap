@@ -15,6 +15,26 @@
   --yellow: #f0c040;
 }
 
+/* Header title link — shared */
+.header-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+.header-title-link:hover {
+  color: var(--accent);
+}
+
+/* GitHub icon link — shared */
+.header-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+}
+.header-link-icon svg {
+  vertical-align: middle;
+}
+
 /* Theme toggle button — shared */
 #theme-toggle:hover {
   border-color: var(--accent) !important;

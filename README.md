@@ -12,6 +12,9 @@ Los datos se extraen de los documentos oficiales de la **Subsecretaría de Telec
 
 ### Mapa de cobertura (`index.html`)
 
+![Mapa de cobertura](static/map.png)
+![Mapa de cobertura](static/map2.png)
+
 - **Mapa interactivo** con Leaflet y tiles CARTO (modo oscuro/claro)
 - **Círculos de cobertura** teóricos por repetidora (VHF/UHF, EIRP)
 - **Marcadores** con tooltip: señal, club, comuna, banda
@@ -21,7 +24,11 @@ Los datos se extraen de los documentos oficiales de la **Subsecretaría de Telec
 - **Leyenda** de zonas con colores
 - **Metodología** de cálculo de cobertura visible (EIRP, base VHF/UHF, factores)
 
+
+
 ### Lista de repetidores (`lista.html`)
+
+![Lista de repetidores](static/list.png)
 
 - **Tabla** agrupada por zona con todos los repetidores
 - **Filtros**: búsqueda (señal, club, comuna), banda, zona
@@ -44,6 +51,9 @@ Los datos se extraen de los documentos oficiales de la **Subsecretaría de Telec
 ├── export-csv.js        # Exportación a CSV
 ├── index.html
 ├── lista.html
+├── static/              # Imágenes para README
+│   ├── map.png
+│   └── list.png
 └── README.md
 ```
 

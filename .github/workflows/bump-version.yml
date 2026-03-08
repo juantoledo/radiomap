@@ -1,0 +1,60 @@
+name: Bump version
+
+on:
+  push:
+    branches: [main]
+
+# Skip when the push is from our own version bump commit (avoid loop)
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'chore(release):') }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump version
+        id: bump
+        run: |
+          # Get current version from data.js
+          CURRENT=$(grep "const VERSION" data.js | sed "s/.*'\([^']*\)'.*/\1/")
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+
+          # Parse commits in this push to determine bump level
+          BUMP_LEVEL="patch"
+          for msg in $(echo '${{ toJSON(github.event.commits) }}' | jq -r '.[].message'); do
+            if echo "$msg" | grep -qE '^[a-zA-Z]+!|BREAKING CHANGE'; then
+              BUMP_LEVEL="major"
+              break
+            fi
+            if echo "$msg" | grep -qE '^feat(\([^)]+\))?:'; then
+              BUMP_LEVEL="minor"
+            fi
+          done
+          echo "level=$BUMP_LEVEL" >> $GITHUB_OUTPUT
+
+          # Bump version (major.minor.patch)
+          IFS='.' read -r MAJ MIN PATCH <<< "$CURRENT"
+          case "$BUMP_LEVEL" in
+            major) MAJ=$((MAJ+1)); MIN=0; PATCH=0 ;;
+            minor) MIN=$((MIN+1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH+1)) ;;
+          esac
+          NEW_VERSION="${MAJ}.${MIN}.${PATCH}"
+          echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          # Update data.js
+          sed -i "s/const VERSION = '[^']*'/const VERSION = '$NEW_VERSION'/" data.js
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.js
+          git diff --staged --quiet || git commit -m "chore(release): bump version to ${{ steps.bump.outputs.new }}"
+          git push
