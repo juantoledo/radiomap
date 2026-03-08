@@ -15,13 +15,14 @@
   --yellow: #f0c040;
 }
 
-/* Header title link — shared */
+/* Header title link — shared (link behavior, no link styling) */
 .header-title-link {
   color: inherit;
   text-decoration: none;
+  cursor: default;
 }
 .header-title-link:hover {
-  color: var(--accent);
+  color: inherit;
 }
 
 /* GitHub icon link — shared */
