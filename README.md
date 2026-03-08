@@ -10,7 +10,7 @@ Los datos se extraen de los documentos oficiales de la **Subsecretaría de Telec
 
 ## Características
 
-### Mapa de cobertura (`mapa.html`)
+### Mapa de cobertura (`index.html`)
 
 - **Mapa interactivo** con Leaflet y tiles CARTO (modo oscuro/claro)
 - **Círculos de cobertura** teóricos por repetidora (VHF/UHF, EIRP)
@@ -42,7 +42,7 @@ Los datos se extraen de los documentos oficiales de la **Subsecretaría de Telec
 ├── theme.js             # Toggle tema claro/oscuro
 ├── theme.css            # Variables CSS y estilos compartidos
 ├── export-csv.js        # Exportación a CSV
-├── mapa.html
+├── index.html
 ├── lista.html
 └── README.md
 ```
@@ -55,7 +55,7 @@ Abrir los archivos HTML directamente en el navegador o servir con un servidor lo
 python -m http.server 8080
 ```
 
-Luego visitar `http://localhost:8080/mapa.html` o `http://localhost:8080/lista.html`.
+Luego visitar `http://localhost:8080/` o `http://localhost:8080/lista.html`.
 
 > **Nota:** Para que el tema y las preferencias persistan correctamente, se recomienda usar un servidor local en lugar de abrir los archivos con `file://`.
 
