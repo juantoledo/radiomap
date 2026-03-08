@@ -578,8 +578,8 @@ function render(filtered) {
       html += `<tr>
         <td class="cell-signal" data-label="${labels[0]}">${r.senal || '—'}</td>
         <td data-label="${labels[1]}"><span class="badge-banda ${bc}">${bandaShort}</span></td>
-        <td class="cell-freq freq-rx" data-label="${labels[2]}">${r.tx || '—'}</td>
-        <td class="cell-freq freq-tx" data-label="${labels[3]}">${r.rx || '—'}</td>
+        <td class="cell-freq freq-rx" data-label="${labels[2]}">${r.rx || '—'}</td>
+        <td class="cell-freq freq-tx" data-label="${labels[3]}">${r.tx || '—'}</td>
         <td class="cell-tone" data-label="${labels[4]}">${r.tono || '—'}</td>
         <td class="cell-pot" data-label="${labels[5]}"><span>${r.potencia || '—'}</span> W</td>
         <td class="cell-club" data-label="${labels[6]}"><strong>${r.nombre}</strong><small>${r.region}</small></td>
