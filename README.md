@@ -2,6 +2,8 @@
 
 Visualización de repetidoras de radioaficionados en Chile, con mapa de cobertura y lista detallada. Datos oficiales de SUBTEL/DGMN.
 
+**[🗺️ → Acceder a la aplicación](https://juantoledo.github.io/cobertura-radial-chile/)**
+
 ## Fuente de datos
 
 Los datos se extraen de los documentos oficiales de la **Subsecretaría de Telecomunicaciones (SUBTEL)**:
