@@ -152,10 +152,17 @@ if (document.getElementById('total-count')) document.getElementById('total-count
 const clubs = new Set(NODES.map(d => d.nombre));
 document.getElementById('clubs-count').textContent = clubs.size;
 
-// Vence status
+// Vence status (fechas en dd-mm-yyyy o yyyy-mm-dd)
+function parseDate(s) {
+  if (!s) return null;
+  const p = String(s).trim().split('-');
+  if (p.length !== 3) return new Date(s);
+  if (p[0].length === 4) return new Date(s);
+  return new Date(parseInt(p[2],10), parseInt(p[1],10)-1, parseInt(p[0],10));
+}
 function venceClass(vence) {
   if (!vence) return '';
-  const d = new Date(vence);
+  const d = parseDate(vence);
   const now = new Date('2026-03-08');
   const diff = (d - now) / (1000*60*60*24);
   if (diff < 0) return 'vence-expired';

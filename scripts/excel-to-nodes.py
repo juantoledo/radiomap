@@ -44,7 +44,7 @@ def fmt(val):
     if val is None:
         return ""
     if isinstance(val, datetime):
-        return val.strftime("%Y-%m-%d")
+        return val.strftime("%d-%m-%Y")
     if isinstance(val, float):
         return str(val) if val == int(val) else str(val)
     return str(val).strip()
