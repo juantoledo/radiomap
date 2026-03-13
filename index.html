@@ -246,7 +246,8 @@ const regionNames = Object.keys(REGION_COLORS || {}).sort();
 const filRegion = document.getElementById('fil-region');
 regionNames.forEach(reg => {
   const o = document.createElement('option');
-  o.value = reg; o.textContent = reg;
+  o.value = reg === '' ? '__sin_region__' : reg;
+  o.textContent = reg || 'Sin región en el archivo de Subtel';
   filRegion.appendChild(o);
 });
 
@@ -255,7 +256,7 @@ const legend = document.getElementById('legend');
 regionNames.forEach(reg => {
   const row = document.createElement('div');
   row.className = 'legend-row';
-  row.innerHTML = '<div class="legend-dot" style="background:' + (REGION_COLORS[reg]||'#888') + '"></div><span class="legend-zone">' + reg + '</span>';
+  row.innerHTML = '<div class="legend-dot" style="background:' + (REGION_COLORS[reg]||'#5e35b1') + '"></div><span class="legend-zone">' + (reg || 'Sin región en el archivo de Subtel') + '</span>';
   legend.appendChild(row);
 });
 
@@ -271,7 +272,7 @@ function renderAll(){
 
   NODES.forEach(r=>{
     const visible = visibleSet.has(r._idx);
-    const color   = REGION_COLORS[r.region] || '#888';
+    const color   = REGION_COLORS[r.region] || REGION_COLORS[''] || '#5e35b1';
     const rgb     = hexToRgb(color);
     const isSelected = r._idx === selectedIdx;
     const isNeighbor = selectedIdx !== null && NODES[selectedIdx]._neighbors.some(n=>n.idx===r._idx);
@@ -353,7 +354,8 @@ function applyFilters(){
   visibleSet = new Set();
   NODES.forEach(r=>{
     if(banda && !r.banda.startsWith(banda)) return;
-    if(region && r.region !== region) return;
+    if(region === '__sin_region__') { if(r.region) return; }
+    else if(region && r.region !== region) return;
     if(search){
       const haystack = [r.signal, r.nombre, r.comuna, r.ubicacion, r.region, r.rx, r.tx, r.tono, r.banda].filter(Boolean).join(' ').toLowerCase();
       if(!haystack.includes(search)) return;
@@ -373,7 +375,7 @@ function selectRepeater(idx){
 
 function showSidebar(idx){
   const r = NODES[idx];
-  const color = REGION_COLORS[r.region] || '#888';
+  const color = REGION_COLORS[r.region] || REGION_COLORS[''] || '#5e35b1';
   const club = r.nombre || getClubName(r.signal);
   document.getElementById('sb-signal').textContent = r.signal;
   document.getElementById('sb-signal').style.color = color;
@@ -407,7 +409,7 @@ function showSidebar(idx){
     const shown = allNeighbors.slice(0, 21);
     html += shown.map(n=>{
       const nb = NODES[n.idx];
-      const nc = REGION_COLORS[nb.region]||'#888';
+      const nc = REGION_COLORS[nb.region]||REGION_COLORS['']||'#5e35b1';
       const rx = nb.rx || '—', tx = nb.tx || '—', tono = nb.tono ? nb.tono+' Hz' : '—';
       const details = 'RX '+rx+' · TX '+tx+' · '+tono;
       const isSelected = n.idx === idx;

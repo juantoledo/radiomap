@@ -141,8 +141,8 @@ const filterRegion = document.getElementById('filter-region');
 const regionNames = Object.keys(REGION_COLORS || {}).sort();
 regionNames.forEach(reg => {
   const opt = document.createElement('option');
-  opt.value = reg;
-  opt.textContent = reg;
+  opt.value = reg === '' ? '__sin_region__' : reg;
+  opt.textContent = reg || 'Sin región en el archivo de Subtel';
   filterRegion.appendChild(opt);
 });
 if (document.getElementById('regions-count')) document.getElementById('regions-count').textContent = regionNames.length;
@@ -193,7 +193,7 @@ function render(filtered) {
     const labels = ['Señal','Banda','RX (MHz)','TX (MHz)','Tono','Pot. W','Club / Titular','Comuna','Ubicación','Vence'];
     html += `<div class="zone-group" data-region="${reg}">
       <div class="zone-header">
-        <span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#888'}; color: ${REGION_COLORS[reg]||'#888'}">${reg}</span>
+        <span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg || 'Sin región en el archivo de Subtel'}</span>
         <span class="zone-count"><span>${rows.length}</span> repetidor${rows.length !== 1 ? 'es' : ''}</span>
       </div>
       <table class="rpt-table">
@@ -241,7 +241,8 @@ function getFiltered() {
   const region = document.getElementById('filter-region').value;
 
   return NODES.filter(r => {
-    if (region && r.region !== region) return false;
+    if (region === '__sin_region__') { if (r.region) return false; }
+    else if (region && r.region !== region) return false;
     if (banda && !r.banda.includes(banda)) return false;
     if (q) {
       const haystack = [r.signal, r.nombre, r.comuna, r.ubicacion, r.region, r.rx, r.tx, r.tono, r.banda].filter(Boolean).join(' ').toLowerCase();
