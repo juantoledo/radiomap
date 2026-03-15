@@ -2,7 +2,7 @@
 
 **Mapa y lista de repetidoras de radioaficionados en Chile** — dónde están, qué cubren y cómo contactar. Datos oficiales SUBTEL/DGMN.
 
-[**→ Abrir la aplicación**](https://juantoledo.github.io/cobertura-radial-chile/)
+[**→ Abrir la aplicación**](https://www.radiomap.cl/)
 
 ---
 
