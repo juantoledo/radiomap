@@ -8,7 +8,9 @@ Scripts técnicos para importar y depurar datos de repetidoras desde el listado 
 
 | Archivo | Descripción |
 |---------|-------------|
-| `excel-to-nodes.py` | Convierte el Excel SUBTEL a `data.js` (NODES) |
+| `excel-to-nodes.py` | Convierte el Excel SUBTEL a `data/data.js` (NODES) |
+| `excel-to-csv.py` | Convierte el Excel SUBTEL a `data/curated_stations.csv` |
+| `csv-to-datajs.py` | Convierte `data/curated_stations.csv` a `data/data.js` (usado en CI) |
 | `debug-coords.py` | Detecta filas con coordenadas que fallan al parsear |
 | `test-dms.py` | Pruebas unitarias del parser DMS → decimal |
 | `Listado_RAF_Repetidoras.xlsx` | Listado oficial SUBTEL (fuente de datos) |
@@ -27,7 +29,7 @@ python scripts/excel-to-nodes.py
 **Qué hace:**
 - Lee `Listado_RAF_Repetidoras.xlsx` (en este directorio)
 - Convierte coordenadas DMS a grados decimales
-- Escribe `data.js` en la raíz del proyecto
+- Escribe `data/data.js`
 
 **Mapeo Rx/Tx:** El Excel se asume con columnas invertidas respecto a la convención usuario:
 - `rx` = valor de la columna **Tx** del Excel
@@ -35,9 +37,9 @@ python scripts/excel-to-nodes.py
 
 **Coordenadas:** Parsea formatos DMS como `27° 13' 33"`, `30° 1° 57,27"`, etc. Corrige minutos/segundos > 59 (typos en el Excel).
 
-**range_km:** Se conserva del `data.js` previo si el `signal` coincide; si no, usa 50 km por defecto.
+**range_km:** Se conserva del `data/data.js` previo si el `signal` coincide; si no, usa 50 km por defecto.
 
-**Preserva:** `VERSION` y `REGION_COLORS` del `data.js` existente.
+**Preserva:** `VERSION` y `REGION_COLORS` del `data/data.js` existente.
 
 ---
 

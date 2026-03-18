@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Convierte Listado_RAF_Repetidoras Excel a NODES para data.js.
-Asume Excel invertido: rx = col Rx, tx = col Tx (sin heurística).
+Convierte Listado_RAF_Repetidoras Excel a data/curated_stations.csv.
+Misma lógica que excel-to-nodes.py (Rx/Tx invertidos, DMS, etc.).
 """
+import csv
 import re
 import json
 from pathlib import Path
@@ -15,8 +16,14 @@ except ImportError:
     raise
 
 EXCEL_PATH = Path(__file__).resolve().parent / "Listado_RAF_Repetidoras.xlsx"
-OUTPUT_PATH = Path(__file__).resolve().parent.parent / "data" / "data.js"
-DATA_JS_PATH = OUTPUT_PATH
+OUTPUT_PATH = Path(__file__).resolve().parent.parent / "data" / "curated_stations.csv"
+DATA_JS_PATH = Path(__file__).resolve().parent.parent / "data" / "data.js"
+
+CSV_HEADERS = [
+    "signal", "nombre", "comuna", "ubicacion", "lat", "lon",
+    "range_km", "potencia", "ganancia", "banda", "rx", "tx",
+    "tono", "region", "otorga", "vence",
+]
 
 
 def dms_to_decimal(s, is_south_or_west=False):
@@ -24,7 +31,6 @@ def dms_to_decimal(s, is_south_or_west=False):
     if s is None or (isinstance(s, (int, float)) and not isinstance(s, bool)):
         return float(s) if s is not None else None
     s = str(s).strip().replace(",", ".")
-    # Formatos: 27° 13' 33", 27° 37′ 38" (U+2019), 70° 93° 33", 30° 1° 57,27"
     m = re.search(r"(-?\d+)\s*[^\d\w]+\s*(\d+)\s*[^\d\w]*\s*([\d.]+)", s)
     if not m:
         return None
@@ -56,7 +62,6 @@ def main():
     headers = [str(c.value).strip() if c.value else "" for c in ws[1]]
     col = {h: i for i, h in enumerate(headers)}
 
-    # Normalizar nombres (encoding)
     def idx(name, alt=None):
         for k, i in col.items():
             if name in k or (alt and alt in k):
@@ -64,7 +69,7 @@ def main():
         return -1
 
     i_nombre = idx("Nombre")
-    i_signal = idx("Tx") - 1 if idx("Tx") > 0 else 3  # Señal col before Tx
+    i_signal = idx("Tx") - 1 if idx("Tx") > 0 else 3
     i_banda = idx("Banda")
     i_tx = idx("Tx")
     i_rx = idx("Rx")
@@ -79,8 +84,7 @@ def main():
     i_lon = idx("Longitud")
     i_ubic = idx("Ubicaci", "Ubicación")
 
-    # Cargar NODES existentes para range_km
-    existing = {}
+    existing_range = {}
     if DATA_JS_PATH.exists():
         txt = DATA_JS_PATH.read_text(encoding="utf-8")
         match = re.search(r"const NODES = (\[.*?\]);", txt, re.DOTALL)
@@ -88,11 +92,11 @@ def main():
             try:
                 nodes = json.loads(match.group(1))
                 for n in nodes:
-                    existing[n.get("signal", "")] = n.get("range_km")
+                    existing_range[n.get("signal", "")] = n.get("range_km")
             except json.JSONDecodeError:
                 pass
 
-    nodes = []
+    rows = []
     for row in ws.iter_rows(min_row=2, values_only=True):
         row = list(row)
         if len(row) <= max(i_signal, i_nombre, 0):
@@ -111,15 +115,12 @@ def main():
 
         excel_tx = row[i_tx] if i_tx >= 0 else None
         excel_rx = row[i_rx] if i_rx >= 0 else None
-        # Excel asumido invertido: col Tx = rx, col Rx = tx → swap siempre
         rx = fmt(excel_tx) if excel_tx is not None else ""
         tx = fmt(excel_rx) if excel_rx is not None else ""
 
-        range_km = existing.get(signal)
-        if range_km is None:
-            range_km = 50.0  # default
+        range_km = existing_range.get(signal, 50.0)
 
-        n = {
+        rows.append({
             "signal": signal,
             "nombre": nombre,
             "comuna": fmt(row[i_comuna]) if i_comuna >= 0 else "",
@@ -136,35 +137,17 @@ def main():
             "region": fmt(row[i_region]) if i_region >= 0 else "",
             "otorga": fmt(row[i_otorga]) if i_otorga >= 0 else "",
             "vence": fmt(row[i_vence]) if i_vence >= 0 else "",
-        }
-        nodes.append(n)
+        })
 
     wb.close()
 
-    # Leer data.js para preservar VERSION y REGION_COLORS
-    version = "1.6.2"
-    region_colors = {}
-    if DATA_JS_PATH.exists():
-        txt = DATA_JS_PATH.read_text(encoding="utf-8")
-        vm = re.search(r"const VERSION = '([^']+)'", txt)
-        if vm:
-            version = vm.group(1)
-        rc = re.search(r"const REGION_COLORS = (\{[^}]+\})", txt)
-        if rc:
-            try:
-                region_colors = json.loads(rc.group(1))
-            except json.JSONDecodeError:
-                pass
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
+        writer.writeheader()
+        writer.writerows(rows)
 
-    out = f"""// Repetidoras Chile — datos centralizados
-const VERSION = '{version}';
-
-const NODES = {json.dumps(nodes, ensure_ascii=False)};
-
-const REGION_COLORS = {json.dumps(region_colors, ensure_ascii=False)};
-"""
-    DATA_JS_PATH.write_text(out, encoding="utf-8")
-    print(f"Escritos {len(nodes)} nodos en {DATA_JS_PATH}")
+    print(f"Generado {OUTPUT_PATH} ({len(rows)} estaciones)")
 
 
 if __name__ == "__main__":
