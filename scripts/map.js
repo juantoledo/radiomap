@@ -173,6 +173,21 @@
         if(visible) clickTarget.addTo(markerLayer);
       }
     });
+    updateMapEmptyOverlay();
+  }
+
+  function updateMapEmptyOverlay() {
+    const el = document.getElementById('map-empty-overlay');
+    if (!el) return;
+    if (visibleSet.size === 0) {
+      el.innerHTML = typeof buildGuidedEmptyStateHtml === 'function'
+        ? buildGuidedEmptyStateHtml()
+        : '<div class="no-results no-results--guided"><p class="no-results-title">Sin resultados</p><button type="button" class="btn-clear-filters" onclick="clearAllFilters()">Limpiar filtros</button></div>';
+      el.hidden = false;
+    } else {
+      el.hidden = true;
+      el.innerHTML = '';
+    }
   }
 
   function setMode(mode){
@@ -244,6 +259,11 @@
       visibleSet.add(r._idx);
       visibleNodes.push(r);
     });
+    if (selectedIdx !== null && !visibleSet.has(selectedIdx)) {
+      selectedIdx = null;
+      const sb = document.getElementById('sidebar');
+      if (sb) sb.classList.remove('open');
+    }
     document.getElementById('shown-count').textContent = visibleSet.size;
     document.getElementById('total-count').textContent = NODES.length;
     document.getElementById('regions-count').textContent = new Set(visibleNodes.map(r => r.region || '')).size;
@@ -345,8 +365,8 @@
     if(filteredNeighbors.length === 0) return;
     /** Same as “Compartir vista”: filtros, cerca de mí, mapa (mlat/mlon/zoom/mode) y signal de la repetidora abierta → al abrir se selecciona y se ve “Nodos cercanos”. */
     const urlStr = typeof buildShareViewURL === 'function' ? buildShareViewURL() : window.location.href;
-    const title = 'Nodos cercanos — ' + (r.signal || 'Radiomap');
-    const text = 'Abre este enlace para ver el mapa con los mismos filtros y posición, y el panel de nodos cercanos a esta repetidora.';
+    const title = r.signal || 'Radiomap';
+    const text = 'Mapa · cercanos.';
     if (navigator.share) {
       navigator.share({ title, text, url: urlStr }).catch(function () {
         if (typeof fallbackCopyShareUrl === 'function') fallbackCopyShareUrl(urlStr);

@@ -134,3 +134,51 @@ function clearAllFilters() {
 }
 
 window.clearAllFilters = clearAllFilters;
+
+/**
+ * Which filters are active — used for guided empty states (list + map).
+ */
+function getActiveFilterFlags() {
+  try {
+    const searchEl = document.getElementById('search');
+    const q = searchEl && searchEl.value.trim();
+    const banda = document.getElementById('filter-banda');
+    const region = document.getElementById('filter-region');
+    const echolink = document.getElementById('filter-echolink');
+    const ec = document.getElementById('filter-echolink-conference');
+    const hasBanda = banda && banda.value;
+    const hasRegion = region && region.value;
+    const hasEcholink = echolink && echolink.value;
+    const hasEc = ec && ec.value;
+    return {
+      hasSearch: !!q,
+      hasFilters: !!(hasBanda || hasRegion || hasEcholink || hasEc),
+      hasNear: typeof getNearMeLocation === 'function' && !!getNearMeLocation()
+    };
+  } catch (e) {
+    return { hasSearch: false, hasFilters: false, hasNear: false };
+  }
+}
+
+/**
+ * HTML for “no results” with contextual hints + clear button (shared list/map).
+ */
+function buildGuidedEmptyStateHtml() {
+  const f = getActiveFilterFlags();
+  const hints = [];
+  if (f.hasSearch) hints.push('Borra o acorta el texto en el campo de búsqueda.');
+  if (f.hasFilters) hints.push('Relaja los filtros: banda, región, tipo Echolink o conferencia.');
+  if (f.hasNear) hints.push('Desactiva «cerca de mí» si no hay nodos en 100 km a tu alrededor.');
+  if (hints.length === 0) hints.push('Amplía la búsqueda o quita filtros.');
+  const items = hints.map(function (h) { return '<li>' + h + '</li>'; }).join('');
+  return '<div class="no-results no-results--guided" role="status">' +
+    '<p class="no-results-title">Sin resultados</p>' +
+    '<p class="no-results-lead">Ninguna repetidora coincide con estos criterios.</p>' +
+    '<ul class="no-results-list">' + items + '</ul>' +
+    '<button type="button" class="btn-clear-filters no-results-cta" onclick="clearAllFilters()">' +
+    '<span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span> Limpiar filtros</button>' +
+    '</div>';
+}
+
+window.getActiveFilterFlags = getActiveFilterFlags;
+window.buildGuidedEmptyStateHtml = buildGuidedEmptyStateHtml;

@@ -58,8 +58,8 @@
   function shareThisView(ev) {
     if (ev) ev.preventDefault();
     var url = buildShareViewURL();
-    var title = 'Radiomap — Vista compartida';
-    var text = 'Abre este enlace para ver la misma vista (filtros y mapa o lista).';
+    var title = 'Radiomap';
+    var text = 'Vista.';
     if (navigator.share) {
       navigator.share({ title: title, text: text, url: url }).catch(function () {
         fallbackCopyShareUrl(url);

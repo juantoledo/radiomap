@@ -173,7 +173,9 @@
     document.getElementById('filter-nearme').textContent = getNearMeLocation() ? ' · cerca de mí' : '';
 
     if (filtered.length === 0) {
-      main.innerHTML = '<div class="no-results">No se encontraron resultados para la búsqueda actual.</div>';
+      main.innerHTML = typeof buildGuidedEmptyStateHtml === 'function'
+        ? buildGuidedEmptyStateHtml()
+        : '<div class="no-results">No se encontraron resultados para la búsqueda actual.</div>';
       return;
     }
 
@@ -342,8 +344,8 @@
     const r = NODES.find(n => n.signal === signal);
     if (!r) return;
     const urlStr = buildStationShareLink(signal);
-    const title = 'Radiomap — ' + (r.signal || 'Repetidora');
-    const text = 'Abre este enlace para ver esta repetidora en la lista (mismos filtros) y abrir su ficha.';
+    const title = r.signal || 'Radiomap';
+    const text = 'Lista.';
     if (navigator.share) {
       navigator.share({ title, text, url: urlStr }).catch(function () {
         if (typeof fallbackCopyShareUrl === 'function') fallbackCopyShareUrl(urlStr);
