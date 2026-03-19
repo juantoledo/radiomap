@@ -1,6 +1,6 @@
 /**
  * List view — table by region, filters, share
- * Requires: data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js, export-csv.js, theme.js, help.js
+ * Requires: data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js, share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -47,6 +47,121 @@
   function bandaClass(banda) {
     if (banda.includes('UHF')) return 'badge-uhf';
     return 'badge-vhf';
+  }
+
+  function escapeHtml(s) {
+    if (s == null || s === '') return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  let stationDetailLastFocus = null;
+  let stationDetailCurrentSignal = null;
+
+  function fmtVal(v) {
+    if (v === null || v === undefined || v === '') return '—';
+    return String(v);
+  }
+
+  function openStationDetail(signal) {
+    if (!signal) return;
+    const r = NODES.find(n => n.signal === signal);
+    if (!r) return;
+
+    const overlay = document.getElementById('station-detail-overlay');
+    const dialog = document.getElementById('station-detail-dialog');
+    const titleEl = document.getElementById('station-detail-title');
+    const subEl = document.getElementById('station-detail-sub');
+    const bodyEl = document.getElementById('station-detail-body');
+    const mapLink = document.getElementById('station-detail-map-link');
+    const shareBtn = document.getElementById('station-detail-share');
+    if (!overlay || !dialog || !titleEl || !subEl || !bodyEl || !mapLink || !shareBtn) return;
+
+    stationDetailCurrentSignal = signal;
+    stationDetailLastFocus = document.activeElement;
+
+    const nearMe = typeof getNearMeLocation === 'function' ? getNearMeLocation() : null;
+    let distKm = null;
+    if (nearMe && r.lat != null && r.lon != null && typeof haversine === 'function') {
+      distKm = Math.round(haversine(nearMe.lat, nearMe.lon, r.lat, r.lon));
+    }
+
+    titleEl.textContent = r.signal || '—';
+    const bandaShort = (r.banda || '').replace('/FM', '');
+    const parts = [bandaShort && (bandaShort + ' · '), r.nombre || ''].filter(Boolean);
+    const subParts = [];
+    if (r.isEcholink) {
+      subParts.push('Echolink' + (r.echoLinkConference ? ' · ' + r.echoLinkConference : ''));
+    }
+    if (distKm != null) subParts.push('~' + distKm + ' km');
+    subEl.textContent = parts.join('') + (subParts.length ? ' · ' + subParts.join(' · ') : '');
+
+    const rows = [
+      [['RX (MHz)', 'station-detail-freq'], r.rx ? r.rx + ' MHz' : '—'],
+      [['TX (MHz)', 'station-detail-freq'], r.tx ? r.tx + ' MHz' : '—'],
+      [['Tono (Hz)', ''], r.tono ? r.tono + ' Hz' : '—'],
+      [['Banda', ''], fmtVal(r.banda)],
+      [['Potencia', ''], r.potencia ? r.potencia + ' W' : '—'],
+      [['Ganancia', ''], fmtVal(r.ganancia)],
+      [['Cobertura', ''], r.range_km !== '' && r.range_km != null ? fmtVal(r.range_km) + ' km' : '—'],
+      [['Región', ''], fmtVal(r.region)],
+      [['Comuna', ''], fmtVal(r.comuna)],
+      [['Ubicación', ''], fmtVal(r.ubicacion)],
+      [['Lat / Lon', ''], r.lat != null && r.lon != null ? r.lat.toFixed(5) + ', ' + r.lon.toFixed(5) : '—'],
+      [['Otorga', ''], fmtVal(r.otorga)],
+      [['Vence', ''], fmtVal(r.vence)]
+    ];
+
+    let dl = '<dl class="station-detail-grid">';
+    rows.forEach(function (row) {
+      const dt = row[0];
+      const label = Array.isArray(dt) ? dt[0] : dt;
+      const ddClass = Array.isArray(dt) && dt[1] ? dt[1] : '';
+      const val = row[1];
+      dl += '<dt>' + escapeHtml(label) + '</dt><dd' + (ddClass ? ' class="' + escapeHtml(ddClass) + '"' : '') + '>' + escapeHtml(val) + '</dd>';
+    });
+    dl += '</dl>';
+    bodyEl.innerHTML = dl;
+
+    try {
+      const u = new URL('index.html', window.location.href);
+      u.searchParams.set('signal', signal);
+      mapLink.href = u.pathname + u.search + (u.hash || '');
+    } catch (e) {
+      mapLink.href = 'index.html?signal=' + encodeURIComponent(signal);
+    }
+
+    mapLink.setAttribute('aria-label', 'Ver ' + (r.signal || 'estación') + ' en el mapa');
+
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    requestAnimationFrame(function () {
+      try {
+        dialog.focus();
+      } catch (e2) { /* ignore */ }
+    });
+  }
+
+  function closeStationDetail() {
+    const overlay = document.getElementById('station-detail-overlay');
+    const bodyEl = document.getElementById('station-detail-body');
+    if (!overlay) return;
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    stationDetailCurrentSignal = null;
+    if (bodyEl) bodyEl.innerHTML = '';
+    try {
+      if (stationDetailLastFocus && typeof stationDetailLastFocus.focus === 'function') {
+        stationDetailLastFocus.focus();
+      }
+    } catch (e) { /* ignore */ }
+    stationDetailLastFocus = null;
   }
 
   function render(filtered) {
@@ -110,7 +225,7 @@
         const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${(r.echoLinkConference || '').replace(/"/g,'&quot;')}">Echolink</span>` : '';
         const distCell = showDistance ? `<td class="cell-dist" data-label="Distancia">${r._dist != null ? r._dist + ' km' : '—'}</td>` : '';
         const sigAttr = (r.signal || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-        html += `<tr data-signal="${sigAttr}">
+        html += `<tr class="rpt-row" data-signal="${sigAttr}">
           <td class="cell-signal" data-label="${labels[0]}">${r.signal || '—'} ${echolinkBadge}</td>
           <td data-label="${labels[1]}"><span class="badge-banda ${bc}">${bandaShort}</span></td>
           ${distCell}
@@ -205,46 +320,79 @@
     return result;
   }
 
+  /**
+   * Share link to lista view with current filters / cerca de mí + signal (opens station dialog on open).
+   * Uses buildShareViewURL from share-view.js when available.
+   */
+  function buildStationShareLink(signal) {
+    let urlStr = typeof buildShareViewURL === 'function' ? buildShareViewURL() : window.location.href;
+    try {
+      const u = new URL(urlStr);
+      u.hash = '';
+      if (signal) u.searchParams.set('signal', signal);
+      urlStr = u.toString();
+    } catch (e) {
+      const sep = String(urlStr).indexOf('?') >= 0 ? '&' : '?';
+      urlStr = String(urlStr).split('#')[0] + sep + 'signal=' + encodeURIComponent(signal || '');
+    }
+    return urlStr;
+  }
+
   function shareStation(signal) {
     const r = NODES.find(n => n.signal === signal);
     if (!r) return;
-    const lines = [
-      r.signal + (r.nombre ? ' — ' + r.nombre : ''),
-      'Banda: ' + (r.banda || '—'),
-      'RX: ' + (r.rx || '—') + ' MHz · TX: ' + (r.tx || '—') + ' MHz',
-      'Tono: ' + (r.tono ? r.tono + ' Hz' : '—'),
-      (r.isEcholink ? 'Echolink' + (r.echoLinkConference ? ': ' + r.echoLinkConference : '') : ''),
-      'Comuna: ' + (r.comuna || '—') + ' · Región: ' + (r.region || '—'),
-      'Ubicación: ' + (r.ubicacion || '—'),
-      'Radiomap — https://www.radiomap.cl/'
-    ].filter(Boolean);
-    const text = lines.join('\n');
+    const urlStr = buildStationShareLink(signal);
     const title = 'Radiomap — ' + (r.signal || 'Repetidora');
+    const text = 'Abre este enlace para ver esta repetidora en la lista (mismos filtros) y abrir su ficha.';
     if (navigator.share) {
-      navigator.share({ title, text, url: 'https://www.radiomap.cl/' }).catch(() => {});
+      navigator.share({ title, text, url: urlStr }).catch(function () {
+        if (typeof fallbackCopyShareUrl === 'function') fallbackCopyShareUrl(urlStr);
+      });
+    } else if (typeof fallbackCopyShareUrl === 'function') {
+      fallbackCopyShareUrl(urlStr);
     } else {
-      fallbackCopy(text);
+      window.prompt('Copia este enlace:', urlStr);
     }
-  }
-  function fallbackCopy(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      if (typeof alert === 'function') alert('Detalles copiados al portapapeles.');
-    }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      alert('Detalles copiados al portapapeles.');
-    });
   }
 
   document.getElementById('main-content').addEventListener('click', function (e) {
     const btn = e.target.closest('.share-btn');
-    if (btn && btn.dataset.signal !== undefined) shareStation(btn.dataset.signal);
+    if (btn && btn.dataset.signal !== undefined) {
+      e.stopPropagation();
+      shareStation(btn.dataset.signal);
+      return;
+    }
+    const tr = e.target.closest('tr.rpt-row');
+    if (!tr) return;
+    const sig = tr.getAttribute('data-signal');
+    if (sig) openStationDetail(sig);
   });
+
+  (function initStationDetailDialog() {
+    const overlay = document.getElementById('station-detail-overlay');
+    const closeBtn = document.getElementById('station-detail-close');
+    const shareBtn = document.getElementById('station-detail-share');
+    if (overlay) {
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeStationDetail();
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', closeStationDetail);
+    if (shareBtn) {
+      shareBtn.addEventListener('click', function () {
+        if (stationDetailCurrentSignal) shareStation(stationDetailCurrentSignal);
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      const ov = document.getElementById('station-detail-overlay');
+      if (ov && ov.classList.contains('open')) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeStationDetail();
+      }
+    }, true);
+  })();
 
   ['search','filter-banda','filter-region','filter-echolink','filter-echolink-conference'].forEach(id => {
     const el = document.getElementById(id);
@@ -303,4 +451,16 @@
   };
 
   render(getFiltered());
+
+  (function maybeOpenStationDetailFromUrl() {
+    try {
+      const sig = new URLSearchParams(window.location.search).get('signal');
+      if (!sig || !NODES.some(n => n.signal === sig)) return;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          openStationDetail(sig);
+        });
+      });
+    } catch (e) { /* ignore */ }
+  })();
 })();

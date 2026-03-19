@@ -73,6 +73,7 @@
 
   window.buildShareViewURL = buildShareViewURL;
   window.shareThisView = shareThisView;
+  window.fallbackCopyShareUrl = fallbackCopyShareUrl;
 
   function bindShareButtons() {
     document.querySelectorAll('#btn-share-view, #btn-share-view-menu').forEach(function (btn) {

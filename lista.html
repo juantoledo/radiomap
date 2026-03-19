@@ -121,6 +121,24 @@
 
 <main id="main-content"></main>
 
+<!-- Station detail (list view) -->
+<div id="station-detail-overlay" class="station-detail-overlay" aria-hidden="true">
+  <div id="station-detail-dialog" class="station-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="station-detail-title" tabindex="-1">
+    <div class="station-detail-header">
+      <div class="station-detail-heading">
+        <div id="station-detail-title" class="station-detail-signal">—</div>
+        <div id="station-detail-sub" class="station-detail-sub">—</div>
+      </div>
+      <button type="button" class="station-detail-close" id="station-detail-close" aria-label="Cerrar"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+    </div>
+    <div class="station-detail-body" id="station-detail-body"></div>
+    <div class="station-detail-footer">
+      <a href="index.html" id="station-detail-map-link" class="station-detail-link"><span class="material-symbols-outlined" aria-hidden="true">map</span> Ver en mapa</a>
+      <button type="button" id="station-detail-share" class="station-detail-btn"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</button>
+    </div>
+  </div>
+</div>
+
 <footer class="app-footer">
   <span>v<span id="app-version">—</span></span>
   <span>·</span>

@@ -296,7 +296,7 @@
 
     const filteredNeighbors = [{idx: idx, dist: 0}, ...r._neighbors.filter(n=>visibleSet.has(n.idx))].sort((a,b)=>a.dist-b.dist);
     if(filteredNeighbors.length > 0){
-      html += '<div class="sb-section-title">NODOS CERCANOS <span class="sb-neighbor-actions"><a href="#" class="sb-download-neighbors" onclick="downloadNeighborsCSV();return false" title="Descargar nodos cercanos como CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span> CSV</a><a href="#" class="sb-share-neighbors" onclick="shareNeighbors();return false" title="Compartir lista"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</a></span></div>';
+      html += '<div class="sb-section-title">NODOS CERCANOS <span class="sb-neighbor-actions"><a href="#" class="sb-download-neighbors" onclick="downloadNeighborsCSV();return false" title="Descargar nodos cercanos como CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span> CSV</a><a href="#" class="sb-share-neighbors" onclick="shareNeighbors();return false" title="Compartir enlace con filtros, mapa y esta repetidora (panel de nodos cercanos)"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</a></span></div>';
       html += filteredNeighbors.map(n=>{
         const nb = NODES[n.idx];
         const nc = REGION_COLORS[nb.region]||REGION_COLORS['']||'#5e35b1';
@@ -343,23 +343,22 @@
     const r = NODES[selectedIdx];
     const filteredNeighbors = [{idx: selectedIdx, dist: 0}, ...(r._neighbors || []).filter(n=>visibleSet.has(n.idx))].sort((a,b)=>a.dist-b.dist);
     if(filteredNeighbors.length === 0) return;
-    const title = 'Nodos Cercanos a ' + (r.signal || 'Repetidora');
-    const stationBlocks = filteredNeighbors.map(n=>{
-      const nb = NODES[n.idx];
-      const distStr = n.dist === 0 ? '0 km' : n.dist + ' km';
-      return (nb.signal || '—') + (nb.nombre ? ' — ' + nb.nombre : '') + ' · ' + distStr + '\n  RX ' + (nb.rx || '—') + ' · TX ' + (nb.tx || '—') + ' · ' + (nb.tono ? nb.tono + ' Hz' : '—') + '\n  ' + (nb.comuna || '—') + ' · ' + (nb.region || '—');
-    });
-    const text = [title, '', stationBlocks.join('\n\n----\n\n'), '', 'Radiomap — https://www.radiomap.cl/'].join('\n');
-    if(navigator.share){
-      navigator.share({ title, text, url: 'https://www.radiomap.cl/' }).catch(()=>{});
-    } else {
-      navigator.clipboard.writeText(text).then(()=>{ alert('Lista copiada al portapapeles.'); }).catch(()=>{
-        const ta = document.createElement('textarea');
-        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        document.execCommand('copy'); document.body.removeChild(ta);
-        alert('Lista copiada al portapapeles.');
+    /** Same as “Compartir vista”: filtros, cerca de mí, mapa (mlat/mlon/zoom/mode) y signal de la repetidora abierta → al abrir se selecciona y se ve “Nodos cercanos”. */
+    const urlStr = typeof buildShareViewURL === 'function' ? buildShareViewURL() : window.location.href;
+    const title = 'Nodos cercanos — ' + (r.signal || 'Radiomap');
+    const text = 'Abre este enlace para ver el mapa con los mismos filtros y posición, y el panel de nodos cercanos a esta repetidora.';
+    if (navigator.share) {
+      navigator.share({ title, text, url: urlStr }).catch(function () {
+        if (typeof fallbackCopyShareUrl === 'function') fallbackCopyShareUrl(urlStr);
       });
+    } else if (typeof fallbackCopyShareUrl === 'function') {
+      fallbackCopyShareUrl(urlStr);
+    } else {
+      try {
+        navigator.clipboard.writeText(urlStr).then(function () { alert('Enlace copiado al portapapeles.'); });
+      } catch (e) {
+        window.prompt('Copia este enlace:', urlStr);
+      }
     }
   }
 
