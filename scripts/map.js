@@ -306,6 +306,40 @@
   }
   window.applyFilters = applyFilters;
 
+  const searchEl = document.getElementById('search');
+  if (searchEl) {
+    function isMapOverlayOpen() {
+      const help = document.getElementById('help-overlay');
+      return !!(help && help.classList.contains('open'));
+    }
+    function activeElementIsEditable() {
+      const el = document.activeElement;
+      if (!el || el.nodeType !== 1) return false;
+      const tag = el.nodeName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      if (el.isContentEditable) return true;
+      return false;
+    }
+    document.addEventListener('keydown', function focusSearchOnPrintableKey(e) {
+      if (e.defaultPrevented) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key.length !== 1) return;
+      if (activeElementIsEditable()) return;
+      if (isMapOverlayOpen()) return;
+      if (e.key === ' ' && document.activeElement && document.activeElement.matches &&
+          document.activeElement.matches('button, [role="button"], a[href], summary')) return;
+
+      e.preventDefault();
+      searchEl.focus();
+      const start = searchEl.selectionStart != null ? searchEl.selectionStart : searchEl.value.length;
+      const end = searchEl.selectionEnd != null ? searchEl.selectionEnd : searchEl.value.length;
+      const val = searchEl.value;
+      searchEl.value = val.slice(0, start) + e.key + val.slice(end);
+      searchEl.setSelectionRange(start + 1, start + 1);
+      searchEl.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+
   function selectRepeater(idx){
     selectedIdx = idx;
     renderAll();
