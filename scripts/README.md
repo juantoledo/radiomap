@@ -27,8 +27,6 @@ python scripts/csv-to-datajs.py
 
 Se ejecuta automáticamente en CI antes del deploy.
 
-La minificación de JS para Pages está definida en `.github/workflows/deploy.yml` (Terser vía `npx`, sin mangling).
-
 ---
 
 ## Formato de curated_stations.csv

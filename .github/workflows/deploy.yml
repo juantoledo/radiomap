@@ -87,48 +87,10 @@ jobs:
       - name: Build data.js from CSV
         run: python scripts/csv-to-datajs.py
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Minify JavaScript
-        run: |
-          set -e
-          TERSER_VERSION=5.37.0
-          minify_one() {
-            npx --yes "terser@${TERSER_VERSION}" "$1" \
-              -c passes=2 \
-              --no-mangle \
-              --format comments=false \
-              -o "$1.tmp" && mv "$1.tmp" "$1"
-          }
-          for f in \
-            scripts/theme.js \
-            scripts/location-filter.js \
-            scripts/share-view.js \
-            scripts/export-csv.js \
-            scripts/help.js \
-            scripts/map.js \
-            scripts/list.js \
-            data/data.js; do
-            minify_one "$f"
-          done
-
       - name: Inject cache-busting version into HTML
         run: |
-          python3 << 'PY'
-          import re
-          from pathlib import Path
-          text = Path("data/data.js").read_text(encoding="utf-8")
-          m = re.search(r"const\s+VERSION\s*=\s*['\"]([^'\"]+)['\"]", text)
-          if not m:
-              raise SystemExit("VERSION not found in data/data.js")
-          ver = m.group(1)
-          for name in ("index.html", "lista.html"):
-              p = Path(name)
-              p.write_text(p.read_text(encoding="utf-8").replace("__VERSION__", ver), encoding="utf-8")
-          PY
+          V=$(grep "const VERSION" data/data.js | sed "s/.*'\([^']*\)'.*/\1/")
+          sed -i "s|__VERSION__|${V}|g" index.html lista.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
