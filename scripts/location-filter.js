@@ -177,7 +177,7 @@ function nodeMatchesFilterCriteria(r, c, nearMe) {
   if (c.echolink === 'no' && r.isEcholink) return false;
   if (c.echolinkConference && c.echolink !== 'no' && r.echoLinkConference !== c.echolinkConference) return false;
   if (c.q) {
-    const haystack = [r.signal, r.nombre, r.comuna, r.ubicacion, r.region, r.rx, r.tx, r.tono, r.banda, r.echoLinkConference].filter(Boolean).join(' ').toLowerCase();
+    const haystack = [r.signal, r.nombre, r.comuna, r.ubicacion, r.region, r.rx, r.tx, r.tono, r.banda, r.echoLinkConference, r.website].filter(Boolean).join(' ').toLowerCase();
     if (!haystack.includes(c.q)) return false;
   }
   if (nearMe && (r.lat == null || r.lon == null || haversine(nearMe.lat, nearMe.lon, r.lat, r.lon) > NEAR_ME_RADIUS_KM)) {

@@ -11,6 +11,25 @@
   function getClubName(signal) { var n = NODES && NODES.find(function(x){ return x.signal === signal; }); return n ? (n.nombre || '') : ''; }
   window.getClubName = getClubName;
 
+  function escapeHtmlText(s) {
+    if (s == null || s === '') return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+  function safeWebsiteUrl(w) {
+    w = (w || '').trim();
+    if (!/^https?:\/\//i.test(w)) return '';
+    try {
+      var u = new URL(w);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+      return u.href;
+    } catch (e) {
+      return '';
+    }
+  }
+
   const DEFAULT_RANGE_KM = 25; // for nodes without range_km (e.g. Echolink)
   const getRange = (n) => (typeof n.range_km === 'number' && !isNaN(n.range_km)) ? n.range_km : DEFAULT_RANGE_KM;
   NODES.forEach((r,i)=>{
@@ -276,8 +295,24 @@
     const r = NODES[idx];
     const color = REGION_COLORS[r.region] || REGION_COLORS[''] || '#5e35b1';
     const club = r.nombre || getClubName(r.signal);
-    document.getElementById('sb-signal').textContent = r.signal;
-    document.getElementById('sb-signal').style.color = color;
+    var sbSig = document.getElementById('sb-signal');
+    var wurl = safeWebsiteUrl(r.website);
+    if (wurl) {
+      sbSig.classList.add('sidebar-signal--with-web');
+      sbSig.innerHTML =
+        '<span class="sidebar-signal-text">' +
+        escapeHtmlText(r.signal) +
+        '</span><a href="' +
+        escapeAttr(wurl) +
+        '" class="station-website-link" target="_blank" rel="noopener noreferrer" aria-label="Sitio web del club" title="Sitio web"><span class="material-symbols-outlined" aria-hidden="true">language</span></a>';
+      var st = sbSig.querySelector('.sidebar-signal-text');
+      if (st) st.style.color = color;
+      sbSig.style.color = '';
+    } else {
+      sbSig.classList.remove('sidebar-signal--with-web');
+      sbSig.textContent = r.signal;
+      sbSig.style.color = color;
+    }
     document.getElementById('sb-club').textContent = club || r.region + ' · ' + r.comuna;
 
     const body = document.getElementById('sb-body');

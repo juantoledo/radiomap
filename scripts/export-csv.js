@@ -3,8 +3,8 @@
  * criteria: { banda, region, search, nearMe } — optional, from current filters
  */
 function exportRepeatersCSV(rows, criteria) {
-  const cols = ['signal','nombre','banda','comuna','ubicacion','rx','tx','tono','potencia','ganancia','region','vence','isEcholink','echoLinkConference'];
-  const headers = ['Señal','Club/Titular','Banda','Comuna','Ubicación','RX (MHz)','TX (MHz)','Tono','Pot. W','Gan. dBi','Región','Vence','Echolink','Conferencia Echolink'];
+  const cols = ['signal','nombre','banda','comuna','ubicacion','rx','tx','tono','potencia','ganancia','region','vence','isEcholink','echoLinkConference','website'];
+  const headers = ['Señal','Club/Titular','Banda','Comuna','Ubicación','RX (MHz)','TX (MHz)','Tono','Pot. W','Gan. dBi','Región','Vence','Echolink','Conferencia Echolink','Sitio web'];
   const esc = v => (v == null || v === '') ? '' : (''+v).includes(',') || (''+v).includes('"') || (''+v).includes('\n') ? '"' + (''+v).replace(/"/g, '""') + '"' : ''+v;
   const fmtBool = v => (v === true || v === 'true' || v === '1') ? 'Sí' : '';
   const csv = [headers.join(','), ...rows.map(r => cols.map(c => c === 'isEcholink' ? esc(fmtBool(r[c])) : esc(r[c])).join(','))].join('\n');

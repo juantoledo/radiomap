@@ -433,6 +433,16 @@ input[type=text] { width: 200px; }
   min-width: 0;
 }
 .sidebar-signal { font-family: 'Share Tech Mono', monospace; font-size: var(--fs-lg); color: var(--accent); }
+.sidebar-signal.sidebar-signal--with-web {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sidebar-signal.sidebar-signal--with-web .sidebar-signal-text {
+  min-width: 0;
+  word-break: break-word;
+}
 .sidebar-club { font-size: var(--fs-sm); color: var(--text-dim); margin-top: 4px; line-height: 1.3; }
 .sidebar-close {
   background: var(--surface2);
@@ -897,7 +907,25 @@ body.page-list main { padding: 24px 32px; }
   font-family: 'Share Tech Mono', monospace;
   color: var(--accent);
   font-size: var(--fs-sm);
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.station-website-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  text-decoration: none;
+  vertical-align: middle;
+  line-height: 1;
+}
+.station-website-link:hover {
+  color: var(--accent);
+}
+.station-website-link .material-symbols-outlined {
+  font-size: 18px;
 }
 .cell-freq { font-family: 'Share Tech Mono', monospace; font-size: var(--fs-md); white-space: nowrap; }
 .freq-tx { color: var(--green); }
@@ -1188,6 +1216,12 @@ body.page-map .map-empty-overlay .no-results--guided {
   color: var(--text-bright);
   line-height: 1.25;
   word-break: break-word;
+}
+.station-detail-signal.station-detail-signal--with-web {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .station-detail-sub {
   margin-top: 4px;

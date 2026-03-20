@@ -57,6 +57,29 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
+  function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+  function safeWebsiteUrl(w) {
+    w = (w || '').trim();
+    if (!/^https?:\/\//i.test(w)) return '';
+    try {
+      const u = new URL(w);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+      return u.href;
+    } catch (e) {
+      return '';
+    }
+  }
+  function websiteLinkHtml(r) {
+    const wurl = safeWebsiteUrl(r.website);
+    if (!wurl) return '';
+    return (
+      ' <a href="' +
+      escapeAttr(wurl) +
+      '" class="station-website-link" target="_blank" rel="noopener noreferrer" aria-label="Sitio web" title="Sitio web"><span class="material-symbols-outlined" aria-hidden="true">language</span></a>'
+    );
+  }
 
   let stationDetailLastFocus = null;
   let stationDetailCurrentSignal = null;
@@ -89,7 +112,14 @@
       distKm = Math.round(haversine(nearMe.lat, nearMe.lon, r.lat, r.lon));
     }
 
-    titleEl.textContent = r.signal || '—';
+    const wurl = safeWebsiteUrl(r.website);
+    if (wurl) {
+      titleEl.classList.add('station-detail-signal--with-web');
+      titleEl.innerHTML = escapeHtml(r.signal || '—') + websiteLinkHtml(r);
+    } else {
+      titleEl.classList.remove('station-detail-signal--with-web');
+      titleEl.textContent = r.signal || '—';
+    }
     const bandaShort = (r.banda || '').replace('/FM', '');
     const parts = [bandaShort && (bandaShort + ' · '), r.nombre || ''].filter(Boolean);
     const subParts = [];
@@ -231,8 +261,9 @@
         const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${(r.echoLinkConference || '').replace(/"/g,'&quot;')}">Echolink</span>` : '';
         const distCell = showDistance ? `<td class="cell-dist" data-label="Distancia">${r._dist != null ? r._dist + ' km' : '—'}</td>` : '';
         const sigAttr = (r.signal || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+        const webLink = websiteLinkHtml(r);
         html += `<tr class="rpt-row" data-signal="${sigAttr}">
-          <td class="cell-signal" data-label="${labels[0]}">${r.signal || '—'} ${echolinkBadge}</td>
+          <td class="cell-signal" data-label="${labels[0]}">${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}</td>
           <td data-label="${labels[1]}"><span class="badge-banda ${bc}">${bandaShort}</span></td>
           ${distCell}
           <td class="cell-freq freq-rx" data-label="${labels[showDistance ? 3 : 2]}">${r.rx || '—'}</td>
