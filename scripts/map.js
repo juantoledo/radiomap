@@ -78,22 +78,32 @@
   let selectedIdx = null;
   let visibleSet = new Set(NODES.map(r=>r._idx));
 
-  const regionNames = Object.keys(REGION_COLORS || {}).sort();
+  const regionNames = Object.keys(REGION_COLORS || {}).filter(Boolean).sort();
   const filterRegion = document.getElementById('filter-region');
-  regionNames.forEach(reg => {
-    const o = document.createElement('option');
-    o.value = reg === '' ? '__sin_region__' : reg;
-    o.textContent = reg || 'Sin región en el archivo de Subtel';
-    filterRegion.appendChild(o);
-  });
-  const filterConf = document.getElementById('filter-echolink-conference');
+  if (filterRegion) {
+    regionNames.forEach(reg => {
+      const label = document.createElement('label');
+      label.className = 'filter-checkbox-row';
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.setAttribute('data-filter-value', reg);
+      label.appendChild(inp);
+      label.appendChild(document.createTextNode(' ' + reg));
+      filterRegion.appendChild(label);
+    });
+  }
+  const filterConf = document.getElementById('filter-conference');
   if (filterConf) {
-    const conferences = [...new Set(NODES.filter(r=>r.isEcholink).map(r=>r.echoLinkConference || '').filter(Boolean))].sort();
+    const conferences = [...new Set(NODES.map(r => (r.conference || '').trim()).filter(Boolean))].sort();
     conferences.forEach(c => {
-      const o = document.createElement('option');
-      o.value = c;
-      o.textContent = c;
-      filterConf.appendChild(o);
+      const label = document.createElement('label');
+      label.className = 'filter-checkbox-row';
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.setAttribute('data-filter-value', c);
+      label.appendChild(inp);
+      label.appendChild(document.createTextNode(' ' + c));
+      filterConf.appendChild(label);
     });
   }
   if (typeof loadFilterState === 'function') loadFilterState();
@@ -138,7 +148,7 @@
     NODES.forEach(r=>{
       if (r.lat == null || r.lon == null) return;
       const visible = visibleSet.has(r._idx);
-      const color = REGION_COLORS[r.region] || REGION_COLORS[''] || '#5e35b1';
+      const color = REGION_COLORS[r.region] || '#5e35b1';
       const rgb = hexToRgb(color);
       const isSelected = r._idx === selectedIdx;
       const isNeighbor = selectedIdx !== null && NODES[selectedIdx]._neighbors.some(n=>n.idx===r._idx);
@@ -163,22 +173,35 @@
       if(currentMode === 'markers' || currentMode === 'both'){
         const size = isSelected ? 14 : 9;
         const isEch = r.isEcholink;
-        const shape = isEch ? 'border-radius:3px' : 'border-radius:50%';
-        const inner = isEch ? '<span style="color:rgba(255,255,255,0.95);font:600 '+(size*0.6)+'px/1 sans-serif;pointer-events:none">e</span>' : '';
+        const isDmr = r.isDMR && !isEch;
+        let shape = 'border-radius:50%';
+        let inner = '';
+        let extraClass = '';
+        if (isEch) {
+          shape = 'border-radius:3px';
+          inner = '<span style="color:rgba(255,255,255,0.95);font:600 '+(size*0.6)+'px/1 sans-serif;pointer-events:none">e</span>';
+          extraClass = ' rpt-marker-echolink';
+        } else if (isDmr) {
+          shape = 'border-radius:3px;transform:rotate(45deg)';
+          inner = '<span style="color:rgba(255,255,255,0.95);font:600 '+(size*0.55)+'px/1 sans-serif;pointer-events:none;transform:rotate(-45deg)">d</span>';
+          extraClass = ' rpt-marker-dmr';
+        }
         const icon = L.divIcon({
           className: '',
-          html: '<div class="rpt-marker' + (isSelected?' selected':'') + (isEch?' rpt-marker-echolink':'') + '" style="background:' + color + ';width:'+size+'px;height:'+size+'px;'+shape+';border:2px solid rgba(255,255,255,'+(isSelected?'0.9':'0.35')+');box-shadow:0 0 '+(isSelected?'8px':'3px')+' rgba('+rgb+',0.6);display:flex;align-items:center;justify-content:center;">'+inner+'</div>',
+          html: '<div class="rpt-marker' + (isSelected?' selected':'') + extraClass + '" style="background:' + color + ';width:'+size+'px;height:'+size+'px;'+shape+';border:2px solid rgba(255,255,255,'+(isSelected?'0.9':'0.35')+');box-shadow:0 0 '+(isSelected?'8px':'3px')+' rgba('+rgb+',0.6);display:flex;align-items:center;justify-content:center;">'+inner+'</div>',
           iconSize: [size, size], iconAnchor: [size/2, size/2],
         });
         const marker = L.marker([mLat, mLon], { icon, zIndexOffset: isSelected ? 1000 : 0 });
         marker.on('click', ()=>{ selectRepeater(r._idx); });
         const club = r.nombre || getClubName(r.signal);
         const rx = r.rx || '—', tx = r.tx || '—', tono = r.tono ? r.tono + ' Hz' : '—';
-        const echolinkLine = r.isEcholink ? '<br><span class="rpt-tooltip-meta">Echolink' + (r.echoLinkConference ? ' · ' + r.echoLinkConference : '') + '</span>' : '';
+        const confT = (r.conference || '').trim();
+        const echolinkLine = r.isEcholink ? '<br><span class="rpt-tooltip-meta">Echolink' + (confT ? ' · ' + escapeHtmlText(confT) : '') + '</span>' : '';
+        const dmrLine = r.isDMR && !r.isEcholink ? '<br><span class="rpt-tooltip-meta">DMR' + (confT ? ' · ' + escapeHtmlText(confT) : '') + '</span>' : '';
         const tooltipHtml = '<div class="rpt-tooltip-inner" style="font-family:Share Tech Mono,monospace;color:#00d4ff;background:#0d1520;border:1px solid #1a2d42;padding:8px 12px;border-radius:4px;">' +
           r.signal + (club ? '<br><span class="rpt-tooltip-club">' + club + '</span>' : '') +
           '<br><span class="rpt-tooltip-meta">' + r.comuna + ' · ' + r.banda + '</span>' +
-          '<br><span class="rpt-tooltip-meta">RX ' + rx + ' · TX ' + tx + ' · ' + tono + '</span>' + echolinkLine + '</div>';
+          '<br><span class="rpt-tooltip-meta">RX ' + rx + ' · TX ' + tx + ' · ' + tono + '</span>' + echolinkLine + dmrLine + '</div>';
         marker.bindTooltip(tooltipHtml, { permanent: false, direction: 'top', opacity: 1, className: 'rpt-tooltip' });
         if(visible) marker.addTo(markerLayer);
       } else {
@@ -293,7 +316,7 @@
 
   function showSidebar(idx){
     const r = NODES[idx];
-    const color = REGION_COLORS[r.region] || REGION_COLORS[''] || '#5e35b1';
+    const color = REGION_COLORS[r.region] || '#5e35b1';
     const club = r.nombre || getClubName(r.signal);
     var sbSig = document.getElementById('sb-signal');
     var wurl = safeWebsiteUrl(r.website);
@@ -325,7 +348,12 @@
       ['COBERTURA', r.range_km ? r.range_km + ' km' : '—'], ['UBICACIÓN', r.ubicacion || '—'], ['VENCE', vence],
     ];
     if (r.isEcholink) {
-      rows.push(['ECHOLINK', '<span class="badge-echolink">Sí</span>' + (r.echoLinkConference ? ' · ' + r.echoLinkConference : '')]);
+      const ccf = (r.conference || '').trim();
+      rows.push(['ECHOLINK', '<span class="badge-echolink">Sí</span>' + (ccf ? ' · ' + escapeHtmlText(ccf) : '')]);
+    }
+    if (r.isDMR && !r.isEcholink) {
+      const ccf = (r.conference || '').trim();
+      rows.push(['DMR', '<span class="badge-dmr">Sí</span>' + (ccf ? ' · ' + escapeHtmlText(ccf) : '')]);
     }
 
     let html = '<div class="sb-detail-grid">' + rows.map(([k,v])=>'<div class="sb-row"><span class="sb-key">'+k+'</span><span class="sb-val">'+v+'</span></div>').join('') + '</div>';
@@ -335,7 +363,7 @@
       html += '<div class="sb-section-title">NODOS CERCANOS <span class="sb-neighbor-actions"><a href="#" class="sb-download-neighbors" onclick="downloadNeighborsCSV();return false" title="Descargar nodos cercanos como CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span> CSV</a><a href="#" class="sb-share-neighbors" onclick="shareNeighbors();return false" title="Compartir enlace con filtros, mapa y esta repetidora (panel de nodos cercanos)"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</a></span></div>';
       html += filteredNeighbors.map(n=>{
         const nb = NODES[n.idx];
-        const nc = REGION_COLORS[nb.region]||REGION_COLORS['']||'#5e35b1';
+        const nc = REGION_COLORS[nb.region]||'#5e35b1';
         const rx = nb.rx || '—', tx = nb.tx || '—', tono = nb.tono ? nb.tono+' Hz' : '—';
         const details = 'RX '+rx+' · TX '+tx+' · '+tono;
         const clubName = (nb.nombre || getClubName(nb.signal) || '').trim();
@@ -348,6 +376,8 @@
         const distStr = n.dist === 0 ? '0 km' : n.dist+' km';
         const dotEl = nb.isEcholink
           ? '<div class="neighbor-echolink" style="background:'+nc+'" title="Echolink">e</div>'
+          : nb.isDMR
+          ? '<div class="neighbor-dmr" style="background:'+nc+'" title="DMR"><span class="neighbor-dmr-letter" aria-hidden="true">d</span></div>'
           : '<div class="neighbor-dot" style="background:'+nc+'"></div>';
         return '<div class="neighbor-row'+(isSelected?' neighbor-selected':'')+'" onclick="selectRepeater('+n.idx+')">' +
           dotEl +
@@ -433,12 +463,7 @@
   });
 
   function getExportCriteria() {
-    const banda = document.getElementById('filter-banda');
-    const region = document.getElementById('filter-region');
-    const echolink = document.getElementById('filter-echolink');
-    const echolinkConference = document.getElementById('filter-echolink-conference');
-    const search = document.getElementById('search');
-    return { banda: banda ? banda.value : '', region: region ? region.value : '', echolink: echolink ? echolink.value : '', echoLinkConference: echolinkConference ? echolinkConference.value : '', search: search ? search.value.trim() : '', nearMe: !!getNearMeLocation() };
+    return typeof getExportFilterCriteria === 'function' ? getExportFilterCriteria() : { search: '', nearMe: !!getNearMeLocation(), bandas: [], regions: [], types: [], conferences: [] };
   }
   document.querySelectorAll('#btn-download-csv, #btn-download-csv-menu').forEach(btn => {
     btn.addEventListener('click', function(e) {

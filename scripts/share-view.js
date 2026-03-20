@@ -10,17 +10,19 @@
     var search = document.getElementById('search');
     if (search && search.value.trim()) p.set('search', search.value.trim());
 
-    var banda = document.getElementById('filter-banda');
-    if (banda && banda.value) p.set('banda', banda.value);
-
-    var region = document.getElementById('filter-region');
-    if (region && region.value) p.set('region', region.value);
-
-    var echolink = document.getElementById('filter-echolink');
-    if (echolink && echolink.value) p.set('echolink', echolink.value);
-
-    var ec = document.getElementById('filter-echolink-conference');
-    if (ec && ec.value) p.set('echolinkConference', ec.value);
+    var c = typeof getFilterCriteria === 'function' ? getFilterCriteria() : { bandas: [], regions: [], types: [], conferences: [] };
+    (c.bandas || []).forEach(function (b) {
+      if (b) p.append('banda', b);
+    });
+    (c.regions || []).forEach(function (r) {
+      if (r) p.append('region', r);
+    });
+    (c.types || []).forEach(function (t) {
+      if (t) p.append('type', t);
+    });
+    (c.conferences || []).forEach(function (x) {
+      if (x) p.append('conference', x);
+    });
 
     var nm = typeof getNearMeLocation === 'function' ? getNearMeLocation() : null;
     if (nm && typeof nm.lat === 'number' && typeof nm.lon === 'number') {

@@ -9,21 +9,31 @@
   document.getElementById('nodes-count') && (document.getElementById('nodes-count').textContent = NODES.length);
 
   const filterRegion = document.getElementById('filter-region');
-  const regionNames = Object.keys(REGION_COLORS || {}).sort();
-  regionNames.forEach(reg => {
-    const opt = document.createElement('option');
-    opt.value = reg === '' ? '__sin_region__' : reg;
-    opt.textContent = reg || 'Sin región en el archivo de Subtel';
-    filterRegion.appendChild(opt);
-  });
-  const filterConf = document.getElementById('filter-echolink-conference');
+  const regionNames = Object.keys(REGION_COLORS || {}).filter(Boolean).sort();
+  if (filterRegion) {
+    regionNames.forEach(reg => {
+      const label = document.createElement('label');
+      label.className = 'filter-checkbox-row';
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.setAttribute('data-filter-value', reg);
+      label.appendChild(inp);
+      label.appendChild(document.createTextNode(' ' + reg));
+      filterRegion.appendChild(label);
+    });
+  }
+  const filterConf = document.getElementById('filter-conference');
   if (filterConf) {
-    const conferences = [...new Set(NODES.filter(r=>r.isEcholink).map(r=>r.echoLinkConference || '').filter(Boolean))].sort();
+    const conferences = [...new Set(NODES.map(r => (r.conference || '').trim()).filter(Boolean))].sort();
     conferences.forEach(c => {
-      const o = document.createElement('option');
-      o.value = c;
-      o.textContent = c;
-      filterConf.appendChild(o);
+      const label = document.createElement('label');
+      label.className = 'filter-checkbox-row';
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.setAttribute('data-filter-value', c);
+      label.appendChild(inp);
+      label.appendChild(document.createTextNode(' ' + c));
+      filterConf.appendChild(label);
     });
   }
   if (typeof loadFilterState === 'function') loadFilterState();
@@ -89,6 +99,40 @@
     return String(v);
   }
 
+  /** Safe HTML for list modal <dd> (DMR chips — matches theme .dmr-* / .station-detail-dd-dmr). */
+  function buildStationDetailDmrHtml(r) {
+    const parts = ['<span class="station-detail-dmr-yes">Sí</span>', '<span class="badge-dmr">DMR</span>'];
+    const conf = (r.conference || '').trim();
+    if (conf) {
+      parts.push(
+        '<span class="dmr-field"><span class="dmr-field-label">Conferencia / red</span><span class="dmr-token">' +
+          escapeHtml(conf) +
+          '</span></span>'
+      );
+    }
+    function tokenField(label, val, tokenClass) {
+      if (val == null || String(val).trim() === '') return;
+      const tokens = String(val)
+        .trim()
+        .split(/\s+/)
+        .map(function (t) {
+          return '<span class="dmr-token ' + tokenClass + '">' + escapeHtml(t) + '</span>';
+        })
+        .join('');
+      parts.push(
+        '<span class="dmr-field"><span class="dmr-field-label">' +
+          escapeHtml(label) +
+          '</span><span class="dmr-tokens">' +
+          tokens +
+          '</span></span>'
+      );
+    }
+    tokenField('Color', r.color, 'dmr-token--cc');
+    tokenField('Slot', r.slot, 'dmr-token--slot');
+    tokenField('TG', r.tg, 'dmr-token--tg');
+    return parts.join('');
+  }
+
   function openStationDetail(signal) {
     if (!signal) return;
     const r = NODES.find(n => n.signal === signal);
@@ -124,7 +168,12 @@
     const parts = [bandaShort && (bandaShort + ' · '), r.nombre || ''].filter(Boolean);
     const subParts = [];
     if (r.isEcholink) {
-      subParts.push('Echolink' + (r.echoLinkConference ? ' · ' + r.echoLinkConference : ''));
+      const ccf = (r.conference || '').trim();
+      subParts.push('Echolink' + (ccf ? ' · ' + ccf : ''));
+    }
+    if (r.isDMR && !r.isEcholink) {
+      const ccf = (r.conference || '').trim();
+      subParts.push('DMR' + (ccf ? ' · ' + ccf : ''));
     }
     if (distKm != null) subParts.push('~' + distKm + ' km');
     subEl.textContent = parts.join('') + (subParts.length ? ' · ' + subParts.join(' · ') : '');
@@ -145,13 +194,27 @@
       [['Vence', ''], fmtVal(r.vence)]
     ];
 
+    if (r.isEcholink) {
+      const ccf = (r.conference || '').trim();
+      rows.push([
+        ['Echolink', 'station-detail-grid-full'],
+        '<span class="badge-echolink">Sí</span>' + (ccf ? ' · ' + escapeHtml(ccf) : ''),
+        'html'
+      ]);
+    }
+    if (r.isDMR && !r.isEcholink) {
+      rows.push([['DMR', 'station-detail-dd-dmr'], buildStationDetailDmrHtml(r), 'html']);
+    }
+
     let dl = '<dl class="station-detail-grid">';
     rows.forEach(function (row) {
       const dt = row[0];
       const label = Array.isArray(dt) ? dt[0] : dt;
       const ddClass = Array.isArray(dt) && dt[1] ? dt[1] : '';
       const val = row[1];
-      dl += '<dt>' + escapeHtml(label) + '</dt><dd' + (ddClass ? ' class="' + escapeHtml(ddClass) + '"' : '') + '>' + escapeHtml(val) + '</dd>';
+      const asHtml = row[2] === 'html';
+      const inner = asHtml ? val : escapeHtml(val);
+      dl += '<dt>' + escapeHtml(label) + '</dt><dd' + (ddClass ? ' class="' + escapeHtml(ddClass) + '"' : '') + '>' + inner + '</dd>';
     });
     dl += '</dl>';
     bodyEl.innerHTML = dl;
@@ -242,7 +305,7 @@
 
       html += `<div class="zone-group" data-region="${reg}">
         <div class="zone-header">
-          <span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg || 'Sin región en el archivo de Subtel'}</span>
+          <span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span>
           <span class="zone-count"><span>${rows.length}</span> repetidor${rows.length !== 1 ? 'es' : ''}</span>
         </div>
         <table class="rpt-table">
@@ -258,12 +321,14 @@
         const vc = venceClass(r.vence);
         const bc = bandaClass(r.banda);
         const bandaShort = (r.banda || '').replace('/FM','');
-        const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${(r.echoLinkConference || '').replace(/"/g,'&quot;')}">Echolink</span>` : '';
+        const confEsc = (r.conference || '').replace(/"/g, '&quot;');
+        const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${confEsc}">Echolink</span>` : '';
+        const dmrBadge = r.isDMR && !r.isEcholink ? `<span class="badge-dmr" title="${confEsc}">DMR</span>` : '';
         const distCell = showDistance ? `<td class="cell-dist" data-label="Distancia">${r._dist != null ? r._dist + ' km' : '—'}</td>` : '';
         const sigAttr = (r.signal || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
         const webLink = websiteLinkHtml(r);
         html += `<tr class="rpt-row" data-signal="${sigAttr}">
-          <td class="cell-signal" data-label="${labels[0]}">${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}</td>
+          <td class="cell-signal" data-label="${labels[0]}">${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}</td>
           <td data-label="${labels[1]}"><span class="badge-banda ${bc}">${bandaShort}</span></td>
           ${distCell}
           <td class="cell-freq freq-rx" data-label="${labels[showDistance ? 3 : 2]}">${r.rx || '—'}</td>
@@ -407,13 +472,16 @@
     }, true);
   })();
 
-  ['search','filter-banda','filter-region','filter-echolink','filter-echolink-conference'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) ['input','change'].forEach(ev => el.addEventListener(ev, () => {
+  const searchEl = document.getElementById('search');
+  if (searchEl) {
+    ['input', 'change'].forEach(ev => searchEl.addEventListener(ev, () => {
       if (typeof saveFilterState === 'function') saveFilterState();
       render(getFiltered());
     }));
-  });
+  }
+  window.__radiomapListMultiselectChange = function () {
+    render(getFiltered());
+  };
 
   updateNearMeButtonState();
 
@@ -429,19 +497,7 @@
   });
 
   function getExportCriteria() {
-    const banda = document.getElementById('filter-banda');
-    const region = document.getElementById('filter-region');
-    const echolink = document.getElementById('filter-echolink');
-    const echolinkConference = document.getElementById('filter-echolink-conference');
-    const search = document.getElementById('search');
-    return {
-      banda: banda ? banda.value : '',
-      region: region ? region.value : '',
-      echolink: echolink ? echolink.value : '',
-      echoLinkConference: echolinkConference ? echolinkConference.value : '',
-      search: search ? search.value.trim() : '',
-      nearMe: !!getNearMeLocation()
-    };
+    return typeof getExportFilterCriteria === 'function' ? getExportFilterCriteria() : { search: '', nearMe: !!getNearMeLocation(), bandas: [], regions: [], types: [], conferences: [] };
   }
   document.querySelectorAll('#btn-download-csv, #btn-download-csv-menu').forEach(btn => {
     btn.addEventListener('click', function(e) {

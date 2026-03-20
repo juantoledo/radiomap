@@ -12,7 +12,6 @@ CSV_PATH = Path(__file__).resolve().parent.parent / "data" / "curated_stations.c
 OUT_PATH = Path(__file__).resolve().parent.parent / "data" / "data.js"
 
 DEFAULT_REGION_COLORS = {
-    "": "#5e35b1",
     "REGIÓN DE ARICA Y PARINACOTA": "#e53935",
     "REGIÓN DE ANTOFAGASTA": "#ff6b35",
     "REGIÓN DE ATACAMA": "#f7931e",
@@ -69,6 +68,7 @@ def read_version_and_colors() -> tuple[str, dict]:
             if rc:
                 try:
                     region_colors = json.loads(rc.group(1))
+                    region_colors.pop("", None)
                     # Merge any missing regions from default (e.g. new regions from CSV)
                     for k, v in DEFAULT_REGION_COLORS.items():
                         if k not in region_colors:
@@ -88,6 +88,7 @@ def main():
         nodes = [parse_row(row) for row in reader]
 
     version, region_colors = read_version_and_colors()
+    region_colors.pop("", None)
 
     out = f"""// Repetidoras Chile — datos centralizados (generado desde curated_stations.csv)
 const VERSION = '{version}';
