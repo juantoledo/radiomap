@@ -117,8 +117,18 @@ jobs:
 
       - name: Inject cache-busting version into HTML
         run: |
-          V=$(grep "const VERSION" data/data.js | sed "s/.*'\([^']*\)'.*/\1/")
-          sed -i "s/__VERSION__/$V/g" index.html lista.html
+          python3 << 'PY'
+          import re
+          from pathlib import Path
+          text = Path("data/data.js").read_text(encoding="utf-8")
+          m = re.search(r"const\s+VERSION\s*=\s*['\"]([^'\"]+)['\"]", text)
+          if not m:
+              raise SystemExit("VERSION not found in data/data.js")
+          ver = m.group(1)
+          for name in ("index.html", "lista.html"):
+              p = Path(name)
+              p.write_text(p.read_text(encoding="utf-8").replace("__VERSION__", ver), encoding="utf-8")
+          PY
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
