@@ -118,6 +118,55 @@
   }
   if (typeof loadFilterState === 'function') loadFilterState();
 
+  /** Fit map to stations matching current filters (lat/lon only). Optionally include distance anchor in bounds. */
+  const FIT_BOUNDS_PADDING = [40, 40];
+  const FIT_BOUNDS_MAX_ZOOM = 17;
+
+  function fitMapToCriteriaPoints(visibleNodes, distAnchor) {
+    var withCoords = visibleNodes.filter(function (r) {
+      return (
+        r.lat != null &&
+        r.lon != null &&
+        typeof r.lat === 'number' &&
+        typeof r.lon === 'number' &&
+        !isNaN(r.lat) &&
+        !isNaN(r.lon)
+      );
+    });
+    if (withCoords.length === 0) {
+      if (distAnchor && typeof distAnchor.lat === 'number' && typeof distAnchor.lon === 'number' && !isNaN(distAnchor.lat) && !isNaN(distAnchor.lon)) {
+        map.setView([distAnchor.lat, distAnchor.lon], 10);
+      } else {
+        try {
+          map.fitBounds(
+            [
+              [-55, -76],
+              [-17, -66],
+            ],
+            { padding: FIT_BOUNDS_PADDING }
+          );
+        } catch (e) { /* ignore */ }
+      }
+      return;
+    }
+    var bounds = L.latLngBounds(withCoords.map(function (r) { return [r.lat, r.lon]; }));
+    if (distAnchor && typeof distAnchor.lat === 'number' && typeof distAnchor.lon === 'number' && !isNaN(distAnchor.lat) && !isNaN(distAnchor.lon)) {
+      bounds.extend([distAnchor.lat, distAnchor.lon]);
+    }
+    if (withCoords.length === 1 && !distAnchor) {
+      map.setView([withCoords[0].lat, withCoords[0].lon], 12);
+      return;
+    }
+    if (withCoords.length === 1 && distAnchor) {
+      try {
+        bounds.pad(0.2);
+      } catch (e) { /* ignore */ }
+    }
+    try {
+      if (bounds.isValid()) map.fitBounds(bounds, { padding: FIT_BOUNDS_PADDING, maxZoom: FIT_BOUNDS_MAX_ZOOM });
+    } catch (e) { /* ignore */ }
+  }
+
   function hexToRgb(hex){
     const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
     return r+','+g+','+b;
@@ -363,15 +412,8 @@
     if (typeof syncNearRadiusControl === 'function') syncNearRadiusControl();
     renderAll();
     if (selectedIdx !== null) showSidebar(selectedIdx);
-    if (!opts.skipFitBounds && distAnchor) {
-      const withCoords = visibleNodes.filter(r => r.lat != null && r.lon != null);
-      if (withCoords.length > 0) {
-        const bounds = L.latLngBounds(withCoords.map(r => [r.lat, r.lon]));
-        bounds.extend([distAnchor.lat, distAnchor.lon]);
-        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
-      } else {
-        map.setView([distAnchor.lat, distAnchor.lon], 10);
-      }
+    if (!opts.skipFitBounds) {
+      fitMapToCriteriaPoints(visibleNodes, distAnchor);
     }
   }
   window.applyFilters = applyFilters;
@@ -598,7 +640,19 @@
     renderAll();
   }
 
-  map.on('click', function(){ if(selectedIdx !== null) closeSidebar(); });
+  /** Clic en el mapa (no en marcador): cerrar panel y quitar repetidora como referencia de distancia. GPS «cerca de mí» no se toca. */
+  map.on('click', function () {
+    var hadSelection = selectedIdx !== null;
+    var hadRef = typeof getRadiusRefSignal === 'function' && !!getRadiusRefSignal();
+    if (!hadSelection && !hadRef) return;
+    if (hadSelection) {
+      var sb = document.getElementById('sidebar');
+      if (sb) sb.classList.remove('open');
+      selectedIdx = null;
+    }
+    if (hadRef && typeof clearRadiusRefSignal === 'function') clearRadiusRefSignal();
+    if (typeof applyFilters === 'function') applyFilters({ skipFitBounds: true });
+  });
 
   function closeMenuMap() {
     const menu = document.getElementById('header-menu');
@@ -713,9 +767,8 @@
 
   if (sharedMapValid) {
     map.setView([mlat, mlon], mzoom);
-  } else if (!nearMeOnLoad) {
-    map.fitBounds([[-55, -76], [-17, -66]]);
   }
+  /* Sin URL de mapa compartido: applyFilters ya ajustó el zoom a los puntos que cumplen criterios (o Chile si no hay coords). */
 
   const sigParam = urlParams.get('signal');
   if (sigParam) {
