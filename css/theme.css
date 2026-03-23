@@ -104,6 +104,24 @@ body.page-list .sticky-top {
   color: var(--accent);
   letter-spacing: 0.08em;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-signal-mark {
+  flex-shrink: 0;
+  line-height: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.header-signal-mark svg {
+  display: block;
+  height: 1.15em;
+  width: auto;
+  vertical-align: middle;
+}
+.header-signal-text {
+  line-height: 1.1;
 }
 a.header-signal {
   cursor: pointer;
@@ -2326,6 +2344,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     font-size: var(--fs-xs);
     letter-spacing: 0.05em;
     flex-shrink: 0;
+    gap: 6px;
   }
   .header-actions {
     display: flex;
@@ -2659,7 +2678,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     padding-right: max(6px, env(safe-area-inset-right, 0px));
     gap: 3px;
   }
-  .header-signal { font-size: var(--fs-xxs); letter-spacing: 0.04em; }
+  .header-signal { font-size: var(--fs-xxs); letter-spacing: 0.04em; gap: 5px; }
   .header-nav { gap: 3px; }
   .header-link-nav {
     padding: 5px 8px;
@@ -2722,7 +2741,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     padding-right: max(6px, env(safe-area-inset-right, 0px));
     gap: 3px;
   }
-  .header-signal { font-size: var(--fs-xxs); }
+  .header-signal { font-size: var(--fs-xxs); gap: 4px; }
   .header-link-nav {
     padding: 4px 6px;
     font-size: var(--fs-xxs);
