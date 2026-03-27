@@ -116,8 +116,32 @@ def apply_effective_range_km(node: dict) -> None:
         node["range_km"] = calc
 
 
+def normalize_rx_tx_mhz_fields(d: dict) -> None:
+    """Format rx/tx to three decimal places for VHF/UHF bands (MHz)."""
+    banda = str(d.get("banda", ""))
+    u = banda.upper()
+    if "VHF" not in u and "UHF" not in u:
+        return
+    for key in ("rx", "tx"):
+        v = d.get(key, "")
+        if v == "" or v is None:
+            continue
+        if not isinstance(v, str):
+            v = str(v)
+        v = v.strip()
+        if not v:
+            continue
+        try:
+            mhz = float(v.replace(",", "."))
+            d[key] = f"{mhz:.3f}"
+        except ValueError:
+            pass
+
+
 def parse_row(row: dict) -> dict:
     """Convierte fila CSV a objeto NODE."""
+    row = {k: v for k, v in row.items()}
+    normalize_rx_tx_mhz_fields(row)
     node = {}
     for k, v in row.items():
         if k is None:
@@ -136,6 +160,26 @@ def parse_row(row: dict) -> dict:
         else:
             node[k] = v
     return node
+
+
+def rewrite_csv_rx_tx_normalized() -> None:
+    """Reescribe curated_stations.csv con rx/tx normalizados (3 decimales VHF/UHF)."""
+    if not CSV_PATH.exists():
+        raise SystemExit(f"CSV no encontrado: {CSV_PATH}")
+    with open(CSV_PATH, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames
+        if not fieldnames:
+            raise SystemExit("CSV sin cabecera")
+        rows = []
+        for row in reader:
+            normalize_rx_tx_mhz_fields(row)
+            rows.append(row)
+    with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"Actualizado {CSV_PATH} (rx/tx MHz con 3 decimales donde aplica)")
 
 
 def read_version_and_colors() -> tuple[str, dict]:
@@ -192,4 +236,9 @@ const REGION_COLORS = {json.dumps(region_colors, ensure_ascii=False)};
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if len(sys.argv) > 1 and sys.argv[1] == "--normalize-csv-freqs":
+        rewrite_csv_rx_tx_normalized()
+    else:
+        main()
