@@ -438,6 +438,7 @@ function clearAllFilters() {
     if (typeof window.__radiomapAfterClearFilters === 'function') {
       window.__radiomapAfterClearFilters();
     }
+    if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
   } catch (e) { /* ignore */ }
 }
 
@@ -588,6 +589,7 @@ function onFilterCheckboxChange(ev) {
   saveFilterState();
   if (typeof window.applyFilters === 'function') window.applyFilters();
   if (typeof window.__radiomapListMultiselectChange === 'function') window.__radiomapListMultiselectChange();
+  if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
 }
 
 function onDocumentClickCloseDropdowns(ev) {
@@ -761,6 +763,7 @@ function wireNearRadiusSliderOnce() {
     } else if (typeof window.__radiomapListRadiusChange === 'function') {
       window.__radiomapListRadiusChange();
     }
+    if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
   });
 }
 

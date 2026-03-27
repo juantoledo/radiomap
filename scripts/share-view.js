@@ -116,16 +116,19 @@
   }
 
   /** When `navigator.share` is missing or fails, copy only the URL (no greeting text). */
-  function fallbackCopyShareUrl(url) {
+  function fallbackCopyShareUrl(url, onMethod) {
     var u = url != null ? String(url) : '';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(u).then(function () {
         alert('Enlace copiado al portapapeles.');
+        if (onMethod) onMethod('clipboard');
       }).catch(function () {
         window.prompt('Copia este enlace:', u);
+        if (onMethod) onMethod('prompt');
       });
     } else {
       window.prompt('Copia este enlace:', u);
+      if (onMethod) onMethod('prompt');
     }
   }
 
@@ -137,6 +140,7 @@
       var s = document.createElement('script');
       s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
       s.crossOrigin = 'anonymous';
+      s.integrity = 'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H';
       s.onload = function () {
         if (typeof window.html2canvas === 'function') resolve(window.html2canvas);
         else reject(new Error('html2canvas'));
@@ -218,7 +222,9 @@
     }
 
     function fallback() {
-      fallbackCopyShareUrl(url);
+      fallbackCopyShareUrl(url, function (m) {
+        if (typeof window.radiomapGaShare === 'function') window.radiomapGaShare(m);
+      });
     }
 
     var chain = Promise.resolve();
@@ -239,6 +245,9 @@
     }
 
     return chain
+      .then(function () {
+        if (typeof window.radiomapGaShare === 'function') window.radiomapGaShare('web_share');
+      })
       .catch(function (err) {
         if (err && err.name === 'AbortError') return;
         fallback();

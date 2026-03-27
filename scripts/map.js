@@ -319,7 +319,7 @@
           iconSize: [size, size], iconAnchor: [size/2, size/2],
         });
         const marker = L.marker([mLat, mLon], { icon, zIndexOffset: isSelected ? 1000 : 0 });
-        marker.on('click', ()=>{ selectRepeater(r._idx); });
+        marker.on('click', ()=>{ selectRepeater(r._idx, 'map_marker'); });
         const club = r.nombre || getClubName(r.signal);
         const confT = (r.conference || '').trim();
         const echolinkLine = r.isEcholink ? '<br><span class="rpt-tooltip-meta">Echolink' + (fieldShown(confT) ? ' · ' + escapeHtml(confT) : '') + '</span>' : '';
@@ -346,7 +346,7 @@
           iconSize: [16,16], iconAnchor: [8,8],
         });
         const clickTarget = L.marker([mLat, mLon], { icon, opacity: 0 });
-        clickTarget.on('click', ()=>selectRepeater(r._idx));
+        clickTarget.on('click', ()=>selectRepeater(r._idx, 'map_marker'));
         if(visible) clickTarget.addTo(markerLayer);
       }
     });
@@ -422,6 +422,7 @@
       if(userMarker) { map.removeLayer(userMarker); userMarker = null; }
       updateNearMeButtonState();
       applyFilters();
+      if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
       return;
     }
     if(!navigator.geolocation){ alert('Tu navegador no soporta geolocalización.'); return; }
@@ -442,11 +443,12 @@
         applyFilters();
         const nearest = findNearestVisibleNodeIndex(lat, lon);
         if (nearest !== null) {
-          selectRepeater(nearest);
+          selectRepeater(nearest, 'near_me');
         } else {
           showUserLocationSidebar(lat, lon);
         }
         if(btn) btn.disabled = false;
+        if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
       },
       function(){
         if(btn) btn.disabled = false;
@@ -486,8 +488,14 @@
   const searchEl = document.getElementById('search');
   if (searchEl) {
     const debouncedApply = typeof debounce === 'function'
-      ? debounce(function () { applyFilters(); }, 200)
-      : function () { applyFilters(); };
+      ? debounce(function () {
+          applyFilters();
+          if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
+        }, 200)
+      : function () {
+          applyFilters();
+          if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
+        };
     searchEl.addEventListener('input', debouncedApply);
     function isMapOverlayOpen() {
       const help = document.getElementById('help-overlay');
@@ -521,9 +529,12 @@
     });
   }
 
-  function selectRepeater(idx){
+  function selectRepeater(idx, interaction){
     selectedIdx = idx;
     const r = NODES[idx];
+    if (r && typeof window.radiomapGaStationSelect === 'function') {
+      window.radiomapGaStationSelect(r.signal, interaction || 'select');
+    }
     if (typeof setRadiusRefSignal === 'function') {
       if (r && r.lat != null && r.lon != null && typeof r.lat === 'number' && typeof r.lon === 'number') {
         setRadiusRefSignal(r.signal);
@@ -638,7 +649,7 @@
           : nb.isAir
           ? '<div class="neighbor-atc" style="background:'+nc+'" title="ATC / aéreo">' + neighborAtcIconSvgHtml() + '</div>'
           : '<div class="neighbor-dot" style="background:'+nc+'"></div>';
-        return '<div class="neighbor-row'+(isSelected?' neighbor-selected':'')+'" onclick="selectRepeater('+n.idx+')" tabindex="0" role="button" data-idx="'+n.idx+'" aria-label="'+escapeAttr(nb.signal)+(isSelected?' (este)':'')+'">' +
+        return '<div class="neighbor-row'+(isSelected?' neighbor-selected':'')+'" onclick="selectRepeater('+n.idx+',\'neighbor\')" tabindex="0" role="button" data-idx="'+n.idx+'" aria-label="'+escapeAttr(nb.signal)+(isSelected?' (este)':'')+'">' +
           dotEl +
           '<div class="neighbor-main"><span class="neighbor-signal">'+escapeHtml(nb.signal)+(isSelected?' (este)':'')+'</span>' +
           metaHtml +
@@ -747,7 +758,7 @@
       var idx = parseInt(row.getAttribute('data-idx'), 10);
       if (!isNaN(idx)) {
         e.preventDefault();
-        selectRepeater(idx);
+        selectRepeater(idx, 'neighbor');
       }
     });
   })();
@@ -758,6 +769,7 @@
   document.querySelectorAll('#btn-download-csv, #btn-download-csv-menu').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
+      if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_csv_download', {});
       const visibleSignals = new Set(NODES.filter((r,i)=>visibleSet.has(i)).map(r=>r.signal));
       const rows = NODES.filter(n=>visibleSignals.has(n.signal));
       exportRepeatersCSV(rows.length ? rows : NODES, getExportCriteria());
@@ -839,7 +851,7 @@
   if (sigParam) {
     const idx = NODES.findIndex(n => n.signal === sigParam);
     if (idx >= 0) {
-      requestAnimationFrame(function () { selectRepeater(idx); });
+      requestAnimationFrame(function () { selectRepeater(idx, 'url_signal'); });
     }
   }
 })();

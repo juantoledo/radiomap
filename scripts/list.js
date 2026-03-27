@@ -158,7 +158,7 @@
     return fieldShown(v) ? '' : ' cell-empty';
   }
 
-  function openStationDetail(signal, nodeIdxOpt) {
+  function openStationDetail(signal, nodeIdxOpt, gaInteraction) {
     let r = null;
     if (nodeIdxOpt != null && nodeIdxOpt !== '') {
       const ni = parseInt(nodeIdxOpt, 10);
@@ -282,6 +282,11 @@
 
     updateStationDetailNav();
 
+    if (typeof window.radiomapGaStationSelect === 'function') {
+      var gaTag = gaInteraction != null && String(gaInteraction).trim() !== '' ? String(gaInteraction).trim() : 'list_row';
+      window.radiomapGaStationSelect(signal, gaTag);
+    }
+
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -394,7 +399,7 @@
     const nextIdx = idx + delta;
     if (nextIdx < 0 || nextIdx >= ordered.length) return;
     const nextRow = ordered[nextIdx];
-    openStationDetail(nextRow.signal, nextRow._idx);
+    openStationDetail(nextRow.signal, nextRow._idx, 'list_nav');
   }
 
   function render(filtered) {
@@ -507,6 +512,7 @@
       updateNearMeButtonState();
       if (typeof saveFilterState === 'function') saveFilterState();
       render(getFiltered());
+      if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
       return;
     }
     if (!navigator.geolocation) {
@@ -520,6 +526,7 @@
         updateNearMeButtonState();
         if (typeof saveFilterState === 'function') saveFilterState();
         render(getFiltered());
+        if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
         if (btn) btn.disabled = false;
       },
       function () {
@@ -657,15 +664,18 @@
       ? debounce(function () {
           if (typeof saveFilterState === 'function') saveFilterState();
           render(getFiltered());
+          if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
         }, 200)
       : function () {
           if (typeof saveFilterState === 'function') saveFilterState();
           render(getFiltered());
+          if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
         };
     searchEl.addEventListener('input', debouncedSearch);
     searchEl.addEventListener('change', function () {
       if (typeof saveFilterState === 'function') saveFilterState();
       render(getFiltered());
+      if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
     });
 
     function isListOverlayOpen() {
@@ -732,6 +742,7 @@
   document.querySelectorAll('#btn-download-csv, #btn-download-csv-menu').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
+      if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_csv_download', {});
       exportRepeatersCSV(getFiltered(), getExportCriteria());
       closeMenu();
     });
@@ -757,7 +768,7 @@
       if (!sig || !NODES.some(n => n.signal === sig)) return;
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
-          openStationDetail(sig);
+          openStationDetail(sig, undefined, 'url_signal');
         });
       });
     } catch (e) { /* ignore */ }
