@@ -1,6 +1,6 @@
 /**
  * List view — table by region, filters, share
- * Requires: utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getFilteredNodes), dmr-ui.js (buildDmrDetailHtml), share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue)
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getFilteredNodes), dmr-ui.js (buildDmrDetailHtml), share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue)
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -22,14 +22,19 @@
   }
   const filterConf = document.getElementById('filter-conference');
   if (filterConf) {
-    const conferences = [...new Set(NODES.map(r => (r.conference || '').trim()).filter(Boolean))].sort();
-    conferences.forEach(c => {
+    var confColorMap = typeof buildConferenceColorMap === 'function' ? buildConferenceColorMap(NODES) : { sortedNames: [], colors: {} };
+    confColorMap.sortedNames.forEach(function (c) {
       const label = document.createElement('label');
       label.className = 'filter-checkbox-row';
       const inp = document.createElement('input');
       inp.type = 'checkbox';
       inp.setAttribute('data-filter-value', c);
+      const swatch = document.createElement('span');
+      swatch.className = 'filter-conference-swatch';
+      swatch.setAttribute('aria-hidden', 'true');
+      swatch.style.background = confColorMap.colors[c] || '#888888';
       label.appendChild(inp);
+      label.appendChild(swatch);
       label.appendChild(document.createTextNode(' ' + c));
       filterConf.appendChild(label);
     });

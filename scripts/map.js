@@ -1,6 +1,6 @@
 /**
  * Map view — Leaflet map, circles, markers, sidebar, filters
- * Requires: utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue)
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue)
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -126,16 +126,23 @@
       filterRegion.appendChild(label);
     });
   }
+  var _confColorMap = typeof buildConferenceColorMap === 'function' ? buildConferenceColorMap(NODES) : { sortedNames: [], colors: {} };
+  const sortedConferenceNames = _confColorMap.sortedNames;
+  const CONFERENCE_COLORS = _confColorMap.colors;
   const filterConf = document.getElementById('filter-conference');
   if (filterConf) {
-    const conferences = [...new Set(NODES.map(r => (r.conference || '').trim()).filter(Boolean))].sort();
-    conferences.forEach(c => {
+    sortedConferenceNames.forEach(function (c) {
       const label = document.createElement('label');
       label.className = 'filter-checkbox-row';
       const inp = document.createElement('input');
       inp.type = 'checkbox';
       inp.setAttribute('data-filter-value', c);
+      const swatch = document.createElement('span');
+      swatch.className = 'filter-conference-swatch';
+      swatch.setAttribute('aria-hidden', 'true');
+      swatch.style.background = CONFERENCE_COLORS[c] || '#888888';
       label.appendChild(inp);
+      label.appendChild(swatch);
       label.appendChild(document.createTextNode(' ' + c));
       filterConf.appendChild(label);
     });
@@ -195,6 +202,29 @@
     const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
     return r+','+g+','+b;
   }
+  /** Para sombras de marcador cuando el color es hsl(...) */
+  function hslStringToRgbComma(hsl) {
+    if (!hsl || typeof hsl !== 'string') return '128,128,128';
+    var m = /^hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)$/i.exec(hsl.trim());
+    if (!m) return '128,128,128';
+    var h = parseFloat(m[1]) / 360;
+    var s = parseFloat(m[2]) / 100;
+    var l = parseFloat(m[3]) / 100;
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    var r = hue2rgb(p, q, h + 1 / 3);
+    var g = hue2rgb(p, q, h);
+    var b = hue2rgb(p, q, h - 1 / 3);
+    return Math.round(r * 255) + ',' + Math.round(g * 255) + ',' + Math.round(b * 255);
+  }
 
   const SPREAD_RADIUS_DEG = 0.0005; // ~55m — offset for co-located markers
   function buildDisplayPositions(){
@@ -228,11 +258,21 @@
     markerLayer.clearLayers();
     const displayPos = buildDisplayPositions();
 
+    var critMarkers = typeof getFilterCriteria === 'function' ? getFilterCriteria() : { conferences: [] };
+    var useConferenceColors =
+      critMarkers.conferences &&
+      critMarkers.conferences.length > 0;
+
     NODES.forEach(r=>{
       if (r.lat == null || r.lon == null) return;
       const visible = visibleSet.has(r._idx);
-      const color = REGION_COLORS[r.region] || '#5e35b1';
-      const rgb = hexToRgb(color);
+      const confTrim = (r.conference || '').trim();
+      let color = REGION_COLORS[r.region] || '#5e35b1';
+      let rgb = hexToRgb(color);
+      if (useConferenceColors && critMarkers.conferences.indexOf(confTrim) >= 0 && CONFERENCE_COLORS[confTrim]) {
+        color = CONFERENCE_COLORS[confTrim];
+        rgb = hslStringToRgbComma(color);
+      }
       const isSelected = r._idx === selectedIdx;
       const isNeighbor = selectedIdx !== null && NODES[selectedIdx]._neighbors.some(n=>n.idx===r._idx);
       const [mLat, mLon] = displayPos.has(r._idx) ? displayPos.get(r._idx) : [r.lat, r.lon];
