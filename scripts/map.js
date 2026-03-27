@@ -333,7 +333,7 @@
         if (fieldShown(r.rx)) freqParts.push('RX ' + escapeHtml(String(r.rx)));
         if (fieldShown(r.tx)) freqParts.push('TX ' + escapeHtml(String(r.tx)));
         if (fieldShown(r.tono)) freqParts.push(escapeHtml(String(r.tono)) + ' Hz');
-        const freqLine = freqParts.length ? '<br><span class="rpt-tooltip-meta">' + freqParts.join(' · ') + '</span>' : '';
+        const freqLine = freqParts.length ? '<br><span class="rpt-tooltip-freq">' + freqParts.join(' · ') + '</span>' : '';
         const tooltipHtml = '<div class="rpt-tooltip-inner">' +
           sigLead + escapeHtml(r.signal) + (fieldShown(club) ? '<br><span class="rpt-tooltip-club">' + escapeHtml(club) + '</span>' : '') +
           locLine + freqLine + echolinkLine + dmrLine + '</div>';
@@ -582,9 +582,9 @@
         '<span style="color:' + (String(r.banda).startsWith('VHF') ? '#29abe2' : '#e91e8c') + '">' + r.banda + '</span>',
       ]);
     }
-    if (fieldShown(r.rx)) rows.push(['RX (MHz)', escapeHtml(String(r.rx))]);
-    if (fieldShown(r.tx)) rows.push(['TX (MHz)', escapeHtml(String(r.tx))]);
-    if (fieldShown(r.tono)) rows.push(['TONO', escapeHtml(String(r.tono)) + ' Hz']);
+    if (fieldShown(r.rx)) rows.push(['RX (MHz)', '<span class="sb-freq-val">' + escapeHtml(String(r.rx)) + '</span>']);
+    if (fieldShown(r.tx)) rows.push(['TX (MHz)', '<span class="sb-freq-val">' + escapeHtml(String(r.tx)) + '</span>']);
+    if (fieldShown(r.tono)) rows.push(['TONO', '<span class="sb-freq-val">' + escapeHtml(String(r.tono)) + ' Hz</span>']);
     if (fieldShown(r.potencia)) rows.push(['POTENCIA', escapeHtml(String(r.potencia)) + ' W']);
     if (fieldShown(r.ganancia)) rows.push(['GANANCIA', escapeHtml(String(r.ganancia)) + ' dBi']);
     if (fieldShown(r.range_km)) rows.push(['COBERTURA', escapeHtml(String(r.range_km)) + ' km']);
@@ -627,7 +627,7 @@
           ? '<div class="neighbor-meta" title="' + escapeAttr(metaLabel) + '">' + escapeHtml(metaLabel) + '</div>'
           : '';
         const detailsHtml = details
-          ? '<div class="neighbor-details"><span>' + details + '</span></div>'
+          ? '<div class="neighbor-details"><span class="neighbor-freq-values">' + details + '</span></div>'
           : '';
         const isSelected = n.idx === idx;
         const distStr = n.dist === 0 ? '0 km' : n.dist+' km';

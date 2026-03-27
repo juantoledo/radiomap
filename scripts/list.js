@@ -5,6 +5,11 @@
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
 
+  /** Stable id for lista (map.js also sets this when the map loads). Needed when several rows share the same `signal`. */
+  NODES.forEach(function (r, i) {
+    r._idx = i;
+  });
+
   if (typeof VERSION !== 'undefined') document.getElementById('app-version') && (document.getElementById('app-version').textContent = VERSION);
   const filterRegion = document.getElementById('filter-region');
   const regionNames = sortRegionKeysChile(Object.keys(REGION_COLORS || {}).filter(Boolean));
@@ -136,6 +141,7 @@
 
   let stationDetailLastFocus = null;
   let stationDetailCurrentSignal = null;
+  let stationDetailCurrentNodeIdx = null;
 
   function fmtVal(v) {
     if (!fieldShown(v)) return '';
@@ -152,10 +158,15 @@
     return fieldShown(v) ? '' : ' cell-empty';
   }
 
-  function openStationDetail(signal) {
-    if (!signal) return;
-    const r = NODES.find(n => n.signal === signal);
+  function openStationDetail(signal, nodeIdxOpt) {
+    let r = null;
+    if (nodeIdxOpt != null && nodeIdxOpt !== '') {
+      const ni = parseInt(nodeIdxOpt, 10);
+      if (!isNaN(ni) && NODES[ni]) r = NODES[ni];
+    }
+    if (!r && signal) r = NODES.find(n => n.signal === signal);
     if (!r) return;
+    signal = r.signal;
 
     const overlay = document.getElementById('station-detail-overlay');
     const dialog = document.getElementById('station-detail-dialog');
@@ -167,6 +178,7 @@
     if (!overlay || !dialog || !titleEl || !subEl || !bodyEl || !mapLink || !shareBtn) return;
 
     stationDetailCurrentSignal = signal;
+    stationDetailCurrentNodeIdx = typeof r._idx === 'number' ? r._idx : NODES.indexOf(r);
     stationDetailLastFocus = document.activeElement;
 
     const distAnchor = typeof getDistanceFilterAnchor === 'function' ? getDistanceFilterAnchor() : null;
@@ -211,7 +223,7 @@
     const rows = [];
     if (fieldShown(r.rx)) rows.push([['RX (MHz)', 'station-detail-freq'], r.rx + ' MHz']);
     if (fieldShown(r.tx)) rows.push([['TX (MHz)', 'station-detail-freq'], r.tx + ' MHz']);
-    if (fieldShown(r.tono)) rows.push([['Tono (Hz)', ''], r.tono + ' Hz']);
+    if (fieldShown(r.tono)) rows.push([['Tono (Hz)', 'station-detail-freq'], r.tono + ' Hz']);
     if (fieldShown(r.banda)) rows.push([['Banda', ''], r.banda]);
     if (fieldShown(r.potencia)) rows.push([['Potencia', ''], r.potencia + ' W']);
     if (fieldShown(r.ganancia)) rows.push([['Ganancia', ''], fmtVal(r.ganancia)]);
@@ -268,6 +280,8 @@
 
     mapLink.setAttribute('aria-label', 'Ver ' + (r.signal || 'estación') + ' en el mapa');
 
+    updateStationDetailNav();
+
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -292,6 +306,7 @@
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     stationDetailCurrentSignal = null;
+    stationDetailCurrentNodeIdx = null;
     if (bodyEl) bodyEl.innerHTML = '';
     try {
       if (stationDetailLastFocus && typeof stationDetailLastFocus.focus === 'function') {
@@ -299,6 +314,87 @@
       }
     } catch (e) { /* ignore */ }
     stationDetailLastFocus = null;
+  }
+
+  /**
+   * Same grouping and row order as the list table: by region, optional region order by min distance,
+   * then optional column sort within each region.
+   * @returns {Array<{ region: string, rows: Array }>}
+   */
+  function buildListRegionGroups(filtered) {
+    const distAnchor = typeof getDistanceFilterAnchor === 'function' ? getDistanceFilterAnchor() : null;
+    const byRegion = {};
+    regionNames.forEach(reg => { byRegion[reg] = []; });
+    filtered.forEach(r => {
+      const reg = r.region || '';
+      if (byRegion[reg] !== undefined) byRegion[reg].push(r);
+    });
+
+    let regionsToShow = regionNames.filter(reg => byRegion[reg] && byRegion[reg].length > 0);
+    if (distAnchor && regionsToShow.length > 1) {
+      regionsToShow.sort((a, b) => {
+        const minA = Math.min(...byRegion[a].map(r => r._dist ?? 9999));
+        const minB = Math.min(...byRegion[b].map(r => r._dist ?? 9999));
+        return minA - minB;
+      });
+    }
+
+    return regionsToShow.map(reg => {
+      let rows = byRegion[reg];
+      if (!rows || !rows.length) return null;
+      if (sortCol && SORT_COMPARATORS[sortCol]) {
+        const cmp = SORT_COMPARATORS[sortCol];
+        rows = rows.slice().sort((a, b) => sortDir === 'asc' ? cmp(a, b) : cmp(b, a));
+      }
+      return { region: reg, rows };
+    }).filter(Boolean);
+  }
+
+  function updateStationDetailNav() {
+    const prevBtn = document.getElementById('station-detail-prev');
+    const nextBtn = document.getElementById('station-detail-next');
+    const posEl = document.getElementById('station-detail-nav-position');
+    if (!prevBtn || !nextBtn) return;
+
+    const groups = buildListRegionGroups(getFiltered());
+    const ordered = groups.flatMap(function (g) {
+      return g.rows;
+    });
+    const idx = ordered.findIndex(function (row) {
+      return row._idx === stationDetailCurrentNodeIdx;
+    });
+    const total = ordered.length;
+    const atStart = idx <= 0;
+    const atEnd = idx < 0 || idx >= total - 1;
+
+    prevBtn.disabled = total === 0 || atStart || idx < 0;
+    nextBtn.disabled = total === 0 || atEnd || idx < 0;
+
+    if (posEl) {
+      if (idx >= 0 && total > 0) {
+        posEl.textContent = (idx + 1) + ' / ' + total;
+        posEl.removeAttribute('hidden');
+      } else {
+        posEl.textContent = '';
+        posEl.setAttribute('hidden', 'hidden');
+      }
+    }
+  }
+
+  function navigateStationDetail(delta) {
+    if (stationDetailCurrentNodeIdx == null) return;
+    const groups = buildListRegionGroups(getFiltered());
+    const ordered = groups.flatMap(function (g) {
+      return g.rows;
+    });
+    const idx = ordered.findIndex(function (row) {
+      return row._idx === stationDetailCurrentNodeIdx;
+    });
+    if (idx < 0) return;
+    const nextIdx = idx + delta;
+    if (nextIdx < 0 || nextIdx >= ordered.length) return;
+    const nextRow = ordered[nextIdx];
+    openStationDetail(nextRow.signal, nextRow._idx);
   }
 
   function render(filtered) {
@@ -320,22 +416,7 @@
 
     const distAnchor = typeof getDistanceFilterAnchor === 'function' ? getDistanceFilterAnchor() : null;
     const showDistance = !!distAnchor;
-
-    const byRegion = {};
-    regionNames.forEach(reg => { byRegion[reg] = []; });
-    filtered.forEach(r => {
-      const reg = r.region || '';
-      if (byRegion[reg] !== undefined) byRegion[reg].push(r);
-    });
-
-    let regionsToShow = regionNames.filter(reg => byRegion[reg] && byRegion[reg].length > 0);
-    if (distAnchor && regionsToShow.length > 1) {
-      regionsToShow.sort((a, b) => {
-        const minA = Math.min(...byRegion[a].map(r => r._dist ?? 9999));
-        const minB = Math.min(...byRegion[b].map(r => r._dist ?? 9999));
-        return minA - minB;
-      });
-    }
+    const regionGroups = buildListRegionGroups(filtered);
 
     function thSort(col, label) {
       const active = sortCol === col;
@@ -344,14 +425,9 @@
     }
 
     let html = '';
-    regionsToShow.forEach(reg => {
-      let rows = byRegion[reg];
-      if (!rows || !rows.length) return;
-
-      if (sortCol && SORT_COMPARATORS[sortCol]) {
-        const cmp = SORT_COMPARATORS[sortCol];
-        rows = rows.slice().sort((a, b) => sortDir === 'asc' ? cmp(a, b) : cmp(b, a));
-      }
+    regionGroups.forEach(function (grp) {
+      const reg = grp.region;
+      const rows = grp.rows;
 
       html += `<div class="zone-group" data-region="${reg}">
         <div class="zone-header">
@@ -389,7 +465,7 @@
         const bandaBadge = fieldShown(r.banda)
           ? `<span class="cell-signal-banda"><span class="badge-banda ${bc}">${escapeHtml(bandaShort)}</span></span>`
           : '';
-        html += `<tr class="rpt-row" data-signal="${sigAttr}">
+        html += `<tr class="rpt-row" data-signal="${sigAttr}" data-node-idx="${r._idx}">
           <td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">${sigLead}${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}${atcBadge}</span>${bandaBadge}</span>${shareBtn}</td>
           ${distCell}
           <td class="cell-freq freq-rx${cellEmptyClass(r.rx)}" data-label="RX (MHz)">${fieldShown(r.rx) ? r.rx : ''}</td>
@@ -520,6 +596,12 @@
     }
     const tr = e.target.closest('tr.rpt-row');
     if (!tr) return;
+    const idxStr = tr.getAttribute('data-node-idx');
+    const ni = idxStr != null && idxStr !== '' ? parseInt(idxStr, 10) : NaN;
+    if (!isNaN(ni) && NODES[ni]) {
+      openStationDetail(NODES[ni].signal, ni);
+      return;
+    }
     const sig = tr.getAttribute('data-signal');
     if (sig) openStationDetail(sig);
   });
@@ -528,6 +610,8 @@
     const overlay = document.getElementById('station-detail-overlay');
     const closeBtn = document.getElementById('station-detail-close');
     const shareBtn = document.getElementById('station-detail-share');
+    const prevBtn = document.getElementById('station-detail-prev');
+    const nextBtn = document.getElementById('station-detail-next');
     if (overlay) {
       overlay.addEventListener('click', function (e) {
         if (e.target === overlay) closeStationDetail();
@@ -539,10 +623,27 @@
         if (stationDetailCurrentSignal) shareStation(stationDetailCurrentSignal);
       });
     }
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        navigateStationDetail(-1);
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        navigateStationDetail(1);
+      });
+    }
     document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape') return;
       const ov = document.getElementById('station-detail-overlay');
-      if (ov && ov.classList.contains('open')) {
+      const open = ov && ov.classList.contains('open');
+      if (open && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateStationDetail(e.key === 'ArrowLeft' ? -1 : 1);
+        return;
+      }
+      if (e.key !== 'Escape') return;
+      if (open) {
         e.preventDefault();
         e.stopPropagation();
         closeStationDetail();
