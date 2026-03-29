@@ -43,7 +43,7 @@
 
 <div class="sticky-top">
 <header class="header">
-  <a href="https://www.radiomap.cl/" class="header-signal"><span class="header-signal-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M 5 22 A 11 11 0 0 1 27 22"/><path d="M 9 22 A 7 7 0 0 1 23 22"/><path d="M 12 22 A 4 4 0 0 1 20 22"/></g><circle cx="16" cy="22" r="2.25" fill="currentColor"/></svg></span><span class="header-signal-text">Radiomap</span></a>
+  <a href="https://www.radiomap.cl/" class="header-signal"><span class="header-signal-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M 5 22 A 11 11 0 0 1 27 22"/><path d="M 9 22 A 7 7 0 0 1 23 22"/><path d="M 12 22 A 4 4 0 0 1 20 22"/></g><circle cx="16" cy="22" r="2.25" fill="currentColor"/></svg></span><span class="header-signal-text"><span class="header-signal-title">Radiomap</span><span class="header-signal-version" id="header-app-version" aria-label="Versión">__VERSION__</span></span></a>
   <nav class="header-nav" aria-label="Navegación principal">
     <a href="index.html" class="header-link header-link-nav header-link-nav--map">MAPA</a>
     <a href="lista.html" class="header-link header-link-nav header-link-nav--list current">LISTA</a>
@@ -78,8 +78,8 @@
       <section class="help-section">
         <h3>Para qué sirve</h3>
         <ul>
-          <li>Ver en el mapa repetidoras, nodos Echolink y estaciones DMR, cobertura teórica y ubicación.</li>
-          <li>Botón 📍 o repetidora de referencia: filtro por distancia (20–100 km); el deslizador está en el mapa al usar ubicación o al elegir una señal.</li>
+          <li>Ver en el mapa repetidoras, nodos Echolink y estaciones DMR; círculos orientativos, propagación donde exista, y ubicación.</li>
+          <li><strong>Cerca de mí</strong> — botón con icono de ubicación (<span class="material-symbols-outlined help-inline-icon" aria-hidden="true">my_location</span>) junto a la búsqueda, o la opción del menú ☰: filtro por distancia (20–100 km) desde tu ubicación; con repetidora de referencia (mapa o enlace compartido), el mismo deslizador <strong>Radio</strong> aplica desde esa señal.</li>
           <li>Buscar por señal, comuna, frecuencias (RX/TX/tono) o filtrar por banda, región y tipo (Echolink / DMR / radioclubes).</li>
           <li>Revisar datos de cada nodo y descargar listas en CSV (botón ↓ CSV siempre visible).</li>
           <li><strong>↗ Compartir</strong>: mensaje con enlace que conserva filtros, búsqueda, referencia de distancia y <strong>radio en km</strong> cuando aplique. Desde la lista el texto es un saludo con el enlace; en el mapa (en otra pestaña) también puede ir una captura de la vista.</li>
@@ -92,6 +92,7 @@
           <li>Vista (iconos): marcador, círculo de cobertura o ambos.</li>
           <li>Filtros: banda, región, tipo y conferencia/red — listas con casillas; «Todas» en cada una quita el filtro de ese criterio (varias opciones = OR).</li>
           <li>En el mapa: radioclubes = círculo; Echolink = cuadrado «e»; DMR = rombo «d». En la lista, insignias junto a la señal. CSV y compartir incluyen los filtros activos.</li>
+          <li><a href="propagacion.html?v=__VERSION__" target="_blank" rel="noopener noreferrer">Sobre propagación</a> — cómo se interpreta el mapa de cobertura experimental, leyenda dBm y limitaciones (en el mapa, donde haya datos).</li>
         </ul>
       </section>
       <section class="help-section">
@@ -102,7 +103,7 @@
           <li>Descarga CSV desde el header (siempre visible, también en móvil).</li>
         </ul>
       </section>
-      <p class="help-meta">Versión <span id="app-version">—</span>. Agénticamente desarrollado por <a href="https://cd3dxz.radio" target="_blank" rel="noopener">CD3DXZ</a>.</p>
+      <p class="help-meta"><span id="help-version-line">Versión <span id="app-version">—</span>. </span>Agénticamente desarrollado por <a href="https://cd3dxz.radio" target="_blank" rel="noopener">CD3DXZ</a>.</p>
     </div>
   </div>
 </div>

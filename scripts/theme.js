@@ -39,6 +39,60 @@
     setTheme(getTheme() === 'dark' ? 'light' : 'dark');
   }
 
+  function radiomapVersionIsSet(v) {
+    if (v == null) return false;
+    var s = String(v).trim();
+    return s.length > 0 && s !== '__VERSION__';
+  }
+
+  function hideRadiomapVersionDisplays() {
+    var h = document.getElementById('header-app-version');
+    if (h) {
+      h.hidden = true;
+      h.setAttribute('aria-hidden', 'true');
+    }
+    var line = document.getElementById('help-version-line');
+    if (line) line.hidden = true;
+  }
+
+  function setRadiomapVersionDisplays(v) {
+    if (!radiomapVersionIsSet(v)) {
+      hideRadiomapVersionDisplays();
+      return;
+    }
+    var s = String(v).trim();
+    var h = document.getElementById('header-app-version');
+    if (h) {
+      h.hidden = false;
+      h.removeAttribute('aria-hidden');
+      h.textContent = s;
+    }
+    var a = document.getElementById('app-version');
+    if (a) a.textContent = s;
+    var line = document.getElementById('help-version-line');
+    if (line) line.hidden = false;
+  }
+
+  function syncHeaderVersionFromCssQuery() {
+    var link = document.querySelector('link[rel="stylesheet"][href*="theme.css"]');
+    if (link) {
+      try {
+        var u = new URL(link.getAttribute('href'), window.location.href);
+        var vParam = u.searchParams.get('v');
+        if (radiomapVersionIsSet(vParam)) {
+          setRadiomapVersionDisplays(vParam);
+          return;
+        }
+      } catch (e) {}
+    }
+    var h = document.getElementById('header-app-version');
+    if (h && radiomapVersionIsSet(h.textContent)) {
+      setRadiomapVersionDisplays(h.textContent.trim());
+      return;
+    }
+    hideRadiomapVersionDisplays();
+  }
+
   function updateToggleButton() {
     var dark = getTheme() === 'dark';
     var label = dark ? 'Modo claro' : 'Modo oscuro';
@@ -57,10 +111,15 @@
 
   setTheme(getTheme(), false);
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateToggleButton);
-  } else {
+  function onDomReadyUi() {
     updateToggleButton();
+    syncHeaderVersionFromCssQuery();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onDomReadyUi);
+  } else {
+    onDomReadyUi();
   }
 
   try {
@@ -71,4 +130,6 @@
 
   window.toggleTheme = toggleTheme;
   window.getTheme = getTheme;
+  window.setRadiomapVersionDisplays = setRadiomapVersionDisplays;
+  window.hideRadiomapVersionDisplays = hideRadiomapVersionDisplays;
 })();

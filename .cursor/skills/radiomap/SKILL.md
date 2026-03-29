@@ -22,7 +22,7 @@ description: >-
 
 - **Source of truth**: [`data/curated_stations.csv`](data/curated_stations.csv). Column order and semantics: [`data/README.md`](data/README.md).
 - **Generated file**: [`data/data.js`](data/data.js) is produced by [`scripts/csv-to-datajs.py`](scripts/csv-to-datajs.py). Do not treat hand-edits to `data.js` as the long-term source; regenerate after CSV changes.
-- **Coverage radius**: when CSV rows include **potencia** and **ganancia**, the script recalculates `range_km` (EIRP model; same idea as the map disclaimer). Details in [`data/README.md`](data/README.md) and [`scripts/README.md`](scripts/README.md).
+- **Map circles**: fixed illustrative radius in [`scripts/map.js`](scripts/map.js) (not per-station from CSV). **Propagation** overlays come from `data/propagation/` when present; engine [Signal-Server](https://github.com/juantoledo/Signal-Server), SRTM-style terrain (citation in [`propagacion.html`](propagacion.html)); experimental — see [`data/propagation/README.md`](data/propagation/README.md) and [`data/README.md`](data/README.md#mapas-de-propagación-datapropagation).
 - **Regenerate locally**: `python scripts/csv-to-datajs.py` from repo root before manual testing after CSV edits.
 
 ## UI surfaces (keep in sync)
@@ -55,4 +55,4 @@ Shared URL / filtros / “cerca de mí” / export: [`scripts/share-view.js`](sc
 1. CSV-only data change → edit `curated_stations.csv` → run `csv-to-datajs.py` → verify map + lista + DMR.
 2. UI change that shows a station field → update `station-display.js` if needed, then map + list + `dmr-ui.js` as applicable.
 3. New URL parameter or filter → `share-view.js` + any filter UI in both pages.
-4. Mention EIRP/coverage assumptions if you change `range_km` logic or the map disclaimer text.
+4. If you change circle radius or neighbor distance, keep [`scripts/map.js`](scripts/map.js) consistent (constants at top of the map IIFE).

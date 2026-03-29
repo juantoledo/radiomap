@@ -7,28 +7,12 @@ from __future__ import annotations
 
 import csv
 import json
-import math
 import re
 from pathlib import Path
-from typing import Optional
-
-# ── Alcance teórico (coherente con la barra metodológica del mapa) ─────────
-# Referencia: 10 W y 6 dBi → 55 km (VHF) / 25 km (UHF).
-# EIRP (dBW) = 10·log10(P_W) + G_dBi. Variación de alcance ∝ √(P_ef) en línea
-# de vista → factor 10^((EIRP − EIRP_ref)/20).
-# Sin dato de altura de antena: factor 1 (no se aplica ×1,65).
-# Tope: 2,5× el radio base de la banda. Ganancia se acota a [0, 25] dBi.
-REF_P_W = 10.0
-REF_G_DBI = 6.0
-BASE_VHF_KM = 55.0
-BASE_UHF_KM = 25.0
-HEIGHT_FACTOR_ASSUMED = 1.0
-CAP_MULT = 2.5
-GAIN_MIN_DBI = 0.0
-GAIN_MAX_DBI = 25.0
 
 CSV_PATH = Path(__file__).resolve().parent.parent / "data" / "curated_stations.csv"
 OUT_PATH = Path(__file__).resolve().parent.parent / "data" / "data.js"
+PROPAGATION_ROOT = Path(__file__).resolve().parent.parent / "data" / "propagation"
 
 # Orden norte → sur (misma lógica que sortRegionKeysChile en location-filter.js)
 DEFAULT_REGION_COLORS = {
@@ -65,55 +49,15 @@ def ordered_region_colors(region_colors: dict) -> dict:
     return {k: region_colors[k] for k in keys}
 
 
-NUMERIC_KEYS = ("lat", "lon", "range_km")
+NUMERIC_KEYS = ("lat", "lon")
 
 
-def _float_field(d: dict, key: str) -> Optional[float]:
-    v = d.get(key)
-    if v is None or v == "":
-        return None
-    try:
-        return float(str(v).replace(",", "."))
-    except ValueError:
-        return None
-
-
-def _band_base_km(banda: str) -> Optional[float]:
-    u = (banda or "").upper()
-    if "VHF" in u:
-        return BASE_VHF_KM
-    if "UHF" in u:
-        return BASE_UHF_KM
-    return None
-
-
-def _eirp_dbw(p_w: float, g_dbi: float) -> float:
-    return 10.0 * math.log10(p_w) + g_dbi
-
-
-def computed_range_km(node: dict) -> Optional[float]:
-    """Alcance modelado desde P, G y banda; None si no aplica."""
-    p_w = _float_field(node, "potencia")
-    g_raw = _float_field(node, "ganancia")
-    if p_w is None or g_raw is None or p_w <= 0:
-        return None
-    g_dbi = max(GAIN_MIN_DBI, min(GAIN_MAX_DBI, g_raw))
-    r0 = _band_base_km(str(node.get("banda", "")))
-    if r0 is None:
-        return None
-    eirp_ref = _eirp_dbw(REF_P_W, REF_G_DBI)
-    eirp = _eirp_dbw(p_w, g_dbi)
-    delta_db = eirp - eirp_ref
-    r_km = r0 * (10.0 ** (delta_db / 20.0)) * HEIGHT_FACTOR_ASSUMED
-    r_km = min(r_km, r0 * CAP_MULT)
-    return round(r_km, 1)
-
-
-def apply_effective_range_km(node: dict) -> None:
-    """Sobrescribe range_km con el modelo EIRP si hay potencia y ganancia válidas."""
-    calc = computed_range_km(node)
-    if calc is not None:
-        node["range_km"] = calc
+def normalize_signal_field(d: dict) -> None:
+    """Cada «/» en la señal → un espacio (las barras rompen rutas URL/carpetas p. ej. propagación)."""
+    v = d.get("signal")
+    if v is None or not isinstance(v, str):
+        return
+    d["signal"] = v.strip().replace("/", " ")
 
 
 def normalize_rx_tx_mhz_fields(d: dict) -> None:
@@ -141,6 +85,7 @@ def normalize_rx_tx_mhz_fields(d: dict) -> None:
 def parse_row(row: dict) -> dict:
     """Convierte fila CSV a objeto NODE."""
     row = {k: v for k, v in row.items()}
+    normalize_signal_field(row)
     normalize_rx_tx_mhz_fields(row)
     node = {}
     for k, v in row.items():
@@ -162,6 +107,26 @@ def parse_row(row: dict) -> dict:
     return node
 
 
+def rewrite_csv_signal_slashes() -> None:
+    """Reescribe curated_stations.csv reemplazando «/» por espacio en la columna signal."""
+    if not CSV_PATH.exists():
+        raise SystemExit(f"CSV no encontrado: {CSV_PATH}")
+    with open(CSV_PATH, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames
+        if not fieldnames:
+            raise SystemExit("CSV sin cabecera")
+        rows = []
+        for row in reader:
+            normalize_signal_field(row)
+            rows.append(row)
+    with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"Actualizado {CSV_PATH} (signal: / → espacio)")
+
+
 def rewrite_csv_rx_tx_normalized() -> None:
     """Reescribe curated_stations.csv con rx/tx normalizados (3 decimales VHF/UHF)."""
     if not CSV_PATH.exists():
@@ -180,6 +145,20 @@ def rewrite_csv_rx_tx_normalized() -> None:
         writer.writeheader()
         writer.writerows(rows)
     print(f"Actualizado {CSV_PATH} (rx/tx MHz con 3 decimales donde aplica)")
+
+
+def propagation_signals_with_overlay() -> set[str]:
+    """Señales con PNG + .pgw (world file); sin PGW el overlay no puede georreferenciarse."""
+    out: set[str] = set()
+    if not PROPAGATION_ROOT.is_dir():
+        return out
+    for d in PROPAGATION_ROOT.iterdir():
+        if not d.is_dir():
+            continue
+        name = d.name
+        if (d / f"{name}.png").is_file() and (d / f"{name}.pgw").is_file():
+            out.add(name)
+    return out
 
 
 def read_version_and_colors() -> tuple[str, dict]:
@@ -215,8 +194,18 @@ def main():
         reader = csv.DictReader(f)
         nodes = [parse_row(row) for row in reader]
 
+    prop_signals = propagation_signals_with_overlay()
     for node in nodes:
-        apply_effective_range_km(node)
+        sig = str(node.get("signal", "")).strip()
+        node["hasPropagation"] = sig in prop_signals
+        if sig in prop_signals:
+            pgw_path = PROPAGATION_ROOT / sig / f"{sig}.pgw"
+            if pgw_path.is_file():
+                # Inline world file so the map need not fetch() .pgw (avoids CORS/file:// issues).
+                node["propagationPgw"] = pgw_path.read_text(encoding="utf-8")
+            dcf_path = PROPAGATION_ROOT / sig / f"{sig}.dcf"
+            if dcf_path.is_file():
+                node["propagationDcf"] = dcf_path.read_text(encoding="utf-8")
 
     version, region_colors = read_version_and_colors()
     region_colors.pop("", None)
@@ -240,5 +229,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and sys.argv[1] == "--normalize-csv-freqs":
         rewrite_csv_rx_tx_normalized()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--normalize-signal-slashes":
+        rewrite_csv_signal_slashes()
     else:
         main()

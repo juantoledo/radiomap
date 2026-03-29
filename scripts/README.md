@@ -34,8 +34,10 @@ python scripts/csv-to-datajs.py
 **Qué hace:**
 - Lee `data/curated_stations.csv`
 - Genera `data/data.js` con NODES, VERSION y REGION_COLORS
-- Si hay **potencia** y **ganancia**, recalcula `range_km` con el modelo EIRP (mismas reglas que el aviso ⚠ del mapa)
+- Añade flags y archivos inline de **propagación** por estación cuando existen en `data/propagation/`
 - Preserva VERSION y REGION_COLORS del `data/data.js` existente
+
+**Propagación:** motor [Signal-Server](https://github.com/juantoledo/Signal-Server), elevación SRTM (cita en [`propagacion.html`](../propagacion.html)); feature experimental — ver [`data/propagation/README.md`](../data/propagation/README.md) y [`data/README.md`](../data/README.md#mapas-de-propagación-datapropagation).
 
 Se ejecuta automáticamente en CI antes del deploy.
 

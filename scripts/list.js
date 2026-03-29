@@ -10,7 +10,12 @@
     r._idx = i;
   });
 
-  if (typeof VERSION !== 'undefined') document.getElementById('app-version') && (document.getElementById('app-version').textContent = VERSION);
+  if (typeof setRadiomapVersionDisplays === 'function') {
+    setRadiomapVersionDisplays(typeof VERSION !== 'undefined' ? VERSION : null);
+  } else if (typeof VERSION !== 'undefined') {
+    var _av = document.getElementById('app-version');
+    if (_av) _av.textContent = VERSION;
+  }
   const filterRegion = document.getElementById('filter-region');
   const regionNames = sortRegionKeysChile(Object.keys(REGION_COLORS || {}).filter(Boolean));
   if (filterRegion) {
@@ -227,7 +232,6 @@
     if (fieldShown(r.banda)) rows.push([['Banda', ''], r.banda]);
     if (fieldShown(r.potencia)) rows.push([['Potencia', ''], r.potencia + ' W']);
     if (fieldShown(r.ganancia)) rows.push([['Ganancia', ''], fmtVal(r.ganancia)]);
-    if (fieldShown(r.range_km)) rows.push([['Cobertura', ''], fmtVal(r.range_km) + ' km']);
     if (fieldShown(r.region)) rows.push([['Región', ''], fmtVal(r.region)]);
     if (fieldShown(r.comuna)) rows.push([['Comuna', ''], fmtVal(r.comuna)]);
     if (fieldShown(r.ubicacion)) rows.push([['Ubicación', ''], fmtVal(r.ubicacion)]);
@@ -272,10 +276,12 @@
         : (function () {
             const u = new URL('index.html', window.location.href);
             u.searchParams.set('signal', signal);
+            u.searchParams.set('sb', '0');
             return u.pathname + u.search + (u.hash || '');
           })();
     } catch (e) {
-      mapLink.href = 'index.html?signal=' + encodeURIComponent(signal);
+      mapLink.href =
+        'index.html?signal=' + encodeURIComponent(signal) + '&sb=0';
     }
 
     mapLink.setAttribute('aria-label', 'Ver ' + (r.signal || 'estación') + ' en el mapa');

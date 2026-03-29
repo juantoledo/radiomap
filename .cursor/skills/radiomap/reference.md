@@ -14,7 +14,7 @@ Node objects follow CSV-derived fields (see `data/README.md`); the generator may
 
 ## CSV column order (one line)
 
-`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `range_km`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `color`, `slot`, `tg`, `website`
+`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `isAir`, `color`, `slot`, `tg`, `website`
 
 (Confirm against `data/README.md` if the pipeline adds columns.)
 
@@ -36,6 +36,13 @@ Implemented in [`scripts/share-view.js`](../../scripts/share-view.js) (build) an
 | `signal` | Reference station for distance filter / map focus |
 | `mlat`, `mlon`, `zoom` | Map center and zoom (map page) |
 | `mode` | Map display mode (when shared from map) |
+| `sb` | `1` = panel lateral (#sidebar) abierto, `0` = cerrado (con `signal` seleccionado) |
+| `prop` | `1` = mapa de propagación activo para esa señal (si hay datos) |
+| `nosb` | Legado: equivalente a `sb=0` al abrir desde lista (sigue soportado) |
+
+## Propagation docs
+
+- **User-facing:** [`propagacion.html`](../../propagacion.html) (deployed as `/propagacion.html`). **Contributors:** [`data/propagation/README.md`](../../data/propagation/README.md) (Signal-Server, SRTM/OpenTopography citation pointer, experimental note).
 
 ## Script map (repo root: `scripts/`)
 

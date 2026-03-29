@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://cdnjs.cloudflare.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com https://google.com https://cdnjs.cloudflare.com; frame-src https://www.googletagmanager.com; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-96T9SZM607"></script>
+<script src="scripts/gtag-init.js?v=__VERSION__"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" href="images/favicon.svg?v=__VERSION__" type="image/svg+xml">
+<title>Propagación en el mapa — Radiomap</title>
+<meta name="description" content="Cómo se generan las capas de cobertura por estación en Radiomap: modelos, terreno y limitaciones.">
+<meta name="theme-color" content="#0d1520">
+<link rel="canonical" href="https://www.radiomap.cl/propagacion.html">
+<script src="scripts/theme.js?v=__VERSION__"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css?v=__VERSION__">
+</head>
+<body class="page-propagacion">
+
+<header class="header header--doc">
+  <a href="https://www.radiomap.cl/" class="header-signal"><span class="header-signal-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M 5 22 A 11 11 0 0 1 27 22"/><path d="M 9 22 A 7 7 0 0 1 23 22"/><path d="M 12 22 A 4 4 0 0 1 20 22"/></g><circle cx="16" cy="22" r="2.25" fill="currentColor"/></svg></span><span class="header-signal-text"><span class="header-signal-title">Radiomap</span><span class="header-signal-version" id="header-app-version" aria-label="Versión">__VERSION__</span></span></a>
+  <nav class="header-nav" aria-label="Navegación principal">
+    <a href="index.html" class="header-link header-link-nav header-link-nav--map">MAPA</a>
+    <a href="lista.html" class="header-link header-link-nav header-link-nav--list">LISTA</a>
+  </nav>
+  <div class="header-actions">
+    <button type="button" id="theme-toggle" onclick="toggleTheme()" aria-label="Modo claro" title="Cambiar tema" class="theme-btn"></button>
+    <a href="https://github.com/juantoledo/radiomap" class="header-link header-link-icon" target="_blank" rel="noopener" title="Ver en GitHub" aria-label="Ver en GitHub"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+  </div>
+  <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Menú" aria-expanded="false" aria-haspopup="menu" title="Menú"><span class="material-symbols-outlined" aria-hidden="true">menu</span></button>
+  <div class="header-menu" id="header-menu" role="menu">
+    <button type="button" onclick="toggleTheme(); closeDocMenu();" class="theme-btn menu-theme-toggle" aria-label="Cambiar tema" role="menuitem"></button>
+    <a href="index.html" class="header-link" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">map</span></span> Mapa</a>
+    <a href="lista.html" class="header-link" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">view_list</span></span> Lista</a>
+    <a href="https://github.com/juantoledo/radiomap" class="header-link" target="_blank" rel="noopener" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">code</span></span> GitHub</a>
+  </div>
+</header>
+
+<main class="doc-main" id="main-content">
+  <article class="doc-article">
+    <h1 class="doc-title">Propagación en el mapa</h1>
+    <p class="doc-lead">Radiomap puede mostrar, para algunas repetidoras, una <strong>capa raster</strong> superpuesta al mapa. Es una <strong>simulación orientativa</strong> de potencia recibida (dBm), no un relevamiento de campo ni una garantía de cobertura real.</p>
+
+    <p class="doc-callout doc-callout--experimental"><strong>Experimental.</strong> Esta vista está <strong>sujeta a mejoras continuas</strong>: los mapas pueden actualizarse a medida que los radioclubes afinan o corrigen los datos de sus transmisores y antenas (potencia, ganancia, altura, ubicación, patrones, etc.), y a medida que en el proyecto se refinan los <strong>umbrales</strong> de la leyenda (dBm / colores) y la forma en que se configura y ejecuta el <strong>motor</strong> de propagación.</p>
+
+    <section class="doc-section">
+      <h2>Origen de los datos</h2>
+      <p>Las imágenes se generan con herramientas de propagación por radio (por ejemplo <strong>Signal-Server HD</strong>) a partir de entradas del transmisor, modelo de propagación y relieve. El motor usado en este proyecto es el del repositorio <a href="https://github.com/juantoledo/Signal-Server" target="_blank" rel="noopener noreferrer">Signal-Server</a> (fork basado en Signal-Server / SPLAT).</p>
+      <ul>
+        <li><strong>Ubicación del transmisor</strong> (latitud, longitud) y parámetros de enlace (frecuencia, potencia, ganancia de antena, altura, etc.).</li>
+        <li><strong>Modelo de propagación</strong> (p. ej. ITM, Hata, línea de vista u otros según la corrida). Cada modelo tiene supuestos distintos y rango de validez.</li>
+        <li><strong>Modelo de terreno</strong> — elevación del relieve (p. ej. teselas SRTM) que condiciona difracción y sombras.</li>
+      </ul>
+      <p><strong>Datos de elevación (SRTM).</strong> Cita del conjunto de datos:</p>
+      <p class="doc-citation">Dataset Citation: NASA Shuttle Radar Topography Mission (SRTM) (2013). Shuttle Radar Topography Mission (SRTM) Global. Distributed by <a href="https://opentopography.org/" target="_blank" rel="noopener noreferrer">OpenTopography</a>.</p>
+      <p>Los detalles concretos de cada corrida (comando, flags y versión del motor) suelen documentarse en el <code>README.md</code> dentro de la carpeta de cada señal bajo <code>data/propagation/&lt;señal&gt;/</code> en el repositorio Radiomap.</p>
+    </section>
+
+    <section class="doc-section">
+      <h2>Archivos que usa el sitio</h2>
+      <ul>
+        <li><strong>PNG</strong> — Mapa de colores (zonas de nivel aproximado). Los píxeles claros suelen ir transparentes para no tapar el mapa base.</li>
+        <li><strong>PGW</strong> — Archivo mundo Esri: escala y origen en WGS‑84 para alinear la imagen sobre Leaflet.</li>
+        <li><strong>DCF</strong> (cuando existe) — Paleta de umbrales dBm y colores para la <strong>leyenda</strong> vertical que ves al activar la capa.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section">
+      <h2>Cómo leer la leyenda</h2>
+      <p>La franja de color indica <strong>potencia recibida aproximada en dBm</strong> según la simulación (no “calidad de audio” ni “distancia exacta”). Valores menos negativos suelen implicar señal más fuerte en el modelo; el entorno real (ruido, antenas, edificios, multipath) puede diferir mucho.</p>
+    </section>
+
+    <section class="doc-section">
+      <h2>Limitaciones</h2>
+      <ul>
+        <li>No sustituye mediciones en sitio, estudios de ingeniería ni autorizaciones.</li>
+        <li>Clima, vegetación, construcciones recientes y equipos no modelados alteran el resultado.</li>
+        <li>La capa solo aparece donde el proyecto incluye PNG+PGW generados para esa señal.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section">
+      <h2>Más información</h2>
+      <p>Código y datos del sitio: <a href="https://github.com/juantoledo/radiomap" target="_blank" rel="noopener noreferrer">Radiomap en GitHub</a>. Motor de propagación: <a href="https://github.com/juantoledo/Signal-Server" target="_blank" rel="noopener noreferrer">Signal-Server</a>. Para volver al mapa: <a href="index.html">Mapa de cobertura</a>.</p>
+    </section>
+  </article>
+</main>
+
+<footer class="app-footer">
+  <span class="app-footer-note">¿Inconsistencias? Escriba a <a href="mailto:cd3dxz@gmail.com">cd3dxz@gmail.com</a></span>
+</footer>
+
+<script>
+(function () {
+  function closeDocMenu() {
+    var menu = document.getElementById('header-menu');
+    var toggle = document.getElementById('menu-toggle');
+    if (menu) menu.classList.remove('open');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  }
+  window.closeDocMenu = closeDocMenu;
+  var menu = document.getElementById('header-menu');
+  var toggle = document.getElementById('menu-toggle');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function () {
+      var open = menu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', function (e) {
+      if (menu.classList.contains('open') && !menu.contains(e.target) && !toggle.contains(e.target)) closeDocMenu();
+    });
+  }
+})();
+</script>
+</body>
+</html>
