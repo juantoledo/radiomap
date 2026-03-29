@@ -10,13 +10,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="icon" href="images/favicon.svg?v=__VERSION__" type="image/svg+xml">
 <title>Radiomap — Mapa de cobertura</title>
-<meta name="description" content="Estaciones de radio en Chile: mapa, cobertura teórica, filtros y búsqueda.">
+<meta name="description" content="Estaciones de radio en Chile: mapa, círculos orientativos y propagación por estación, filtros y búsqueda.">
 <meta name="theme-color" content="#0d1520">
 <link rel="canonical" href="https://www.radiomap.cl/">
 <meta property="og:site_name" content="Radiomap">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Radiomap — Mapa de cobertura">
-<meta property="og:description" content="Estaciones de radio en Chile: mapa, cobertura y filtros.">
+<meta property="og:description" content="Estaciones de radio en Chile: mapa, círculos orientativos y propagación, filtros y búsqueda.">
 <meta property="og:url" content="https://www.radiomap.cl/">
 <meta property="og:image" content="https://www.radiomap.cl/images/web-dark.png?v=__VERSION__">
 <meta property="og:image:secure_url" content="https://www.radiomap.cl/images/web-dark.png?v=__VERSION__">
@@ -27,7 +27,7 @@
 <meta property="og:locale" content="es_CL">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Radiomap — Mapa de cobertura">
-<meta name="twitter:description" content="Estaciones de radio en Chile: mapa, cobertura y filtros.">
+<meta name="twitter:description" content="Estaciones de radio en Chile: mapa, círculos orientativos y propagación, filtros y búsqueda.">
 <meta name="twitter:image" content="https://www.radiomap.cl/images/web-dark.png?v=__VERSION__">
 <meta name="twitter:image:alt" content="Captura del mapa de cobertura de repetidoras en Chile — Radiomap">
 <meta name="twitter:site" content="@radiomap_cl">
@@ -49,6 +49,7 @@
 <script defer src="scripts/export-csv.js?v=__VERSION__"></script>
 <script defer src="scripts/help.js?v=__VERSION__"></script>
 <script defer src="scripts/station-display.js?v=__VERSION__"></script>
+<script defer src="scripts/propagation-map.js?v=__VERSION__"></script>
 <script defer src="scripts/analytics.js?v=__VERSION__"></script>
 </head>
 <body class="page-map">
@@ -56,7 +57,7 @@
 
 <!-- HEADER -->
 <header class="header">
-  <a href="https://www.radiomap.cl/" class="header-signal"><span class="header-signal-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M 5 22 A 11 11 0 0 1 27 22"/><path d="M 9 22 A 7 7 0 0 1 23 22"/><path d="M 12 22 A 4 4 0 0 1 20 22"/></g><circle cx="16" cy="22" r="2.25" fill="currentColor"/></svg></span><span class="header-signal-text">Radiomap</span></a>
+  <a href="https://www.radiomap.cl/" class="header-signal"><span class="header-signal-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M 5 22 A 11 11 0 0 1 27 22"/><path d="M 9 22 A 7 7 0 0 1 23 22"/><path d="M 12 22 A 4 4 0 0 1 20 22"/></g><circle cx="16" cy="22" r="2.25" fill="currentColor"/></svg></span><span class="header-signal-text"><span class="header-signal-title">Radiomap</span><span class="header-signal-version" id="header-app-version" aria-label="Versión">__VERSION__</span></span></a>
   <nav class="header-nav" aria-label="Navegación principal">
     <a href="index.html" class="header-link header-link-nav header-link-nav--map current">MAPA</a>
     <a href="lista.html" class="header-link header-link-nav header-link-nav--list">LISTA</a>
@@ -91,8 +92,8 @@
       <section class="help-section">
         <h3>Para qué sirve</h3>
         <ul>
-          <li>Ver en el mapa repetidoras, nodos Echolink y estaciones DMR, cobertura teórica y ubicación.</li>
-          <li>Botón 📍 para filtrar por distancia desde tu ubicación, o elegí una repetidora en el mapa y usá el mismo control de radio (20–100 km) desde esa señal.</li>
+          <li>Ver en el mapa repetidoras, nodos Echolink y estaciones DMR; círculos orientativos, propagación donde exista, y ubicación.</li>
+          <li><strong>Cerca de mí</strong> — botón con icono de ubicación (<span class="material-symbols-outlined help-inline-icon" aria-hidden="true">my_location</span>) junto a la búsqueda, o la misma opción en el menú ☰: filtra por distancia desde tu posición. En el mapa, también podés elegir una repetidora y usar el deslizador <strong>Radio</strong> (20–100 km) desde esa señal.</li>
           <li>Buscar por señal, comuna, frecuencias (RX/TX/tono) o filtrar por banda, región y tipo (Echolink / DMR / radioclubes).</li>
           <li>Revisar datos de cada nodo y descargar listas en CSV (botón ↓ CSV siempre visible).</li>
           <li><strong>↗ Compartir</strong>: mensaje con enlace que incluye filtros, ubicación o repetidora de referencia (si aplica), <strong>radio en km</strong> (<code>nearRadius</code>), posición del mapa y la repetidora abierta en el panel (si hay una). En el mapa, si el navegador lo permite, se adjunta una <strong>captura de la vista actual</strong>.</li>
@@ -105,6 +106,7 @@
           <li>Vista (iconos): marcador, círculo de cobertura o ambos.</li>
           <li>Filtros: banda, región, tipo y conferencia/red — listas con casillas; «Todas» en cada una quita el filtro de ese criterio (varias opciones = OR).</li>
           <li>Clic en un punto: datos y nodos cercanos en el panel. Radioclubes = círculo; Echolink = cuadrado «e»; DMR = rombo «d». Descarga CSV o comparte desde el panel.</li>
+          <li><a href="propagacion.html?v=__VERSION__" target="_blank" rel="noopener noreferrer">Sobre propagación</a> — cómo se interpreta el mapa de cobertura experimental, leyenda dBm y limitaciones.</li>
         </ul>
       </section>
       <section class="help-section">
@@ -120,36 +122,23 @@
   </div>
 </div>
 
-<!-- METHODOLOGY BAR -->
-<div class="methodology-bar">
-  <span class="meth-label">CÁLCULO DE COBERTURA</span>
-  <span class="meth-info" data-tooltip="EIRP (dBW) = 10·log₁₀(P en W) + G (dBi). Si hay potencia y ganancia en los datos, al generar el mapa el radio (km) parte de la base 55 km (VHF) o 25 km (UHF) a 10 W y 6 dBi y escala como la raíz cuadrada de la potencia efectiva (mismo margen en dB que en espacio libre). Sin dato de altura no aplicamos el factor 1,65 (se asume 1×). Tope: 2,5× esa base por banda. Ganancias se limitan a 0–25 dBi para evitar errores de carga. Si faltan P o G, se usa el km del CSV. Modelo plano, sin relieve." title="Explicación del cálculo de cobertura">?</span>
-  <span class="meth-sep">|</span>
-  <span class="meth-text">EIRP(dBW) = 10·log₁₀(P) + G<sub>dBi</sub></span>
-  <span class="meth-sep">|</span>
-  <span class="meth-text">Base <strong>VHF 55 km</strong> · <strong>UHF 25 km</strong> @ 10W+6dBi</span>
-  <span class="meth-sep">|</span>
-  <span class="meth-text">Altura ×<strong>1.65</strong> · Límite ×<strong>2.5</strong></span>
-  <span class="meth-sep">|</span>
-  <span class="meth-warn" title="Con potencia (W) y ganancia (dBi), al publicar: EIRP vs 10 W+6 dBi; base 55 km VHF / 25 km UHF; alcance ∝ √(potencia efectiva), 10^ΔdB/20; sin altura 1×; tope ×2,5 base; G 0–25 dBi. Sin P/G → km del CSV. No modela relieve ni obstáculos.">⚠ Plano: km=EIRP si hay P+G; si no, CSV. Sin relieve/obstáculos.</span>
-</div>
-
 <!-- CONTROLS -->
 <div class="controls">
-  <div class="ctrl-group">
-    <span class="ctrl-label">Vista</span>
-    <div class="btn-group">
-      <button type="button" class="mode-btn active" id="btn-markers" onclick="setMode('markers')" title="Marcadores" aria-label="Solo marcadores">
-        <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-      </button>
-      <button type="button" class="mode-btn" id="btn-circles" onclick="setMode('circles')" title="Círculos" aria-label="Solo círculos de cobertura">
-        <span class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</span>
-      </button>
-      <button type="button" class="mode-btn" id="btn-both" onclick="setMode('both')" title="Ambos" aria-label="Marcadores y círculos">
-        <span class="material-symbols-outlined" aria-hidden="true">layers</span>
-      </button>
-    </div>
+  <!-- Vista (marcadores / círculos / ambos): oculto; vista por defecto = marcadores (map.js currentMode) -->
+  <!--
+  <div class="btn-group" role="group" aria-labelledby="map-view-label">
+    <span class="ctrl-label" id="map-view-label">Vista</span>
+    <button type="button" class="mode-btn active" id="btn-markers" onclick="setMode('markers')" title="Marcadores" aria-label="Solo marcadores">
+      <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+    </button>
+    <button type="button" class="mode-btn" id="btn-circles" onclick="setMode('circles')" title="Círculos" aria-label="Solo círculos de cobertura">
+      <span class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</span>
+    </button>
+    <button type="button" class="mode-btn" id="btn-both" onclick="setMode('both')" title="Ambos" aria-label="Marcadores y círculos">
+      <span class="material-symbols-outlined" aria-hidden="true">layers</span>
+    </button>
   </div>
+  -->
   <div class="search-nearme-wrap">
     <div class="search-wrap">
       <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
@@ -196,18 +185,32 @@
     </div>
   </details>
   <button type="button" id="btn-clear-filters" class="btn-clear-filters" onclick="clearAllFilters()" title="Quitar búsqueda, filtros y cerca de mí" aria-label="Limpiar filtros"><span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span> Limpiar filtros</button>
-  <div class="filter-count-wrap">
-    <div class="filter-count">Mostrando <span id="shown-count">172</span> de <span id="total-count">172</span> · <span id="regions-count">13</span> regiones · <span id="clubs-count">—</span> clubes<span id="filter-nearme"></span></div>
-    <div id="near-radius-floater" class="near-radius-floater" hidden aria-hidden="true" title="Distancia máxima desde la referencia (ubicación o repetidora elegida)">
-      <div class="near-radius-floater__head">
-        <label class="near-radius-floater__label" for="near-radius-slider">Radio</label>
-        <span id="near-radius-value" class="near-radius-floater__value">100 km</span>
+  <div class="controls-footer-row">
+    <div class="filter-count-wrap">
+      <div class="filter-count">Mostrando <span id="shown-count">172</span> de <span id="total-count">172</span> · <span id="regions-count">13</span> regiones · <span id="clubs-count">—</span> clubes<span id="filter-nearme"></span></div>
+      <div id="near-radius-floater" class="near-radius-floater" hidden aria-hidden="true" title="Distancia máxima desde la referencia (ubicación o repetidora elegida)">
+        <div class="near-radius-floater__head">
+          <label class="near-radius-floater__label" for="near-radius-slider">Radio</label>
+          <span id="near-radius-value" class="near-radius-floater__value">100 km</span>
+        </div>
+        <div class="near-radius-floater__slider-row">
+          <span class="near-radius-floater__ticks" aria-hidden="true">20</span>
+          <input type="range" id="near-radius-slider" class="near-radius-floater__slider" min="20" max="100" step="1" value="100" aria-valuemin="20" aria-valuemax="100" aria-valuenow="100" aria-label="Distancia máxima desde la referencia (ubicación o repetidora elegida), en kilómetros">
+          <span class="near-radius-floater__ticks" aria-hidden="true">100</span>
+        </div>
       </div>
-      <div class="near-radius-floater__slider-row">
-        <span class="near-radius-floater__ticks" aria-hidden="true">20</span>
-        <input type="range" id="near-radius-slider" class="near-radius-floater__slider" min="20" max="100" step="1" value="100" aria-valuemin="20" aria-valuemax="100" aria-valuenow="100" aria-label="Distancia máxima desde la referencia (ubicación o repetidora elegida), en kilómetros">
-        <span class="near-radius-floater__ticks" aria-hidden="true">100</span>
+    </div>
+    <div id="propagation-actions-wrap" class="propagation-actions-wrap" hidden>
+      <div id="propagation-toolbar" class="propagation-toolbar">
+        <button type="button" id="btn-toggle-propagation" class="btn-toggle-propagation" aria-pressed="false" aria-label="Mostrar u ocultar mapa de propagación en el mapa">
+          <span class="material-symbols-outlined btn-toggle-propagation__icon" aria-hidden="true">radar</span>
+          <span class="btn-toggle-propagation__text">Propagación</span>
+        </button>
       </div>
+      <a href="propagacion.html?v=__VERSION__" class="btn-propagation-about" id="link-propagation-about" target="_blank" rel="noopener noreferrer" title="Cómo se calcula la cobertura y qué significa el mapa">
+        <span class="material-symbols-outlined btn-propagation-about__icon" aria-hidden="true">menu_book</span>
+        <span class="btn-propagation-about__text">Sobre propagación</span>
+      </a>
     </div>
   </div>
 </div>
@@ -215,6 +218,7 @@
 <!-- MAP -->
 <div id="map-wrap">
   <div id="map"></div>
+  <div id="propagation-legend-host" class="propagation-legend-float" hidden aria-live="polite"></div>
   <div id="map-empty-overlay" class="map-empty-overlay" hidden aria-live="polite"></div>
   <!-- SIDEBAR -->
   <div id="sidebar">

@@ -52,15 +52,7 @@
   /** Heuristic zoom from coverage radius (map init uses mlat/mlon/zoom) */
   function zoomForStationNode(r) {
     if (!r) return 5;
-    var rk = r.range_km;
-    if (typeof rk !== 'number' || isNaN(rk)) {
-      return r.isEcholink ? 7 : 8;
-    }
-    if (rk >= 100) return 6;
-    if (rk >= 50) return 7;
-    if (rk >= 25) return 8;
-    if (rk >= 15) return 9;
-    return 10;
+    return r.isEcholink ? 7 : 8;
   }
 
   /**
@@ -82,6 +74,8 @@
       }
     }
     ensureNearRadiusInParams(p);
+    /* Lista «Ver en mapa»: repetidora seleccionada, panel lateral cerrado (map.js lee sb=0). */
+    p.set('sb', '0');
     base.search = p.toString();
     return base.toString();
   }
@@ -99,15 +93,18 @@
       /* ignore */
     }
 
-    if (typeof window.__radiomapGetMapShareState === 'function') {
-      var m = window.__radiomapGetMapShareState();
-      if (m && typeof m.lat === 'number' && typeof m.lng === 'number' && typeof m.zoom === 'number') {
-        p.set('mlat', m.lat.toFixed(5));
-        p.set('mlon', m.lng.toFixed(5));
-        p.set('zoom', String(m.zoom));
-        if (m.mode) p.set('mode', m.mode);
-        if (m.signal) p.set('signal', m.signal);
-      }
+    var mapShare = typeof window.__radiomapGetMapShareState === 'function' ? window.__radiomapGetMapShareState() : null;
+    if (mapShare && typeof mapShare.lat === 'number' && typeof mapShare.lng === 'number' && typeof mapShare.zoom === 'number') {
+      p.set('mlat', mapShare.lat.toFixed(5));
+      p.set('mlon', mapShare.lng.toFixed(5));
+      p.set('zoom', String(mapShare.zoom));
+      if (mapShare.mode) p.set('mode', mapShare.mode);
+      if (mapShare.signal) p.set('signal', mapShare.signal);
+    }
+    if (mapShare && mapShare.signal && p.get('signal') === mapShare.signal) {
+      p.set('sb', mapShare.sidebarOpen ? '1' : '0');
+      if (mapShare.propagationOn) p.set('prop', '1');
+      else p.delete('prop');
     }
 
     ensureNearRadiusInParams(p);

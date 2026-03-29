@@ -90,7 +90,7 @@ jobs:
       - name: Inject cache-busting version into HTML
         run: |
           V=$(grep "const VERSION" data/data.js | sed "s/.*'\([^']*\)'.*/\1/")
-          sed -i "s|__VERSION__|${V}|g" index.html lista.html
+          sed -i "s|__VERSION__|${V}|g" index.html lista.html propagacion.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

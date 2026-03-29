@@ -39,6 +39,25 @@
     setTheme(getTheme() === 'dark' ? 'light' : 'dark');
   }
 
+  function setRadiomapVersionDisplays(v) {
+    if (v == null || v === '') return;
+    var s = String(v);
+    var h = document.getElementById('header-app-version');
+    if (h) h.textContent = s;
+    var a = document.getElementById('app-version');
+    if (a) a.textContent = s;
+  }
+
+  function syncHeaderVersionFromCssQuery() {
+    var link = document.querySelector('link[rel="stylesheet"][href*="theme.css"]');
+    if (!link) return;
+    try {
+      var u = new URL(link.getAttribute('href'), window.location.href);
+      var v = u.searchParams.get('v');
+      if (v) setRadiomapVersionDisplays(v);
+    } catch (e) {}
+  }
+
   function updateToggleButton() {
     var dark = getTheme() === 'dark';
     var label = dark ? 'Modo claro' : 'Modo oscuro';
@@ -57,10 +76,15 @@
 
   setTheme(getTheme(), false);
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateToggleButton);
-  } else {
+  function onDomReadyUi() {
     updateToggleButton();
+    syncHeaderVersionFromCssQuery();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onDomReadyUi);
+  } else {
+    onDomReadyUi();
   }
 
   try {
@@ -71,4 +95,5 @@
 
   window.toggleTheme = toggleTheme;
   window.getTheme = getTheme;
+  window.setRadiomapVersionDisplays = setRadiomapVersionDisplays;
 })();

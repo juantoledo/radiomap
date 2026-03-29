@@ -27,11 +27,22 @@ Los datos provienen del [listado oficial SUBTEL](https://www.subtel.gob.cl/) y p
 python scripts/csv-to-datajs.py
 ```
 
-El script lee `curated_stations.csv` y produce `data.js`. Se ejecuta en CI antes del deploy.
-
-Si la fila tiene **potencia** (W) y **ganancia** (dBi), el script **recalcula** `range_km` en `data.js` con el modelo EIRP descrito en el aviso ⚠ del mapa (base VHF/UHF, ley de alcance, tope y reglas asumidas). Si faltan esos campos, se conserva el `range_km` del CSV.
+El script lee `curated_stations.csv` y produce `data.js`. Se ejecuta en CI antes del deploy. Incrusta metadatos de **mapas de propagación** (`hasPropagation`, `propagationPgw`, `propagationDcf` opcional) cuando existen en `data/propagation/<señal>/`.
 
 Tras editar el CSV en local, conviene regenerar `data.js` antes de probar la app.
+
+---
+
+## Mapas de propagación (`data/propagation/`)
+
+Por estación, carpeta `data/propagation/<señal>/` con **`{señal}.png`** + **`{señal}.pgw`** (WorldFile); opcional **`{señal}.dcf`** (paleta dBm para la leyenda flotante). El generador incrusta `hasPropagation`, `propagationPgw` y `propagationDcf` cuando existen.
+
+- **Motor** — [Signal-Server](https://github.com/juantoledo/Signal-Server) (fork/ajustes del proyecto).
+- **Elevación** — Típicamente **SRTM** (NASA SRTM, distribuido por [OpenTopography](https://www.opentopography.org/)); la cita exacta figura en [`propagacion.html`](../propagacion.html).
+- **Estado** — Funcionalidad **experimental**: la calidad depende de los datos de TX/antena en el CSV, de los umbrales dBm/colores y de la configuración del motor; puede refinarse con el tiempo.
+- **Documentación** — Texto orientado al usuario y limitaciones: [`propagacion.html`](../propagacion.html). Detalle para quien mantiene el repo: [`data/propagation/README.md`](propagation/README.md).
+
+Los `README.md` dentro de cada carpeta de señal documentan corridas concretas (parámetros, fechas); no sustituyen la página anterior.
 
 ---
 
@@ -46,8 +57,7 @@ Tras editar el CSV en local, conviene regenerar `data.js` antes de probar la app
 | `comuna` | Comuna. |
 | `ubicacion` | Lugar o referencia de emplazamiento. |
 | `lat`, `lon` | Latitud y longitud (grados decimales). |
-| `range_km` | Radio de cobertura teórica usado en el mapa (km). |
-| `potencia`, `ganancia` | Potencia (W) y ganancia de antena según registro. |
+| `potencia`, `ganancia` | Potencia (W) y ganancia de antena según registro (datos; el mapa no deriva de ellos un radio por estación). |
 | `banda` | Banda de servicio (ej. `VHF/FM`, `UHF/FM`). |
 | `rx`, `tx` | Frecuencias de recepción y transmisión (MHz). |
 | `tono` | Tono subaudible / DCS si aplica. |
@@ -56,6 +66,7 @@ Tras editar el CSV en local, conviene regenerar `data.js` antes de probar la app
 | `isEcholink` | `1`, `true` o `yes` = nodo Echolink; vacío u otro = no. |
 | `conference` | Nombre de la **conferencia o red** (Echolink, DMR u otro): ej. `Red Chile`, `RCDR`, `SUR`, `Zona DMR CL`. Vacío si no aplica. |
 | `isDMR` | `1`, `true` o `yes` = estación / repetidor DMR; vacío u otro = no. |
+| `isAir` | `1`, `true` o `yes` = ATC / aeronáutico (solo escucha donde aplique); vacío u otro = no. |
 | `color` | Código o etiqueta de **color** (CC) DMR. Vacío si no aplica. Varios valores: **separar con espacio** (ej. `1`). |
 | `slot` | **Slot** de tiempo DMR. Varios slots: **solo espacios** (ej. `1 2`), sin «y». |
 | `tg` | **Talkgroups** DMR. Varios TG: **solo espacios** (ej. `730 7300444 7301`), sin guiones. Sin filtro dedicado en la app. |
@@ -99,4 +110,4 @@ Columna opcional. Si está vacía, la interfaz no muestra enlace junto a la señ
 
 ## Referencia rápida de columnas (una línea)
 
-`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `range_km`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `color`, `slot`, `tg`, `website`.
+`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `isAir`, `color`, `slot`, `tg`, `website`.

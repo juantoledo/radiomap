@@ -8,7 +8,7 @@
 
 ## Por qué usarlo
 
-- **Una vista del país** — Cobertura teórica en mapa y tabla por región, con datos alineados al trabajo de SUBTEL/DGMN y curación propia donde hace falta.
+- **Una vista del país** — Mapa y tabla por región, con datos alineados al trabajo de SUBTEL/DGMN y curación propia donde hace falta.
 - **Encuentra rápido** — Búsqueda por indicativo, comuna, RX/TX, tono, texto en DMR (color, slot, TG) y más.
 - **Filtra como operador** — Banda, región, tipo (**radioclubes / Echolink / DMR**) y **conferencia o red** (varias opciones = OR dentro de cada criterio).
 - **Cerca tuyo o de una repetidora** — **Cerca de mí** o repetidora de referencia, con **radio ajustable (20–100 km)** para ver solo lo que te sirve en el momento.
@@ -38,9 +38,10 @@ Capturas del **mapa en modo oscuro y claro** — mismo producto, distinto tema; 
 ## Mapa
 
 - **Leyenda visual** — Radioclubes (círculo), Echolink (cuadrado **e**), DMR (rombo **d**).
-- **Cómo ver la cobertura** — Marcador solo, círculo solo o ambos; explorás Chile con zoom y pan habituales.
+- **Cómo ver la cobertura** — Marcador solo, **círculos orientativos** (radio fijo en el mapa) o ambos; donde hay **mapa de propagación** por estación, activalo desde los controles del mapa (junto al contador de filtros). Explorás Chile con zoom y pan habituales.
+- **Propagación (experimental)** — Los mapas raster se generan con el motor [Signal-Server](https://github.com/juantoledo/Signal-Server) y elevación tipo **SRTM** (cita de datos en la página de documentación). Mejoran a medida que se refinan datos de transmisor/antena de los radioclubes, umbrales de la leyenda (dBm/colores) y la configuración del motor. **Documentación completa:** [Sobre propagación](https://www.radiomap.cl/propagacion.html) (también enlazada desde el mapa como «Sobre propagación»).
 - **Detalle al tocar** — Ficha con lo esencial y **nodos cercanos**; desde ahí podés exportar CSV de vecinos o compartir la vista.
-- El mapa muestra **cobertura teórica**; condiciones reales (terreno, antena, QRM) siempre pueden diferir — revisá el aviso en la app.
+- La vista es **orientativa**; condiciones reales (terreno, antena, QRM) siempre pueden diferir — revisá el aviso en la app.
 
 ---
 

@@ -1,11 +1,17 @@
 /**
  * Map view — Leaflet map, circles, markers, sidebar, filters
- * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue)
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), propagation-map.js (radiomapPropagation: overlay + leyenda dBm flotante en el mapa)
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
 
-  if (typeof VERSION !== 'undefined') document.getElementById('app-version') && (document.getElementById('app-version').textContent = VERSION);
+  if (typeof VERSION !== 'undefined') {
+    if (typeof setRadiomapVersionDisplays === 'function') setRadiomapVersionDisplays(VERSION);
+    else {
+      var _av = document.getElementById('app-version');
+      if (_av) _av.textContent = VERSION;
+    }
+  }
   function getClubName(signal) { var n = NODES && NODES.find(function(x){ return x.signal === signal; }); return n ? (n.nombre || '') : ''; }
   window.getClubName = getClubName;
 
@@ -38,19 +44,19 @@
     return v != null && String(v).trim() !== '';
   }
 
-  const DEFAULT_RANGE_KM = 25; // for nodes without range_km (e.g. Echolink)
-  const getRange = (n) => (typeof n.range_km === 'number' && !isNaN(n.range_km)) ? n.range_km : DEFAULT_RANGE_KM;
+  /** Radio fijo (km) para círculos «cobertura» en vista círculos/ambos — orientativo, no por estación. */
+  const DISPLAY_CIRCLE_RADIUS_KM = 25;
+  /** Máx. distancia entre coordenadas para listar «nodos cercanos» en el panel. */
+  const NEIGHBOR_MAX_KM = 50;
   NODES.forEach((r,i)=>{
     r._idx = i;
     r._neighbors = [];
     if (r.lat == null || r.lon == null || (typeof r.lat !== 'number') || (typeof r.lon !== 'number')) return;
-    const rRange = getRange(r);
     NODES.forEach((s,j)=>{
       if(i===j) return;
       if (s.lat == null || s.lon == null || (typeof s.lat !== 'number') || (typeof s.lon !== 'number')) return;
-      const sRange = getRange(s);
       const d = haversine(r.lat,r.lon,s.lat,s.lon);
-      if(d < rRange + sRange) r._neighbors.push({idx:j, dist:Math.round(d)});
+      if(d < NEIGHBOR_MAX_KM) r._neighbors.push({idx:j, dist:Math.round(d)});
     });
     r._neighbors.sort((a,b)=>a.dist-b.dist);
   });
@@ -79,10 +85,135 @@
     ).addTo(map);
   }
 
+  /** Raster de propagación (sobre teselas, bajo círculos y marcadores). */
+  const propagationLayerGroup = L.layerGroup().addTo(map);
   const circleLayer = L.layerGroup().addTo(map);
   /** Anillo casi invisible del radio «cerca de mí / referencia» (sobre cobertura, bajo marcadores). */
   const nearRadiusFilterLayer = L.layerGroup().addTo(map);
   const markerLayer = L.layerGroup().addTo(map);
+
+  let propagationToggleOn = false;
+  let propagationActiveSignal = null;
+
+  function removePropagationLegend() {
+    var host = document.getElementById('propagation-legend-host');
+    if (host) {
+      host.innerHTML = '';
+      host.hidden = true;
+    }
+  }
+
+  function showPropagationLegendFromNode(r) {
+    removePropagationLegend();
+    if (!r || typeof r.propagationDcf !== 'string' || !r.propagationDcf.trim()) return;
+    var rp = window.radiomapPropagation;
+    if (!rp || typeof rp.parseDcfPalette !== 'function' || typeof rp.buildPropagationLegendElement !== 'function') return;
+    var stops = rp.parseDcfPalette(r.propagationDcf);
+    if (!stops.length) return;
+    var el = rp.buildPropagationLegendElement(stops);
+    if (typeof L !== 'undefined' && L.DomEvent) {
+      L.DomEvent.disableClickPropagation(el);
+      L.DomEvent.disableScrollPropagation(el);
+    }
+    var host = document.getElementById('propagation-legend-host');
+    if (!host) return;
+    host.appendChild(el);
+    host.hidden = false;
+  }
+
+  function resetPropagationSidebar() {
+    propagationToggleOn = false;
+    propagationActiveSignal = null;
+    var propWrap = document.getElementById('propagation-actions-wrap');
+    if (propWrap) propWrap.hidden = true;
+    var btn = document.getElementById('btn-toggle-propagation');
+    if (btn) {
+      btn.setAttribute('aria-pressed', 'false');
+      btn.classList.remove('is-pressed');
+      btn.disabled = false;
+    }
+    if (window.radiomapPropagation && typeof window.radiomapPropagation.clearPropagationOverlay === 'function') {
+      window.radiomapPropagation.clearPropagationOverlay(propagationLayerGroup);
+    }
+    removePropagationLegend();
+  }
+
+  /** Nodo usado para el botón Propagación (panel abierto o propagación activa con panel cerrado). */
+  function nodeForPropagationControl() {
+    if (selectedIdx != null && NODES[selectedIdx]) return NODES[selectedIdx];
+    if (propagationToggleOn && propagationActiveSignal) {
+      var ix = NODES.findIndex(function (n) {
+        return n.signal === propagationActiveSignal;
+      });
+      if (ix >= 0) return NODES[ix];
+    }
+    return null;
+  }
+
+  function nodeBySignal(sig) {
+    if (!sig) return null;
+    var ix = NODES.findIndex(function (n) {
+      return n.signal === sig;
+    });
+    return ix >= 0 ? NODES[ix] : null;
+  }
+
+  function syncPropagationSidebarUI(r) {
+    var propWrap = document.getElementById('propagation-actions-wrap');
+    var btn = document.getElementById('btn-toggle-propagation');
+    if (!r || !r.hasPropagation) {
+      if (propWrap) propWrap.hidden = true;
+      if (window.radiomapPropagation && typeof window.radiomapPropagation.clearPropagationOverlay === 'function') {
+        window.radiomapPropagation.clearPropagationOverlay(propagationLayerGroup);
+      }
+      removePropagationLegend();
+      propagationToggleOn = false;
+      propagationActiveSignal = null;
+      if (btn) {
+        btn.setAttribute('aria-pressed', 'false');
+        btn.classList.remove('is-pressed');
+      }
+      return;
+    }
+    if (propWrap) propWrap.hidden = false;
+    if (btn) {
+      var on = !!(propagationToggleOn && propagationActiveSignal === r.signal);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.classList.toggle('is-pressed', on);
+    }
+  }
+
+  /** Mantiene signal + panel lateral (sb) + propagación (prop) en la URL para recargar y compartir. */
+  function syncRadiomapMapUiToUrl() {
+    try {
+      var u = new URL(window.location.href);
+      var p = u.searchParams;
+      p.delete('nosb');
+      if (selectedIdx !== null && NODES[selectedIdx]) {
+        var sig = NODES[selectedIdx].signal;
+        p.set('signal', sig);
+        var sbEl = document.getElementById('sidebar');
+        var sbOpen = !!(sbEl && sbEl.classList.contains('open'));
+        p.set('sb', sbOpen ? '1' : '0');
+        if (propagationToggleOn && propagationActiveSignal === sig) p.set('prop', '1');
+        else p.delete('prop');
+      } else {
+        var propSig =
+          propagationToggleOn && propagationActiveSignal ? propagationActiveSignal : null;
+        if (propSig) {
+          p.set('signal', propSig);
+          p.set('sb', '0');
+          p.set('prop', '1');
+        } else {
+          p.delete('signal');
+          p.delete('sb');
+          p.delete('prop');
+        }
+      }
+      var qs = p.toString();
+      history.replaceState(null, '', u.pathname + (qs ? '?' + qs : '') + u.hash);
+    } catch (eSync) { /* ignore */ }
+  }
 
   function syncNearRadiusFilterOverlay() {
     nearRadiusFilterLayer.clearLayers();
@@ -285,7 +416,7 @@
         else { fillOp = 0.02; strokeOp = 0.07; weight = 0.5; dashArr = null; }
 
         const circle = L.circle([r.lat, r.lon], {
-          radius: getRange(r) * 1000,
+          radius: DISPLAY_CIRCLE_RADIUS_KM * 1000,
           color: 'rgba('+rgb+','+strokeOp+')',
           fillColor: 'rgba('+rgb+','+fillOp+')',
           fillOpacity: 1, weight: weight, dashArray: dashArr, interactive: false,
@@ -370,8 +501,9 @@
 
   function setMode(mode){
     currentMode = mode;
-    ['markers','circles','both'].forEach(m=>{
-      document.getElementById('btn-'+m).classList.toggle('active', m===mode);
+    ['markers','circles','both'].forEach(function (m) {
+      var el = document.getElementById('btn-' + m);
+      if (el) el.classList.toggle('active', m === mode);
     });
     renderAll();
   }
@@ -395,6 +527,7 @@
   }
 
   function showUserLocationSidebar(lat, lon) {
+    resetPropagationSidebar();
     selectedIdx = null;
     if (typeof clearRadiusRefSignal === 'function') clearRadiusRefSignal();
     renderAll();
@@ -464,8 +597,11 @@
     const visibleIndices = getVisibleNodeIndices();
     visibleSet = new Set(visibleIndices);
     const visibleNodes = visibleIndices.map(function (i) { return NODES[i]; });
+    var clearedSelection = false;
     if (selectedIdx !== null && !visibleSet.has(selectedIdx)) {
       selectedIdx = null;
+      clearedSelection = true;
+      resetPropagationSidebar();
       const sb = document.getElementById('sidebar');
       if (sb) sb.classList.remove('open');
     }
@@ -478,10 +614,14 @@
     if (typeof saveFilterState === 'function') saveFilterState();
     if (typeof syncNearRadiusControl === 'function') syncNearRadiusControl();
     renderAll();
-    if (selectedIdx !== null) showSidebar(selectedIdx);
+    if (selectedIdx !== null && !opts.skipSidebar) showSidebar(selectedIdx);
+    if (selectedIdx !== null && NODES[selectedIdx]) {
+      syncPropagationSidebarUI(NODES[selectedIdx]);
+    }
     if (!opts.skipFitBounds) {
       fitMapToCriteriaPoints(visibleNodes, distAnchor);
     }
+    if (clearedSelection) syncRadiomapMapUiToUrl();
   }
   window.applyFilters = applyFilters;
 
@@ -529,9 +669,21 @@
     });
   }
 
-  function selectRepeater(idx, interaction){
+  function selectRepeater(idx, interaction, openOpts){
+    openOpts = openOpts || {};
+    var prevIdx = selectedIdx;
+    var prevSig = prevIdx !== null && NODES[prevIdx] ? NODES[prevIdx].signal : null;
     selectedIdx = idx;
     const r = NODES[idx];
+    var newSig = r ? r.signal : null;
+    if (prevSig != null && newSig != null && prevSig !== newSig) {
+      propagationToggleOn = false;
+      propagationActiveSignal = null;
+      if (window.radiomapPropagation && typeof window.radiomapPropagation.clearPropagationOverlay === 'function') {
+        window.radiomapPropagation.clearPropagationOverlay(propagationLayerGroup);
+      }
+      removePropagationLegend();
+    }
     if (r && typeof window.radiomapGaStationSelect === 'function') {
       window.radiomapGaStationSelect(r.signal, interaction || 'select');
     }
@@ -542,7 +694,8 @@
         clearRadiusRefSignal();
       }
     }
-    applyFilters({ skipFitBounds: true });
+    applyFilters({ skipFitBounds: true, skipSidebar: !!openOpts.skipSidebar });
+    if (openOpts.skipSidebar) syncRadiomapMapUiToUrl();
   }
 
   function showSidebar(idx){
@@ -598,7 +751,6 @@
     if (fieldShown(r.tono)) rows.push(['TONO', '<span class="sb-freq-val">' + escapeHtml(String(r.tono)) + ' Hz</span>']);
     if (fieldShown(r.potencia)) rows.push(['POTENCIA', escapeHtml(String(r.potencia)) + ' W']);
     if (fieldShown(r.ganancia)) rows.push(['GANANCIA', escapeHtml(String(r.ganancia)) + ' dBi']);
-    if (fieldShown(r.range_km)) rows.push(['COBERTURA', escapeHtml(String(r.range_km)) + ' km']);
     if (fieldShown(r.ubicacion)) rows.push(['UBICACIÓN', escapeHtml(r.ubicacion)]);
     if (fieldShown(r.vence)) rows.push(['VENCE', escapeHtml(r.vence)]);
     if (r.isEcholink) {
@@ -660,6 +812,7 @@
 
     body.innerHTML = html;
     document.getElementById('sidebar').classList.add('open');
+    syncRadiomapMapUiToUrl();
   }
 
   function downloadNeighborsCSV(){
@@ -711,9 +864,22 @@
   }
 
   function closeSidebar(){
+    var keepPropagation =
+      selectedIdx !== null &&
+      NODES[selectedIdx] &&
+      propagationToggleOn &&
+      propagationActiveSignal === NODES[selectedIdx].signal;
+    if (!keepPropagation) {
+      resetPropagationSidebar();
+    }
     document.getElementById('sidebar').classList.remove('open');
     selectedIdx = null;
     renderAll();
+    if (keepPropagation && propagationActiveSignal) {
+      var rKeep = nodeBySignal(propagationActiveSignal);
+      if (rKeep) syncPropagationSidebarUI(rKeep);
+    }
+    syncRadiomapMapUiToUrl();
   }
 
   /** Clic en el mapa (no en marcador): cerrar panel y quitar repetidora como referencia de distancia. GPS «cerca de mí» no se toca. */
@@ -722,12 +888,14 @@
     var hadRef = typeof getRadiusRefSignal === 'function' && !!getRadiusRefSignal();
     if (!hadSelection && !hadRef) return;
     if (hadSelection) {
+      resetPropagationSidebar();
       var sb = document.getElementById('sidebar');
       if (sb) sb.classList.remove('open');
       selectedIdx = null;
     }
     if (hadRef && typeof clearRadiusRefSignal === 'function') clearRadiusRefSignal();
     if (typeof applyFilters === 'function') applyFilters({ skipFitBounds: true });
+    if (hadSelection || hadRef) syncRadiomapMapUiToUrl();
   });
 
   function closeMenuMap() {
@@ -760,6 +928,90 @@
         e.preventDefault();
         selectRepeater(idx, 'neighbor');
       }
+    });
+  })();
+
+  function applyPropagationFromUrlIfNeeded() {
+    if (selectedIdx == null || !window.radiomapPropagation) return;
+    var r = NODES[selectedIdx];
+    if (!r || !r.hasPropagation) return;
+    var rp = window.radiomapPropagation;
+    var btn = document.getElementById('btn-toggle-propagation');
+    propagationToggleOn = true;
+    propagationActiveSignal = r.signal;
+    if (btn) btn.disabled = true;
+    rp.showPropagationOverlay(propagationLayerGroup, r.signal, { opacity: 0.45 })
+      .then(function () {
+        if (btn) {
+          btn.setAttribute('aria-pressed', 'true');
+          btn.classList.add('is-pressed');
+          btn.disabled = false;
+        }
+        var rDone = nodeBySignal(propagationActiveSignal);
+        if (rDone) showPropagationLegendFromNode(rDone);
+        var sb = document.getElementById('sidebar');
+        if (sb) sb.classList.remove('open');
+        closeMenuMap();
+        if (rDone) syncPropagationSidebarUI(rDone);
+        syncRadiomapMapUiToUrl();
+      })
+      .catch(function (err) {
+        console.error(err);
+        propagationToggleOn = false;
+        propagationActiveSignal = null;
+        rp.clearPropagationOverlay(propagationLayerGroup);
+        removePropagationLegend();
+        if (btn) btn.disabled = false;
+        syncRadiomapMapUiToUrl();
+      });
+  }
+
+  (function wirePropagationToggle() {
+    var btn = document.getElementById('btn-toggle-propagation');
+    if (!btn || !window.radiomapPropagation) return;
+    btn.addEventListener('click', function () {
+      var r = nodeForPropagationControl();
+      if (!r || !r.hasPropagation) return;
+      var rp = window.radiomapPropagation;
+      var pressed = btn.getAttribute('aria-pressed') === 'true';
+      if (pressed) {
+        propagationToggleOn = false;
+        propagationActiveSignal = null;
+        rp.clearPropagationOverlay(propagationLayerGroup);
+        removePropagationLegend();
+        btn.setAttribute('aria-pressed', 'false');
+        btn.classList.remove('is-pressed');
+        syncPropagationSidebarUI(nodeForPropagationControl());
+        syncRadiomapMapUiToUrl();
+        return;
+      }
+      btn.disabled = true;
+      propagationToggleOn = true;
+      propagationActiveSignal = r.signal;
+      rp.showPropagationOverlay(propagationLayerGroup, r.signal, { opacity: 0.45 })
+        .then(function () {
+          btn.setAttribute('aria-pressed', 'true');
+          btn.classList.add('is-pressed');
+          var rDone = nodeBySignal(propagationActiveSignal);
+          if (rDone) showPropagationLegendFromNode(rDone);
+          var sb = document.getElementById('sidebar');
+          if (sb) sb.classList.remove('open');
+          closeMenuMap();
+          if (rDone) syncPropagationSidebarUI(rDone);
+          syncRadiomapMapUiToUrl();
+        })
+        .catch(function (err) {
+          console.error(err);
+          propagationToggleOn = false;
+          propagationActiveSignal = null;
+          rp.clearPropagationOverlay(propagationLayerGroup);
+          removePropagationLegend();
+          alert('No se pudo cargar el mapa de propagación.');
+          syncRadiomapMapUiToUrl();
+        })
+        .finally(function () {
+          btn.disabled = false;
+        });
     });
   })();
 
@@ -802,12 +1054,27 @@
 
   window.__radiomapGetMapShareState = function () {
     const c = map.getCenter();
+    var sbEl = document.getElementById('sidebar');
+    var sidebarOpen = !!(sbEl && sbEl.classList.contains('open'));
+    var sig =
+      selectedIdx != null && NODES[selectedIdx]
+        ? NODES[selectedIdx].signal
+        : propagationToggleOn && propagationActiveSignal
+          ? propagationActiveSignal
+          : null;
+    var propagationOn = !!(
+      sig &&
+      propagationToggleOn &&
+      propagationActiveSignal === sig
+    );
     return {
       lat: c.lat,
       lng: c.lng,
       zoom: map.getZoom(),
       mode: currentMode,
-      signal: selectedIdx != null && NODES[selectedIdx] ? NODES[selectedIdx].signal : null
+      signal: sig,
+      sidebarOpen: sidebarOpen,
+      propagationOn: propagationOn
     };
   };
 
@@ -848,10 +1115,27 @@
   /* Sin URL de mapa compartido: applyFilters ya ajustó el zoom a los puntos que cumplen criterios (o Chile si no hay coords). */
 
   const sigParam = urlParams.get('signal');
+  const skipSidebarFromNosb = urlParams.get('nosb') === '1';
+  const skipSidebarFromSb = urlParams.get('sb') === '0';
+  const wantPropFromUrl = urlParams.get('prop') === '1';
   if (sigParam) {
     const idx = NODES.findIndex(n => n.signal === sigParam);
     if (idx >= 0) {
-      requestAnimationFrame(function () { selectRepeater(idx, 'url_signal'); });
+      requestAnimationFrame(function () {
+        const rNode = NODES[idx];
+        const skipForClosedPanel = skipSidebarFromNosb || skipSidebarFromSb;
+        const skipForPropagation = wantPropFromUrl && rNode.hasPropagation;
+        selectRepeater(idx, 'url_signal', {
+          skipSidebar: skipForClosedPanel || skipForPropagation
+        });
+        if (wantPropFromUrl && rNode.hasPropagation) {
+          requestAnimationFrame(function () {
+            applyPropagationFromUrlIfNeeded();
+          });
+        } else {
+          syncRadiomapMapUiToUrl();
+        }
+      });
     }
   }
 })();
