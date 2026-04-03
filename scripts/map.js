@@ -573,7 +573,7 @@
       '<div class="sb-detail-grid">' +
       '<div class="sb-row"><span class="sb-key">Filtro</span><span class="sb-val">Cerca de mí</span></div>' +
       '</div>' +
-      '<p class="sb-nearme-hint">No hay repetidoras visibles aquí. Ajustá filtros o la búsqueda.</p>';
+      '<p class="sb-nearme-hint">No hay repetidoras visibles aquí. Ajusta filtros o la búsqueda.</p>';
     if (typeof window.__radiomapCloseMapFilterSheet === 'function') window.__radiomapCloseMapFilterSheet();
     openSidebarAfterLayout(syncRadiomapMapUiToUrl);
   }

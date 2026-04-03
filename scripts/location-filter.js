@@ -605,7 +605,7 @@ function buildGuidedEmptyStateHtml() {
   var hints = [];
   if (f.hasSearch) hints.push('Borra o acorta el texto en el campo de búsqueda.');
   if (f.hasFilters) hints.push('Relaja los filtros: banda, región, tipo (Echolink / DMR / radioclub) o conferencia.');
-  if (f.hasNear) hints.push('Desactivá el filtro por distancia (ubicación o repetidora de referencia), o ampliá el radio (hasta ' + NEAR_ME_RADIUS_MAX_KM + ' km).');
+  if (f.hasNear) hints.push('Desactiva el filtro por distancia (ubicación o repetidora de referencia), o amplía el radio (hasta ' + NEAR_ME_RADIUS_MAX_KM + ' km).');
   if (hints.length === 0) hints.push('Amplía la búsqueda o quita filtros.');
   var items = hints.map(function (h) { return '<li>' + h + '</li>'; }).join('');
   return '<div class="no-results no-results--guided" role="status">' +

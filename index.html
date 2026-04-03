@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es-MX" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://cdnjs.cloudflare.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com https://google.com https://cdnjs.cloudflare.com https://cloudflareinsights.com; frame-src https://www.googletagmanager.com; upgrade-insecure-requests">
@@ -51,6 +51,7 @@
 <script defer src="scripts/station-display.js?v=__VERSION__"></script>
 <script defer src="scripts/propagation-map.js?v=__VERSION__"></script>
 <script defer src="scripts/analytics.js?v=__VERSION__"></script>
+<script defer src="scripts/coach-marks.js?v=__VERSION__"></script>
 </head>
 <body class="page-map">
 <div id="app">
@@ -58,9 +59,9 @@
 <!-- HEADER -->
 <header class="header header--app-bar">
   <a href="https://www.radiomap.cl/" class="header-signal header-signal--map"><span class="header-signal-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M 5 22 A 11 11 0 0 1 27 22"/><path d="M 9 22 A 7 7 0 0 1 23 22"/><path d="M 12 22 A 4 4 0 0 1 20 22"/></g><circle cx="16" cy="22" r="2.25" fill="currentColor"/></svg></span><span class="header-signal-text"><span class="header-signal-title">Radiomap</span><span class="header-signal-version" id="header-app-version" aria-label="Versión">__VERSION__</span></span></a>
-  <nav class="header-nav header-nav--map" aria-label="Navegación principal">
-    <a href="index.html" class="header-link header-link-nav header-link-nav--map current">MAPA</a>
-    <a href="lista.html" class="header-link header-link-nav header-link-nav--list">LISTA</a>
+  <nav class="header-nav header-view-switch" aria-label="Navegación principal">
+    <a href="index.html" class="header-view-switch__segment header-view-switch__segment--map current" aria-current="page">Mapa</a>
+    <a href="lista.html" class="header-view-switch__segment header-view-switch__segment--list">Lista</a>
   </nav>
   <div class="header-map-tools">
     <div class="header-actions">
@@ -107,7 +108,7 @@
         <h3>Para qué sirve</h3>
         <ul>
           <li>Ver en el mapa repetidoras, nodos Echolink y estaciones DMR; círculos orientativos, propagación donde exista, y ubicación.</li>
-          <li><strong>Cerca de mí</strong> — botón con icono de ubicación (<span class="material-symbols-outlined help-inline-icon" aria-hidden="true">my_location</span>) junto a la búsqueda, o la misma opción en el menú ☰: filtra por distancia desde tu posición. En el mapa, también podés elegir una repetidora y usar el deslizador <strong>Radio</strong> (20–100 km) desde esa señal.</li>
+          <li><strong>Cerca de mí</strong> — botón con icono de ubicación (<span class="material-symbols-outlined help-inline-icon" aria-hidden="true">my_location</span>) junto a la búsqueda, o la misma opción en el menú ☰: filtra por distancia desde tu posición. En el mapa, también puedes elegir una repetidora y usar el deslizador <strong>Radio</strong> (20–100 km) desde esa señal.</li>
           <li>Buscar por señal, comuna, frecuencias (RX/TX/tono) o filtrar por banda, región y tipo (Echolink / DMR / radioclubes).</li>
           <li>Revisar datos de cada nodo y descargar listas en CSV (botón ↓ CSV siempre visible).</li>
           <li><strong>↗ Compartir</strong>: mensaje con enlace que incluye filtros, ubicación o repetidora de referencia (si aplica), <strong>radio en km</strong> (<code>nearRadius</code>), posición del mapa y la repetidora abierta en el panel (si hay una). En el mapa, si el navegador lo permite, se adjunta una <strong>captura de la vista actual</strong>.</li>
@@ -172,7 +173,10 @@
         <h2 id="map-filter-sheet-title" class="map-filter-sheet-panel__title">Filtros</h2>
         <p class="map-filter-sheet-panel__meta" id="filter-unified-summary-sheet" aria-live="polite"></p>
       </div>
-      <button type="button" id="btn-map-filter-sheet-close" class="map-filter-sheet-panel__close" aria-label="Cerrar filtros"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      <div class="map-filter-sheet-panel__header-actions">
+        <button type="button" class="map-filter-sheet-panel__clear" onclick="clearAllFilters()" title="Quitar búsqueda, filtros y cerca de mí" aria-label="Limpiar filtros"><span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span></button>
+        <button type="button" id="btn-map-filter-sheet-close" class="map-filter-sheet-panel__close" aria-label="Cerrar filtros"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      </div>
     </div>
     <div class="map-filter-sheet-panel__body">
   <details class="filter-dropdown filter-dropdown--unified" id="map-filters-details">
