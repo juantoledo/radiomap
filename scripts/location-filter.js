@@ -247,6 +247,67 @@ function setCheckedFilterValues(listId, values) {
   });
 }
 
+/** CSV `serviceType` filters — hide row when no station has that type (e.g. no Bomberos → hide Bomberos). */
+var FILTER_TYPE_SERVICE_IDS = ['atc', 'fire', 'ambulance', 'sea'];
+
+/**
+ * Hide tipo rows for service icons (ATC, bomberos, ambulancia, marítimo) when no station matches.
+ * Echolink / DMR / Radioclubes stay visible. Call after loadFilterState() so URLs/session are cleaned.
+ */
+function syncFilterTypeOptionsAvailability() {
+  var listEl = document.getElementById('filter-type');
+  if (!listEl || typeof NODES === 'undefined' || !NODES.length) return;
+
+  var getSvc =
+    typeof getStationServiceType === 'function'
+      ? getStationServiceType
+      : function (r) {
+          if (!r) return '';
+          var t = String(r.serviceType || '')
+            .trim()
+            .toLowerCase();
+          if (t === 'atc' || t === 'fire' || t === 'ambulance' || t === 'sea') return t;
+          return r.isAir ? 'atc' : '';
+        };
+
+  var counts = { atc: 0, fire: 0, ambulance: 0, sea: 0 };
+
+  for (var i = 0; i < NODES.length; i++) {
+    var r = NODES[i];
+    var svc = getSvc(r) || '';
+    if (svc === 'atc') counts.atc++;
+    else if (svc === 'fire') counts.fire++;
+    else if (svc === 'ambulance') counts.ambulance++;
+    else if (svc === 'sea') counts.sea++;
+  }
+
+  listEl.querySelectorAll('label.filter-checkbox-row:not(.filter-checkbox-row--all)').forEach(function (label) {
+    var inp = label.querySelector('input[data-filter-value]');
+    if (!inp) return;
+    var v = inp.getAttribute('data-filter-value') || '';
+    if (FILTER_TYPE_SERVICE_IDS.indexOf(v) < 0) {
+      label.hidden = false;
+      return;
+    }
+    var show = counts[v] > 0;
+    label.hidden = !show;
+    if (!show) inp.checked = false;
+  });
+
+  var allInput = listEl.querySelector('input[data-filter-all="1"]');
+  var valueInputs = listEl.querySelectorAll('input[data-filter-value]');
+  var anyChecked = false;
+  valueInputs.forEach(function (inp) {
+    if (inp.checked) anyChecked = true;
+  });
+  if (!anyChecked && allInput) allInput.checked = true;
+
+  if (typeof updateFilterMultiselectSummaries === 'function') updateFilterMultiselectSummaries();
+  if (typeof saveFilterState === 'function') saveFilterState();
+}
+
+window.syncFilterTypeOptionsAvailability = syncFilterTypeOptionsAvailability;
+
 function syncCheckboxGroup(listEl, changedInput) {
   const allInput = listEl.querySelector('input[data-filter-all="1"]');
   const valueInputs = listEl.querySelectorAll('input[data-filter-value]');
@@ -282,6 +343,9 @@ function buildUnifiedFilterSummaryText() {
         if (v === 'echolink') return 'Echolink';
         if (v === 'dmr') return 'DMR';
         if (v === 'atc') return 'ATC / aéreo';
+        if (v === 'fire') return 'Bomberos';
+        if (v === 'ambulance') return 'Ambulancia';
+        if (v === 'sea') return 'Marítimo';
         if (v === 'radioclub') return 'Radioclubes';
       }
       return v;
@@ -337,6 +401,9 @@ function updateFilterMultiselectSummaries() {
     if (v === 'echolink') return 'Echolink';
     if (v === 'dmr') return 'DMR';
     if (v === 'atc') return 'ATC / aéreo';
+    if (v === 'fire') return 'Bomberos';
+    if (v === 'ambulance') return 'Ambulancia';
+    if (v === 'sea') return 'Marítimo';
     if (v === 'radioclub') return 'Radioclubes';
     return v;
   });
@@ -513,11 +580,15 @@ function nodeMatchesFilterCriteria(r, c, distAnchor) {
     if (!c.bandas.some(function (x) { return b.indexOf(x) >= 0; })) return false;
   }
   if (c.types && c.types.length) {
+    var svc = typeof getStationServiceType === 'function' ? (getStationServiceType(r) || '') : (r.isAir ? 'atc' : '');
     var okType = c.types.some(function (t) {
       if (t === 'echolink') return !!r.isEcholink;
       if (t === 'dmr') return !!r.isDMR;
-      if (t === 'atc') return !!r.isAir;
-      if (t === 'radioclub') return !r.isEcholink && !r.isDMR && !r.isAir;
+      if (t === 'atc') return svc === 'atc';
+      if (t === 'fire') return svc === 'fire';
+      if (t === 'ambulance') return svc === 'ambulance';
+      if (t === 'sea') return svc === 'sea';
+      if (t === 'radioclub') return !r.isEcholink && !r.isDMR && !svc;
       return false;
     });
     if (!okType) return false;
@@ -529,7 +600,7 @@ function nodeMatchesFilterCriteria(r, c, distAnchor) {
   if (c.q) {
     var haystack = [
       r.signal, r.nombre, r.comuna, r.ubicacion, r.region, r.rx, r.tx, r.tono, r.banda,
-      r.conference, r.color, r.slot, r.tg, r.website
+      r.conference, r.color, r.slot, r.tg, r.website, r.notes, r.serviceType
     ].filter(Boolean).join(' ').toLowerCase();
     if (haystack.indexOf(c.q) < 0) return false;
   }

@@ -66,11 +66,12 @@ Los `README.md` dentro de cada carpeta de señal documentan corridas concretas (
 | `isEcholink` | `1`, `true` o `yes` = nodo Echolink; vacío u otro = no. |
 | `conference` | Nombre de la **conferencia o red** (Echolink, DMR u otro): ej. `Red Chile`, `RCDR`, `SUR`, `Zona DMR CL`. Vacío si no aplica. |
 | `isDMR` | `1`, `true` o `yes` = estación / repetidor DMR; vacío u otro = no. |
-| `isAir` | `1`, `true` o `yes` = ATC / aeronáutico (solo escucha donde aplique); vacío u otro = no. |
+| `serviceType` | Servicio / icono especial en mapa y lista: `atc` (ATC / aeronáutico), `fire` (bomberos), `ambulance` (ambulancia / emergencia médica), `sea` (marítimo / costa). **Un valor como máximo**; vacío = repetidor genérico. En `data.js` se deriva `isAir === true` cuando `serviceType` es `atc` (compatibilidad con propagación y filtros). |
 | `color` | Código o etiqueta de **color** (CC) DMR. Vacío si no aplica. Varios valores: **separar con espacio** (ej. `1`). |
 | `slot` | **Slot** de tiempo DMR. Varios slots: **solo espacios** (ej. `1 2`), sin «y». |
 | `tg` | **Talkgroups** DMR. Varios TG: **solo espacios** (ej. `730 7300444 7301`), sin guiones. Sin filtro dedicado en la app. |
 | `website` | URL pública del club o red asociada a esa fila (ver abajo). |
+| `notes` | Notas libres de curación (texto). Vacío si no aplica. En la app solo se muestran en el **detalle de estación** (lista) cuando hay contenido; entran en búsqueda y en la exportación CSV. |
 
 ### `isEcholink` y `conference`
 
@@ -110,4 +111,4 @@ Columna opcional. Si está vacía, la interfaz no muestra enlace junto a la señ
 
 ## Referencia rápida de columnas (una línea)
 
-`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `isAir`, `color`, `slot`, `tg`, `website`.
+`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `serviceType`, `color`, `slot`, `tg`, `website`, `notes`.

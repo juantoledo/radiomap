@@ -3,8 +3,8 @@
  * criteria: from getExportFilterCriteria() — { search, nearMe, bandas, regions, types, conferences }
  */
 function exportRepeatersCSV(rows, criteria) {
-  const cols = ['signal', 'nombre', 'banda', 'comuna', 'ubicacion', 'rx', 'tx', 'tono', 'potencia', 'ganancia', 'region', 'vence', 'isEcholink', 'isDMR', 'isAir', 'conference', 'color', 'slot', 'tg', 'website'];
-  const headers = ['Señal', 'Club/Titular', 'Banda', 'Comuna', 'Ubicación', 'RX (MHz)', 'TX (MHz)', 'Tono', 'Pot. W', 'Gan. dBi', 'Región', 'Vence', 'Echolink', 'DMR', 'ATC aéreo', 'Conferencia / red', 'Color', 'Slot', 'TG', 'Sitio web'];
+  const cols = ['signal', 'nombre', 'banda', 'comuna', 'ubicacion', 'rx', 'tx', 'tono', 'potencia', 'ganancia', 'region', 'vence', 'isEcholink', 'isDMR', 'serviceType', 'conference', 'color', 'slot', 'tg', 'website', 'notes'];
+  const headers = ['Señal', 'Club/Titular', 'Banda', 'Comuna', 'Ubicación', 'RX (MHz)', 'TX (MHz)', 'Tono', 'Pot. W', 'Gan. dBi', 'Región', 'Vence', 'Echolink', 'DMR', 'Servicio (icono)', 'Conferencia / red', 'Color', 'Slot', 'TG', 'Sitio web', 'Notas'];
   const esc = function (v) {
     if (v == null || v === '') return '';
     var s = '' + v;
@@ -16,7 +16,7 @@ function exportRepeatersCSV(rows, criteria) {
   };
   const csv = [headers.join(','), ...rows.map(function (r) {
     return cols.map(function (c) {
-      if (c === 'isEcholink' || c === 'isDMR' || c === 'isAir') return esc(fmtBool(r[c]));
+      if (c === 'isEcholink' || c === 'isDMR') return esc(fmtBool(r[c]));
       return esc(r[c]);
     }).join(',');
   })].join('\n');
@@ -45,6 +45,9 @@ function buildExportFilename(criteria) {
     if (types.indexOf('dmr') >= 0) parts.push('dmr');
     if (types.indexOf('radioclub') >= 0) parts.push('radioclubes');
     if (types.indexOf('atc') >= 0) parts.push('atc');
+    if (types.indexOf('fire') >= 0) parts.push('bomberos');
+    if (types.indexOf('ambulance') >= 0) parts.push('ambulancia');
+    if (types.indexOf('sea') >= 0) parts.push('maritimo');
     if (!types.length && criteria.echolink === 'only') parts.push('echolink');
     if (!types.length && criteria.echolink === 'no') parts.push('repetidoras');
     const conferences = criteria.conferences || (criteria.echoLinkConference ? [criteria.echoLinkConference] : []);

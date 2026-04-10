@@ -1,6 +1,6 @@
 /**
  * Map view — Leaflet map, circles, markers, sidebar, filters
- * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), propagation-map.js (radiomapPropagation: overlay + leyenda dBm flotante en el mapa)
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), station-service-icons.js (getStationServiceType, stationServiceIconInlineHtml, …), propagation-map.js (radiomapPropagation: overlay + leyenda dBm flotante en el mapa)
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -14,18 +14,6 @@
   function getClubName(signal) { var n = NODES && NODES.find(function(x){ return x.signal === signal; }); return n ? (n.nombre || '') : ''; }
   window.getClubName = getClubName;
 
-  function aircraftIconSvgHtml() {
-    return '<svg class="signal-air-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>';
-  }
-  /** Same path as signal-air-icon; class sized for sidebar “nodos cercanos” ATC chip */
-  function neighborAtcIconSvgHtml() {
-    return '<svg class="neighbor-atc-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>';
-  }
-  /** Aircraft icon for Leaflet divIcon marker; px scales with marker size (9 / 14) */
-  function rptMarkerAircraftSvgHtml(px) {
-    var p = Math.max(4, Math.round(px));
-    return '<svg class="rpt-marker-air-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + p + '" height="' + p + '" aria-hidden="true" focusable="false"><path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>';
-  }
   function safeWebsiteUrl(w) {
     w = (w || '').trim();
     if (!/^https?:\/\//i.test(w)) return '';
@@ -308,6 +296,7 @@
     });
   }
   if (typeof loadFilterState === 'function') loadFilterState();
+  if (typeof syncFilterTypeOptionsAvailability === 'function') syncFilterTypeOptionsAvailability();
 
   /** Fit map to stations matching current filters (lat/lon only). Optionally include distance anchor in bounds. */
   const FIT_BOUNDS_PADDING = [40, 40];
@@ -457,7 +446,7 @@
         const size = isSelected ? 14 : 9;
         const isEch = r.isEcholink;
         const isDmr = r.isDMR && !isEch;
-        const isAir = !!r.isAir && !isEch && !isDmr;
+        const svcT = !isEch && !isDmr && typeof getStationServiceType === 'function' ? getStationServiceType(r) : '';
         let shape = 'border-radius:50%';
         let inner = '';
         let extraClass = '';
@@ -469,9 +458,9 @@
           shape = 'border-radius:3px;transform:rotate(45deg)';
           inner = '<span style="color:rgba(255,255,255,0.95);font:600 '+(size*0.55)+'px/1 sans-serif;pointer-events:none;transform:rotate(-45deg)">d</span>';
           extraClass = ' rpt-marker-dmr';
-        } else if (isAir) {
-          inner = rptMarkerAircraftSvgHtml(size * 0.58);
-          extraClass = ' rpt-marker-atc';
+        } else if (svcT && typeof stationServiceMarkerInnerHtml === 'function') {
+          inner = stationServiceMarkerInnerHtml(svcT, size * 0.58);
+          extraClass = ' rpt-marker-service rpt-marker-service--' + svcT;
         }
         const icon = L.divIcon({
           className: '',
@@ -484,7 +473,7 @@
         const confT = (r.conference || '').trim();
         const echolinkLine = r.isEcholink ? '<br><span class="rpt-tooltip-meta">Echolink' + (fieldShown(confT) ? ' · ' + escapeHtml(confT) : '') + '</span>' : '';
         const dmrLine = r.isDMR && !r.isEcholink ? '<br><span class="rpt-tooltip-meta">DMR' + (fieldShown(confT) ? ' · ' + escapeHtml(confT) : '') + '</span>' : '';
-        const sigLead = r.isAir ? aircraftIconSvgHtml() : '';
+        const sigLead = typeof stationServiceIconInlineHtml === 'function' ? stationServiceIconInlineHtml(r, '') : '';
         const locParts = [];
         if (fieldShown(r.comuna)) locParts.push(escapeHtml(r.comuna));
         if (fieldShown(r.banda)) locParts.push(escapeHtml(r.banda));
@@ -565,7 +554,7 @@
     const sbClub = document.getElementById('sb-club');
     const body = document.getElementById('sb-body');
     if (!sidebar || !sbSig || !sbClub || !body) return;
-    sbSig.classList.remove('sidebar-signal--with-web', 'sidebar-signal--air');
+    sbSig.classList.remove('sidebar-signal--with-web', 'sidebar-signal--service');
     sbSig.textContent = 'Tu ubicación';
     sbSig.style.color = '#00d4ff';
     sbClub.textContent = lat.toFixed(5) + ', ' + lon.toFixed(5);
@@ -737,12 +726,13 @@
     const club = r.nombre || getClubName(r.signal);
     var sbSig = document.getElementById('sb-signal');
     var wurl = safeWebsiteUrl(r.website);
-    sbSig.classList.toggle('sidebar-signal--air', !!r.isAir);
-    var airPre = r.isAir ? aircraftIconSvgHtml() : '';
+    var hasSvc = typeof hasStationServiceType === 'function' ? hasStationServiceType(r) : !!r.isAir;
+    sbSig.classList.toggle('sidebar-signal--service', hasSvc);
+    var svcPre = typeof stationServiceIconInlineHtml === 'function' ? stationServiceIconInlineHtml(r, '') : '';
     if (wurl) {
       sbSig.classList.add('sidebar-signal--with-web');
       sbSig.innerHTML =
-        airPre +
+        svcPre +
         '<span class="sidebar-signal-text">' +
         escapeHtml(r.signal) +
         '</span><a href="' +
@@ -751,9 +741,9 @@
       var st = sbSig.querySelector('.sidebar-signal-text');
       if (st) st.style.color = color;
       sbSig.style.color = '';
-    } else if (r.isAir) {
+    } else if (hasSvc) {
       sbSig.classList.remove('sidebar-signal--with-web');
-      sbSig.innerHTML = airPre + '<span class="sidebar-signal-text">' + escapeHtml(r.signal) + '</span>';
+      sbSig.innerHTML = svcPre + '<span class="sidebar-signal-text">' + escapeHtml(r.signal) + '</span>';
       var stA = sbSig.querySelector('.sidebar-signal-text');
       if (stA) stA.style.color = color;
       sbSig.style.color = '';
@@ -827,12 +817,13 @@
           : '';
         const isSelected = n.idx === idx;
         const distStr = n.dist === 0 ? '0 km' : n.dist+' km';
+        var neighborSvc = typeof stationServiceNeighborDotHtml === 'function' ? stationServiceNeighborDotHtml(nb, nc) : '';
         const dotEl = nb.isEcholink
           ? '<div class="neighbor-echolink" style="background:'+nc+'" title="Echolink">e</div>'
           : nb.isDMR
           ? '<div class="neighbor-dmr" style="background:'+nc+'" title="DMR"><span class="neighbor-dmr-letter" aria-hidden="true">d</span></div>'
-          : nb.isAir
-          ? '<div class="neighbor-atc" style="background:'+nc+'" title="ATC / aéreo">' + neighborAtcIconSvgHtml() + '</div>'
+          : neighborSvc
+          ? neighborSvc
           : '<div class="neighbor-dot" style="background:'+nc+'"></div>';
         return '<div class="neighbor-row'+(isSelected?' neighbor-selected':'')+'" onclick="selectRepeater('+n.idx+',\'neighbor\')" tabindex="0" role="button" data-idx="'+n.idx+'" aria-label="'+escapeAttr(nb.signal)+(isSelected?' (este)':'')+'">' +
           dotEl +

@@ -14,7 +14,7 @@ Node objects follow CSV-derived fields (see `data/README.md`); the generator may
 
 ## CSV column order (one line)
 
-`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `isAir`, `color`, `slot`, `tg`, `website`
+`signal`, `nombre`, `comuna`, `ubicacion`, `lat`, `lon`, `potencia`, `ganancia`, `banda`, `rx`, `tx`, `tono`, `region`, `otorga`, `vence`, `isEcholink`, `conference`, `isDMR`, `serviceType`, `color`, `slot`, `tg`, `website`, `notes`
 
 (Confirm against `data/README.md` if the pipeline adds columns.)
 

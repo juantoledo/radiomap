@@ -1,6 +1,6 @@
 /**
  * List view — table by region, filters, share
- * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getFilteredNodes), dmr-ui.js (buildDmrDetailHtml), share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue)
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getFilteredNodes), dmr-ui.js (buildDmrDetailHtml), share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), station-service-icons.js
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -50,17 +50,11 @@
     });
   }
   if (typeof loadFilterState === 'function') loadFilterState();
+  if (typeof syncFilterTypeOptionsAvailability === 'function') syncFilterTypeOptionsAvailability();
 
   let sortCol = null;
   let sortDir = 'asc';
 
-  function parseDate(s) {
-    if (!s) return null;
-    const p = String(s).trim().split('-');
-    if (p.length !== 3) return new Date(s);
-    if (p[0].length === 4) return new Date(s);
-    return new Date(parseInt(p[2],10), parseInt(p[1],10)-1, parseInt(p[0],10));
-  }
   function cmpStr(a, b) {
     const sa = (a == null || a === '') ? null : String(a);
     const sb = (b == null || b === '') ? null : String(b);
@@ -77,14 +71,6 @@
     if (nb === null || isNaN(nb)) return -1;
     return na - nb;
   }
-  function cmpDate(a, b) {
-    const da = parseDate(a);
-    const db = parseDate(b);
-    if (!da && !db) return 0;
-    if (!da || isNaN(da)) return 1;
-    if (!db || isNaN(db)) return -1;
-    return da - db;
-  }
   const SORT_COMPARATORS = {
     signal:    (a, b) => cmpStr(a.signal, b.signal),
     banda:     (a, b) => cmpStr(a.banda, b.banda),
@@ -95,19 +81,9 @@
     nombre:    (a, b) => cmpStr(a.nombre, b.nombre),
     comuna:    (a, b) => cmpStr(a.comuna, b.comuna),
     ubicacion: (a, b) => cmpStr(a.ubicacion, b.ubicacion),
-    vence:     (a, b) => cmpDate(a.vence, b.vence),
     _dist:     (a, b) => cmpNum(a._dist, b._dist),
   };
 
-  function venceClass(vence) {
-    if (!vence) return '';
-    const d = parseDate(vence);
-    const now = new Date();
-    const diff = (d - now) / (1000*60*60*24);
-    if (diff < 0) return 'vence-expired';
-    if (diff < 365) return 'vence-warn';
-    return 'vence-ok';
-  }
   function bandaClass(banda) {
     const b = banda || '';
     if (b.includes('ATC') || b.includes('/AM')) return 'badge-air';
@@ -133,14 +109,6 @@
       ' <a href="' +
       escapeAttr(wurl) +
       '" class="station-website-link" target="_blank" rel="noopener noreferrer" aria-label="Sitio web" title="Sitio web"><span class="material-symbols-outlined" aria-hidden="true">language</span></a>'
-    );
-  }
-
-  /** Inline aircraft icon (ATC / isAir) — prepended before signal text */
-  function aircraftIconHtml() {
-    return (
-      '<svg class="signal-air-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-      '<path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>'
     );
   }
 
@@ -192,13 +160,15 @@
       distKm = Math.round(haversine(distAnchor.lat, distAnchor.lon, r.lat, r.lon));
     }
 
-    titleEl.classList.toggle('station-detail-signal--with-air', !!r.isAir);
+    const hasSvc = typeof hasStationServiceType === 'function' ? hasStationServiceType(r) : !!r.isAir;
+    titleEl.classList.toggle('station-detail-signal--with-service', hasSvc);
     const wurl = safeWebsiteUrl(r.website);
-    const sigHtml = (r.isAir ? aircraftIconHtml() : '') + escapeHtml(r.signal || '—');
+    const svcIcon = typeof stationServiceIconInlineHtml === 'function' ? stationServiceIconInlineHtml(r, '') : '';
+    const sigHtml = svcIcon + escapeHtml(r.signal || '—');
     if (wurl) {
       titleEl.classList.add('station-detail-signal--with-web');
       titleEl.innerHTML = sigHtml + websiteLinkHtml(r);
-    } else if (r.isAir) {
+    } else if (hasSvc) {
       titleEl.classList.remove('station-detail-signal--with-web');
       titleEl.innerHTML = sigHtml;
     } else {
@@ -240,6 +210,12 @@
     }
     if (fieldShown(r.otorga)) rows.push([['Otorga', ''], fmtVal(r.otorga)]);
     if (fieldShown(r.vence)) rows.push([['Vence', ''], fmtVal(r.vence)]);
+    if (fieldShown(r.notes)) {
+      const notesHtml = String(r.notes).split(/\r?\n/).map(function (line) {
+        return escapeHtml(line);
+      }).join('<br>');
+      rows.push([['Notas', 'station-detail-grid-full station-detail-notes'], notesHtml, 'html']);
+    }
 
     if (r.isEcholink) {
       const ccf = (r.conference || '').trim();
@@ -310,7 +286,7 @@
     const titleEl = document.getElementById('station-detail-title');
     if (!overlay) return;
     if (titleEl) {
-      titleEl.classList.remove('station-detail-signal--with-web', 'station-detail-signal--with-air');
+      titleEl.classList.remove('station-detail-signal--with-web', 'station-detail-signal--with-service');
       titleEl.textContent = '—';
     }
     overlay.classList.remove('open');
@@ -450,25 +426,24 @@
             ${thSort('signal','Señal')}
             ${showDistance ? thSort('_dist','Distancia') : ''}
             ${thSort('rx','RX (MHz)')}${thSort('tx','TX (MHz)')}${thSort('tono','Tono')}${thSort('potencia','Pot. W')}
-            ${thSort('nombre','Club / Titular')}${thSort('comuna','Comuna')}${thSort('ubicacion','Ubicación')}${thSort('vence','Vence')}
+            ${thSort('nombre','Club / Titular')}${thSort('comuna','Comuna')}${thSort('ubicacion','Ubicación')}
           </tr></thead>
           <tbody>`;
 
       rows.forEach(r => {
-        const vc = fieldShown(r.vence) ? venceClass(r.vence) : '';
         const bc = bandaClass(r.banda);
         const bandaShort = (r.banda || '').replace('/FM','');
         const confEsc = escapeAttr(r.conference || '');
         const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${confEsc}">Echolink</span>` : '';
         const dmrBadge = r.isDMR && !r.isEcholink ? `<span class="badge-dmr" title="${confEsc}">DMR</span>` : '';
-        const atcBadge = r.isAir ? '<span class="badge-atc" title="ATC aeronáutico (solo RX / escucha)">ATC</span>' : '';
+        const svcBadge = typeof stationServiceBadgeHtml === 'function' ? stationServiceBadgeHtml(r) : '';
         const distHasVal = showDistance && r._dist != null && typeof r._dist === 'number' && !isNaN(r._dist);
         const distCell = showDistance
           ? `<td class="cell-dist${distHasVal ? '' : ' cell-empty'}" data-label="Distancia">${distHasVal ? r._dist + ' km' : ''}</td>`
           : '';
         const sigAttr = (r.signal || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
         const webLink = websiteLinkHtml(r);
-        const sigLead = r.isAir ? aircraftIconHtml() : '';
+        const sigLead = typeof stationServiceIconInlineHtml === 'function' ? stationServiceIconInlineHtml(r, '') : '';
         const clubStrong = fieldShown(r.nombre) ? `<strong>${escapeHtml(r.nombre)}</strong>` : '';
         const clubSmall = fieldShown(r.region) ? `<small>${escapeHtml(r.region)}</small>` : '';
         const clubEmpty = !fieldShown(r.nombre) && !fieldShown(r.region);
@@ -477,7 +452,7 @@
           ? `<span class="cell-signal-banda"><span class="badge-banda ${bc}">${escapeHtml(bandaShort)}</span></span>`
           : '';
         html += `<tr class="rpt-row" data-signal="${sigAttr}" data-node-idx="${r._idx}">
-          <td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">${sigLead}${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}${atcBadge}</span>${bandaBadge}</span>${shareBtn}</td>
+          <td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">${sigLead}${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}${svcBadge}</span>${bandaBadge}</span>${shareBtn}</td>
           ${distCell}
           <td class="cell-freq freq-rx${cellEmptyClass(r.rx)}" data-label="RX (MHz)">${fieldShown(r.rx) ? r.rx : ''}</td>
           <td class="cell-freq freq-tx${cellEmptyClass(r.tx)}" data-label="TX (MHz)">${fieldShown(r.tx) ? r.tx : ''}</td>
@@ -486,7 +461,6 @@
           <td class="cell-club${clubEmpty ? ' cell-empty' : ''}" data-label="Club / Titular">${clubStrong}${clubSmall}</td>
           <td class="cell-comuna${cellEmptyClass(r.comuna)}" data-label="Comuna">${fieldShown(r.comuna) ? escapeHtml(r.comuna) : ''}</td>
           <td class="cell-ub${cellEmptyClass(r.ubicacion)}" data-label="Ubicación">${fieldShown(r.ubicacion) ? escapeHtml(r.ubicacion) : ''}</td>
-          <td class="cell-vence ${vc}${cellEmptyClass(r.vence)}" data-label="Vence">${fieldShown(r.vence) ? escapeHtml(r.vence) : ''}</td>
         </tr>`;
       });
 

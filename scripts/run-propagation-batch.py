@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Batch-invoke Signal-Server runsignal-hd-transparent.sh for each eligible row in
-data/curated_stations.csv (ham repeaters / Echolink / DMR; excludes ATC via isAir).
+data/curated_stations.csv (ham repeaters / Echolink / DMR; excludes ATC via serviceType=atc).
 
 Signal-Server root is required: set **SIGNAL_SERVER_ROOT** or pass **--signal-server-root**.
 
@@ -48,10 +48,9 @@ def _resolve_signal_server_root(cli_path: Path | None) -> Path | None:
     return None
 
 
-def _truthy_air(v: str | None) -> bool:
-    if not v or not isinstance(v, str):
-        return False
-    return v.strip().lower() in ("1", "true", "yes")
+def _is_atc_row(row: dict) -> bool:
+    """ATC / aeronáutico: no propagación (columna CSV `serviceType` = atc)."""
+    return (row.get("serviceType") or "").strip().lower() == "atc"
 
 
 def _parse_float(s: str | None) -> float | None:
@@ -133,7 +132,7 @@ def build_argv(
 
 def main() -> int:
     p = argparse.ArgumentParser(
-        description="Run Signal-Server propagation wrapper for each CSV row (skips isAir)."
+        description="Run Signal-Server propagation wrapper for each CSV row (skips serviceType=atc / ATC)."
     )
     p.add_argument(
         "--csv",
@@ -214,7 +213,7 @@ def main() -> int:
                 continue
             if args.only_signal is not None and sig != args.only_signal.strip():
                 continue
-            if _truthy_air(row.get("isAir")):
+            if _is_atc_row(row):
                 skipped += 1
                 continue
 

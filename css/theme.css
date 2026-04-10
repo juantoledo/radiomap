@@ -607,6 +607,10 @@ input[type=text] { width: 200px; }
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
 }
+/* syncFilterTypeOptionsAvailability: author display:flex must not override [hidden] */
+.filter-checkbox-list .filter-checkbox-row[hidden] {
+  display: none !important;
+}
 .filter-checkbox-row:hover { background: rgba(0, 212, 255, 0.06); }
 .filter-checkbox-row input {
   margin-top: 0;
@@ -1217,7 +1221,7 @@ html[data-theme="light"] #sidebar.open .sidebar-panel-slide {
   font-size: var(--fs-xs);
 }
 .sidebar-signal { font-family: var(--font-mono); font-size: var(--fs-lg); color: var(--accent); }
-.sidebar-signal.sidebar-signal--air {
+.sidebar-signal.sidebar-signal--service {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -1648,7 +1652,7 @@ html[data-theme="light"] .btn-toggle-propagation[aria-pressed="true"] {
   line-height: 1;
   pointer-events: none;
 }
-.neighbor-atc {
+.neighbor-service {
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -1661,7 +1665,7 @@ html[data-theme="light"] .btn-toggle-propagation[aria-pressed="true"] {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
   color: rgba(255,255,255,0.95);
 }
-.neighbor-atc-icon {
+.neighbor-service-icon {
   width: 10px;
   height: 10px;
   display: block;
@@ -1793,10 +1797,10 @@ html[data-theme="light"] .btn-toggle-propagation[aria-pressed="true"] {
 }
 .rpt-marker:hover { transform: scale(1.6); border-color: var(--accent) !important; box-shadow: 0 0 6px rgba(0,212,255,0.4); }
 .rpt-marker.selected { transform: scale(1.8); border-color: rgba(255,255,255,0.9); box-shadow: 0 0 8px rgba(0,212,255,0.6); }
-.rpt-marker-atc {
+.rpt-marker-service {
   color: rgba(255,255,255,0.95);
 }
-.rpt-marker-air-icon {
+.rpt-marker-service-icon {
   display: block;
   pointer-events: none;
   flex-shrink: 0;
@@ -2253,8 +2257,8 @@ body.page-list main { padding: 24px 32px; }
   color: var(--text);
   vertical-align: middle;
 }
-/* ATC / aéreo — prepended before signal text (list, map, modals) */
-.signal-air-icon {
+/* Servicios (ATC, bomberos, …) — icono antes del indicativo (lista, mapa, modales) */
+.signal-service-icon {
   display: inline-block;
   flex-shrink: 0;
   vertical-align: -0.15em;
@@ -2263,7 +2267,7 @@ body.page-list main { padding: 24px 32px; }
   margin-right: 0;
   color: currentColor;
 }
-.rpt-tooltip-inner .signal-air-icon {
+.rpt-tooltip-inner .signal-service-icon {
   width: 14px;
   height: 14px;
   vertical-align: -0.2em;
@@ -2386,16 +2390,30 @@ body.page-list main { padding: 24px 32px; }
   margin-left: 4px;
   white-space: nowrap;
 }
-.badge-atc {
+.badge-service {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: var(--fs-xxs);
   padding: 1px 4px;
   border-radius: 3px;
-  border: 1px solid #7986cb;
-  color: #9fa8da;
   margin-left: 4px;
   white-space: nowrap;
+}
+.badge-service--atc {
+  border: 1px solid #7986cb;
+  color: #9fa8da;
+}
+.badge-service--fire {
+  border: 1px solid #e65100;
+  color: #ffab91;
+}
+.badge-service--ambulance {
+  border: 1px solid #c62828;
+  color: #ef9a9a;
+}
+.badge-service--sea {
+  border: 1px solid #0277bd;
+  color: #81d4fa;
 }
 /* DMR: valores separados por espacio (CSV) → chips que envuelven en móvil */
 .dmr-tokens {
@@ -2541,7 +2559,6 @@ body.page-list main { padding: 24px 32px; }
   line-height: 1.4;
 }
 .cell-comuna { font-size: var(--fs-sm); color: var(--text); }
-.cell-vence { font-family: var(--font-mono); font-size: var(--fs-sm); white-space: nowrap; }
 .cell-dist { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: 600; white-space: nowrap; }
 .share-btn {
   background: var(--surface2);
@@ -2562,9 +2579,6 @@ body.page-list main { padding: 24px 32px; }
 }
 .share-btn .material-symbols-outlined { font-size: 20px; }
 .share-btn:hover { border-color: var(--accent); color: var(--accent); }
-.vence-ok { color: var(--green); }
-.vence-warn { color: var(--yellow); }
-.vence-expired { color: var(--accent2); }
 .no-results {
   text-align: center;
   padding: 48px;
@@ -2902,7 +2916,7 @@ html[data-theme="light"] .radiomap-coach-shade {
   line-height: 1.25;
   word-break: break-word;
 }
-.station-detail-signal.station-detail-signal--with-air {
+.station-detail-signal.station-detail-signal--with-service {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -3043,6 +3057,11 @@ html[data-theme="light"] .radiomap-coach-shade {
   font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--accent);
+}
+.station-detail-grid dd.station-detail-notes {
+  font-size: var(--fs-xs);
+  color: var(--text);
+  line-height: 1.45;
 }
 .station-detail-footer {
   display: flex;
@@ -3935,7 +3954,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   .neighbor-dot,
   .neighbor-echolink,
   .neighbor-dmr,
-  .neighbor-atc {
+  .neighbor-service {
     grid-row: 1 / -1;
     align-self: start;
     margin-top: 3px;
@@ -4424,10 +4443,6 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   }
   /* Potencia oculta en móvil (ahorra línea) */
   body.page-list .rpt-table tbody tr.rpt-row td.cell-pot { display: none; }
-  /* Vence oculto en tarjeta móvil (visible en tabla de escritorio) */
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-vence {
-    display: none !important;
-  }
   /* Ubicación: ancho completo, texto íntegro (varias líneas) */
   body.page-list .rpt-table tbody tr.rpt-row td.cell-ub {
     display: flex;
@@ -4447,7 +4462,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td.cell-ub {
     grid-row: 4;
   }
-  /* Club + fila comuna/vence */
+  /* Club + fila comuna */
   body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td.cell-club {
     grid-column: 1 / -1;
     grid-row: 4;
@@ -4460,7 +4475,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     margin-top: 2px;
     padding-top: 2px;
   }
-  /* Comuna: ancho completo (vence no se muestra en tarjeta) */
+  /* Comuna: ancho completo */
   body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td.cell-comuna {
     grid-column: 1 / -1;
     grid-row: 5;

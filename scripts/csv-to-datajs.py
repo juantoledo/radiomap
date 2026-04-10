@@ -51,6 +51,9 @@ def ordered_region_colors(region_colors: dict) -> dict:
 
 NUMERIC_KEYS = ("lat", "lon")
 
+# Servicios / iconos especiales (CSV `serviceType`); vacío = repetidor genérico
+SERVICE_TYPE_ALLOWED = frozenset({"atc", "fire", "ambulance", "sea"})
+
 
 def normalize_signal_field(d: dict) -> None:
     """Cada «/» en la señal → un espacio (las barras rompen rutas URL/carpetas p. ej. propagación)."""
@@ -100,10 +103,15 @@ def parse_row(row: dict) -> dict:
                 node[k] = float(v)
             except ValueError:
                 node[k] = v
-        elif k in ("isEcholink", "isDMR", "isAir"):
+        elif k in ("isEcholink", "isDMR"):
             node[k] = v.lower() in ("1", "true", "yes")
+        elif k == "serviceType":
+            st = v.lower() if v else ""
+            node[k] = st if st in SERVICE_TYPE_ALLOWED else ""
         else:
             node[k] = v
+    # Compat: propagación y lógica JS que aún usa `isAir` para ATC
+    node["isAir"] = node.get("serviceType") == "atc"
     return node
 
 
