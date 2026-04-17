@@ -67,7 +67,7 @@
   <div class="header-map-tools">
     <div class="header-actions">
       <button type="button" id="theme-toggle" onclick="toggleTheme()" aria-label="Modo claro" title="Cambiar tema" class="theme-btn"></button>
-      <button type="button" id="help-btn" onclick="openHelp()" aria-label="Ayuda" title="Cómo usar la app" class="help-btn"><span class="material-symbols-outlined" aria-hidden="true">help</span></button>
+      <button type="button" id="help-btn" onclick="openHelp()" aria-label="Acerca de Radiomap" title="Acerca de Radiomap" class="help-btn"><span class="material-symbols-outlined" aria-hidden="true">help</span></button>
       <a href="#" id="btn-share-view" class="header-action-link btn-download" title="Copiar enlace con filtros y vista del mapa" aria-label="Compartir vista del mapa"><span class="material-symbols-outlined" aria-hidden="true">share</span><span class="header-action-link__text">Compartir</span></a>
       <a href="#" id="btn-download-csv" class="header-action-link btn-download" title="Descargar CSV" aria-label="Descargar CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span><span class="header-action-link__text">CSV</span></a>
       <a href="https://github.com/juantoledo/radiomap" class="header-link header-link-icon" target="_blank" rel="noopener" title="Ver en GitHub" aria-label="Ver en GitHub"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
@@ -78,7 +78,7 @@
     <div class="header-menu-group" role="group" aria-labelledby="menu-grp-appearance">
       <div class="header-menu-group__label" id="menu-grp-appearance">Apariencia</div>
       <button type="button" onclick="toggleTheme(); closeMenuMap();" class="theme-btn menu-theme-toggle" aria-label="Cambiar tema" role="menuitem"></button>
-      <button type="button" onclick="openHelp(); closeMenuMap();" class="help-btn" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">help</span></span> Ayuda</button>
+      <button type="button" onclick="openHelp(); closeMenuMap();" class="help-btn" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">help</span></span> Acerca</button>
     </div>
     <div class="header-menu-group" role="group" aria-labelledby="menu-grp-location">
       <div class="header-menu-group__label" id="menu-grp-location">Ubicación</div>
@@ -95,48 +95,6 @@
     </div>
   </div>
 </header>
-
-<!-- HELP MODAL -->
-<div id="help-overlay" class="help-overlay" aria-hidden="true" tabindex="-1">
-  <div class="help-modal" role="dialog" aria-labelledby="help-title" aria-modal="true">
-    <div class="help-modal-header">
-      <h2 id="help-title" class="help-title">Cómo usar la app</h2>
-      <button type="button" class="help-close" onclick="closeHelp()" aria-label="Cerrar"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
-    </div>
-    <div class="help-modal-body">
-      <p class="help-lead"><strong>Radiomap</strong> — mapa y lista de repetidoras, nodos Echolink y estaciones DMR en Chile.</p>
-      <section class="help-section">
-        <h3>Para qué sirve</h3>
-        <ul>
-          <li>Ver en el mapa repetidoras, nodos Echolink y estaciones DMR; círculos orientativos, propagación donde exista, y ubicación.</li>
-          <li><strong>Cerca de mí</strong> — botón con icono de ubicación (<span class="material-symbols-outlined help-inline-icon" aria-hidden="true">my_location</span>) junto a la búsqueda, o la misma opción en el menú ☰: filtra por distancia desde tu posición. En el mapa, también puedes elegir una repetidora y usar el deslizador <strong>Radio</strong> (20–100 km) desde esa señal.</li>
-          <li>Buscar por señal, comuna, frecuencias (RX/TX/tono) o filtrar por banda, región y tipo (Echolink / DMR / radioclubes).</li>
-          <li>Revisar datos de cada nodo y descargar listas en CSV (botón ↓ CSV siempre visible).</li>
-          <li><strong>↗ Compartir</strong>: mensaje con enlace que incluye filtros, ubicación o repetidora de referencia (si aplica), <strong>radio en km</strong> (<code>nearRadius</code>), posición del mapa y la repetidora abierta en el panel (si hay una). En el mapa, si el navegador lo permite, se adjunta una <strong>captura de la vista actual</strong>.</li>
-        </ul>
-      </section>
-      <section class="help-section">
-        <h3>Mapa de cobertura</h3>
-        <ul>
-          <li>Explora el mapa; cambia el tema claro/oscuro con ☽.</li>
-          <li>Vista (iconos): marcador, círculo de cobertura o ambos.</li>
-          <li>Filtros: banda, región, tipo y conferencia/red — listas con casillas; «Todas» en cada una quita el filtro de ese criterio (varias opciones = OR). En pantallas chicas, el botón <span class="material-symbols-outlined help-inline-icon" aria-hidden="true">tune</span> abre los filtros en un panel inferior.</li>
-          <li>Clic en un punto: datos y nodos cercanos en el panel (en móvil, panel inferior deslizable). Radioclubes = círculo; Echolink = cuadrado «e»; DMR = rombo «d». Descarga CSV o comparte desde el panel.</li>
-          <li><a href="propagacion.html?v=__VERSION__" target="_blank" rel="noopener noreferrer">Sobre propagación</a> — cómo se interpreta el mapa de cobertura experimental, leyenda dBm y limitaciones. Con una repetidora que tenga mapa, el interruptor <strong>Propagación</strong> y el enlace de ayuda están en la cabecera del panel de la estación (junto al título).</li>
-        </ul>
-      </section>
-      <section class="help-section">
-        <h3>Lista de repetidores</h3>
-        <ul>
-          <li>Tabla agrupada por región con señal, banda, RX/TX, tono, potencia, club, comuna y vencimiento.</li>
-          <li>Mismos filtros y búsqueda (incluye frecuencias).</li>
-          <li>Descarga CSV desde el header (siempre visible, también en móvil).</li>
-        </ul>
-      </section>
-      <p class="help-meta"><span id="help-version-line">Versión <span id="app-version">—</span>. </span>Agénticamente desarrollado por <a href="https://cd3dxz.radio" target="_blank" rel="noopener">CD3DXZ</a>.</p>
-    </div>
-  </div>
-</div>
 
 <!-- MAP -->
 <div id="map-wrap">

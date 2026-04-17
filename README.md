@@ -8,7 +8,7 @@
 
 ## Por qué usarlo
 
-- **Una vista del país** — Mapa y tabla por región, con datos alineados al trabajo de SUBTEL/DGMN y curación propia donde hace falta.
+- **Una vista del país** — Mapa y tabla por región, con datos consolidados desde fuentes públicas de regulación y curación propia donde hace falta.
 - **Encuentra rápido** — Búsqueda por indicativo, comuna, RX/TX, tono, texto en DMR (color, slot, TG) y más.
 - **Filtra como operador** — Banda, región, tipo (**radioclubes / Echolink / DMR**) y **conferencia o red** (varias opciones = OR dentro de cada criterio).
 - **Cerca tuyo o de una repetidora** — **Cerca de mí** o repetidora de referencia, con **radio ajustable (20–100 km)** para ver solo lo que te sirve en el momento.
@@ -60,7 +60,7 @@ Con la capa **Propagación** activa, el mapa muestra un **raster orientativo** d
 
 ## Datos y confianza
 
-La base parte del [**listado oficial de repetidoras de SUBTEL**](https://www.subtel.gob.cl/), complementado con nodos **Echolink** (p. ej. Red Chile, Red Echolink Chile, RCDR) y **DMR** según lo curado en el proyecto. Las regiones siguen la división administrativa chilena. El archivo curado vive en `data/curated_stations.csv`; si encontrás inconsistencias, el flujo del repo permite corregir y regenerar el dataset publicado.
+La base combina **registros públicos de autorización** de repetidoras con nodos **Echolink** (p. ej. Red Chile, Red Echolink Chile, RCDR) y **DMR** según lo curado en el proyecto. Las regiones siguen la división administrativa chilena. El archivo curado vive en `data/curated_stations.csv`; si encontrás inconsistencias, el flujo del repo permite corregir y regenerar el dataset publicado.
 
 ---
 

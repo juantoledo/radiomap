@@ -15,7 +15,7 @@ Archivos de datos para el mapa y la lista de repetidoras.
 
 ## Origen y curación
 
-Los datos provienen del [listado oficial SUBTEL](https://www.subtel.gob.cl/) y pueden curarse en `curated_stations.csv` para corregir errores de la fuente (coordenadas, frecuencias, nombres, etc.).
+Los datos parten de **registros públicos de regulación** del espectro en Chile y pueden curarse en `curated_stations.csv` para corregir errores (coordenadas, frecuencias, nombres, etc.).
 
 ---
 
@@ -61,7 +61,7 @@ Los `README.md` dentro de cada carpeta de señal documentan corridas concretas (
 | `banda` | Banda de servicio (ej. `VHF/FM`, `UHF/FM`). |
 | `rx`, `tx` | Frecuencias de recepción y transmisión (MHz). |
 | `tono` | Tono subaudible / DCS si aplica. |
-| `region` | Región (texto alineado a división SUBTEL/DGMN). |
+| `region` | Región (texto alineado a la división administrativa chilena). |
 | `otorga`, `vence` | Fechas de otorgamiento y vencimiento de la autorización. |
 | `isEcholink` | `1`, `true` o `yes` = nodo Echolink; vacío u otro = no. |
 | `conference` | Nombre de la **conferencia o red** (Echolink, DMR u otro): ej. `Red Chile`, `RCDR`, `SUR`, `Zona DMR CL`. Vacío si no aplica. |

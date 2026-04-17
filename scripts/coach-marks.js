@@ -274,7 +274,24 @@
     if (!pageOk()) return;
     if (shouldSkipStorage()) return;
     var help = document.getElementById('help-overlay');
-    if (help && help.classList.contains('open')) return;
+    if (help && help.classList.contains('open')) {
+      var n = 0;
+      var maxPolls = 150;
+      var pollMs = 200;
+      var id = window.setInterval(function () {
+        n++;
+        var h = document.getElementById('help-overlay');
+        var stillOpen = h && h.classList.contains('open');
+        if (!stillOpen || n >= maxPolls) {
+          window.clearInterval(id);
+          if (stillOpen) return;
+          if (!pageOk()) return;
+          if (shouldSkipStorage()) return;
+          startTour();
+        }
+      }, pollMs);
+      return;
+    }
     startTour();
   }
 

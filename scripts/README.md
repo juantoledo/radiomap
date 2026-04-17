@@ -47,4 +47,4 @@ Se ejecuta automáticamente en CI antes del deploy.
 
 Columnas (orden): ver `data/README.md` — incluye `isEcholink`, `conference`, `isDMR`, `color`, `slot`, `tg`, `website`, etc.
 
-Los datos provienen del [listado oficial SUBTEL](https://www.subtel.gob.cl/) y pueden curarse para corregir errores de la fuente.
+Los datos parten de registros públicos de regulación del espectro en Chile y pueden curarse para corregir errores de la fuente.
