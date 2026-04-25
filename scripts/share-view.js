@@ -254,8 +254,7 @@
 
   function shareThisView(ev) {
     if (ev) ev.preventDefault();
-    var isList = document.body.classList.contains('page-list');
-    radiomapPerformShare({ withScreenshot: !isList });
+    radiomapPerformShare({ withScreenshot: false });
   }
 
   window.buildShareViewURL = buildShareViewURL;
