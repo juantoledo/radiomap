@@ -185,6 +185,28 @@
   }
 
   /**
+   * Mobile browsers are stricter about transient user activation for Web Share.
+   * Capturing a screenshot first (html2canvas + toBlob) may expire that activation,
+   * so on touch/mobile we prioritize reliable native share with just the URL.
+   */
+  function shouldBypassScreenshotOnThisDevice() {
+    var coarsePointer = false;
+    try {
+      coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    } catch (e) {
+      coarsePointer = false;
+    }
+    var ua = '';
+    try {
+      ua = String((navigator && navigator.userAgent) || '').toLowerCase();
+    } catch (e2) {
+      ua = '';
+    }
+    var mobileUa = /android|iphone|ipad|ipod|mobile/.test(ua);
+    return coarsePointer || mobileUa;
+  }
+
+  /**
    * @param {object} opts
    * @param {string} [opts.urlOverride] — full URL to share (default: buildShareViewURL())
    * @param {boolean} [opts.withScreenshot] — on map page, attach PNG of #map when supported
@@ -194,7 +216,7 @@
     opts = opts || {};
     var url = opts.urlOverride || buildShareViewURL();
     var isMapPage = document.body.classList.contains('page-map');
-    var wantScreenshot = !!opts.withScreenshot && isMapPage;
+    var wantScreenshot = !!opts.withScreenshot && isMapPage && !shouldBypassScreenshotOnThisDevice();
     var msgs = sharePayloadForPage(url, isMapPage);
     var title = opts.title != null && String(opts.title).trim() ? String(opts.title).trim() : msgs.title;
     var text = msgs.text;
