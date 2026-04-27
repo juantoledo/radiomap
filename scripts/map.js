@@ -59,8 +59,6 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
-    /** Needed so html2canvas can export the map (tiles) without tainting the canvas */
-    crossOrigin: true,
   };
   let currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', tileOpts).addTo(map);
 
@@ -887,7 +885,7 @@
     if(filteredNeighbors.length === 0) return;
     /** Same as “Compartir vista”: filtros, cerca de mí, mapa (mlat/mlon/zoom/mode) y signal de la repetidora abierta → al abrir se selecciona y se ve “Nodos cercanos”. */
     if (typeof radiomapPerformShare === 'function') {
-      radiomapPerformShare({ withScreenshot: true, title: r.signal || 'Radiomap' });
+      radiomapPerformShare({ title: r.signal || 'Radiomap' });
       return;
     }
     const urlStr = typeof buildShareViewURL === 'function' ? buildShareViewURL() : window.location.href;

@@ -129,48 +129,6 @@
     }
   }
 
-  var html2canvasLoadPromise = null;
-  function ensureHtml2Canvas() {
-    if (typeof window.html2canvas === 'function') return Promise.resolve(window.html2canvas);
-    if (html2canvasLoadPromise) return html2canvasLoadPromise;
-    html2canvasLoadPromise = new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      s.crossOrigin = 'anonymous';
-      s.integrity = 'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H';
-      s.onload = function () {
-        if (typeof window.html2canvas === 'function') resolve(window.html2canvas);
-        else reject(new Error('html2canvas'));
-      };
-      s.onerror = function () {
-        reject(new Error('html2canvas load'));
-      };
-      document.head.appendChild(s);
-    });
-    return html2canvasLoadPromise;
-  }
-
-  function captureMapElementToPngBlob() {
-    var el = document.getElementById('map');
-    if (!el || typeof window.html2canvas !== 'function') return Promise.reject(new Error('no map'));
-    return window.html2canvas(el, {
-        useCORS: true,
-        allowTaint: false,
-        scale: Math.min(2, window.devicePixelRatio || 1),
-        logging: false,
-        backgroundColor: null,
-        imageTimeout: 15000,
-      })
-      .then(function (canvas) {
-        return new Promise(function (resolve, reject) {
-          canvas.toBlob(function (blob) {
-            if (blob) resolve(blob);
-            else reject(new Error('toBlob'));
-          }, 'image/png');
-        });
-      });
-  }
-
   function sharePayloadForPage(url, isMapPage) {
     if (isMapPage) {
       return {
@@ -185,38 +143,14 @@
   }
 
   /**
-   * Mobile browsers are stricter about transient user activation for Web Share.
-   * Capturing a screenshot first (html2canvas + toBlob) may expire that activation,
-   * so on touch/mobile we prioritize reliable native share with just the URL.
-   */
-  function shouldBypassScreenshotOnThisDevice() {
-    var coarsePointer = false;
-    try {
-      coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    } catch (e) {
-      coarsePointer = false;
-    }
-    var ua = '';
-    try {
-      ua = String((navigator && navigator.userAgent) || '').toLowerCase();
-    } catch (e2) {
-      ua = '';
-    }
-    var mobileUa = /android|iphone|ipad|ipod|mobile/.test(ua);
-    return coarsePointer || mobileUa;
-  }
-
-  /**
    * @param {object} opts
    * @param {string} [opts.urlOverride] — full URL to share (default: buildShareViewURL())
-   * @param {boolean} [opts.withScreenshot] — on map page, attach PNG of #map when supported
    * @param {string} [opts.title] — share title (e.g. station signal)
    */
   function radiomapPerformShare(opts) {
     opts = opts || {};
     var url = opts.urlOverride || buildShareViewURL();
     var isMapPage = document.body.classList.contains('page-map');
-    var wantScreenshot = !!opts.withScreenshot && isMapPage && !shouldBypassScreenshotOnThisDevice();
     var msgs = sharePayloadForPage(url, isMapPage);
     var title = opts.title != null && String(opts.title).trim() ? String(opts.title).trim() : msgs.title;
     var text = msgs.text;
@@ -246,22 +180,7 @@
       });
     }
 
-    var chain = Promise.resolve();
-    if (wantScreenshot) {
-      chain = ensureHtml2Canvas()
-        .then(captureMapElementToPngBlob)
-        .then(function (blob) {
-          var file = new File([blob], 'radiomap-mapa.png', { type: 'image/png' });
-          return tryShare([file]).catch(function () {
-            return tryShare(null);
-          });
-        })
-        .catch(function () {
-          return tryShare(null);
-        });
-    } else {
-      chain = tryShare(null);
-    }
+    var chain = tryShare(null);
 
     return chain
       .then(function () {
@@ -276,7 +195,7 @@
 
   function shareThisView(ev) {
     if (ev) ev.preventDefault();
-    radiomapPerformShare({ withScreenshot: false });
+    radiomapPerformShare();
   }
 
   window.buildShareViewURL = buildShareViewURL;
