@@ -2,5 +2,6 @@
 window.RADIOMAP_EXPORTERS = [
   { id: 'chirp', label: 'CHIRP', fn: 'exportChirp', url: 'https://chirpmyradio.com/' },
   { id: 'ft5dr', label: 'Yaesu FT5DR', fn: 'exportFT5DR', url: 'https://www.yaesu.com' },
-  { id: 'ftm150', label: 'Yaesu FTM-150', fn: 'exportFTM150', url: 'https://www.yaesu.com' }
+  { id: 'ftm150', label: 'Yaesu FTM-150', fn: 'exportFTM150', url: 'https://www.yaesu.com' },
+  { id: 'opengd77', label: 'OpenGD77', fn: 'exportOpenGD77', url: 'https://grid.radio/opengd77/' }
 ];
