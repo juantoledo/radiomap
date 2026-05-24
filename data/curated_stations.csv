@@ -404,3 +404,9 @@ CB-37,Canal 37 Banda Ciudadana,,,,,,,HF,27.375,27.375,,,,,,,,,,,,,,cb 11mt banda
 CB-38,Canal 38 Banda Ciudadana,,,,,,,HF,27.385,27.385,,,,,,,,,,,,,,cb 11mt banda-ciudadana
 CB-39,Canal 39 Banda Ciudadana,,,,,,,HF,27.395,27.395,,,,,,,,,,,,,,cb 11mt banda-ciudadana
 CB-40,Canal 40 Banda Ciudadana,,,,,,,HF,27.405,27.405,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+27.455 USB,Canal Encuentro Internacional Latino,,,,,,,HF,27.455,27.455,,,,,,,,,,,,,27.455 MHz USB,11mt banda-ciudadana encuentro
+27.555 USB,Canal Encuentro Internacional,,,,,,,HF,27.555,27.555,,,,,,,,,,,,,27.555 MHz USB,11mt banda-ciudadana encuentro
+27.625,Canal Encuentro Alemania y Países Nórdicos,,,,,,,HF,27.625,27.625,,,,,,,,,,,,,27.625 MHz,11mt banda-ciudadana encuentro
+26.555 LSB,Canal de Encuentro Caribe/América Central,,,,,,,HF,26.555,26.555,,,,,,,,,,,,,26.555 MHz LSB,11mt banda-ciudadana encuentro caribe
+28.575 USB,Frecuencia Encuentro Inglaterra,,,,,,,HF,28.575,28.575,,,,,,,,,,,,,28.575 MHz USB,10mt banda-ciudadana encuentro inglaterra
+29.250 C4FM,Canal Encuentro Internacional C4FM,,,,,,,HF,29.250,29.250,,,,,,,,,,,,,29.250 MHz C4FM,10mt banda-ciudadana encuentro c4fm
