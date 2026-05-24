@@ -361,7 +361,7 @@ function buildUnifiedFilterSummaryText() {
   if (t) bits.push(t);
   var c = part('filter-conference', 'conferencias');
   if (c) bits.push(c);
-  if (!bits.length) return 'Sin restricciones';
+  if (!bits.length) return 'Sin Filtros';
   if (bits.length <= 2) return bits.join(' · ');
   return bits.length + ' criterios activos';
 }
@@ -371,7 +371,7 @@ function setUnifiedFilterSummaryUi() {
   var u = document.getElementById('filter-unified-summary');
   if (u) u.textContent = t;
   var sheet = document.getElementById('filter-unified-summary-sheet');
-  if (sheet) sheet.textContent = t === 'Sin restricciones' ? '' : t;
+  if (sheet) sheet.textContent = t === 'Sin Filtros' ? '' : t;
 }
 
 function updateFilterMultiselectSummaries() {
@@ -577,7 +577,7 @@ function nodeMatchesFilterCriteria(r, c, distAnchor) {
   }
   if (c.bandas && c.bandas.length) {
     var b = r.banda || '';
-    if (!c.bandas.some(function (x) { return b.indexOf(x) >= 0; })) return false;
+    if (!c.bandas.some(function (x) { return x === 'HF' ? b === 'HF' : b.indexOf(x) >= 0; })) return false;
   }
   if (c.types && c.types.length) {
     var svc = typeof getStationServiceType === 'function' ? (getStationServiceType(r) || '') : (r.isAir ? 'atc' : '');

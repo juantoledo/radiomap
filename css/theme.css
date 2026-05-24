@@ -2375,7 +2375,7 @@ body.page-list main { padding: 24px 32px; }
 .badge-vhf { border-color: var(--green); color: var(--green); }
 .badge-uhf { border-color: #ff9500; color: #ff9500; }
 .badge-air { border-color: #5c6bc0; color: #9fa8da; }
-.badge-echolink {
+.badge-hf { border-color: rgba(255,152,0,0.5); color: #ff9800; background: rgba(255,152,0,0.1); }.badge-echolink {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: var(--fs-xxs);

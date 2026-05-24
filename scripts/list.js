@@ -87,6 +87,7 @@
   function bandaClass(banda) {
     const b = banda || '';
     if (b.includes('ATC') || b.includes('/AM')) return 'badge-air';
+    if (b === 'HF') return 'badge-hf';
     if (b.includes('UHF')) return 'badge-uhf';
     return 'badge-vhf';
   }
@@ -321,10 +322,14 @@
     regionNames.forEach(reg => { byRegion[reg] = []; });
     filtered.forEach(r => {
       const reg = r.region || '';
-      if (byRegion[reg] !== undefined) byRegion[reg].push(r);
+      if (!Object.prototype.hasOwnProperty.call(byRegion, reg)) byRegion[reg] = [];
+      byRegion[reg].push(r);
     });
 
-    let regionsToShow = regionNames.filter(reg => byRegion[reg] && byRegion[reg].length > 0);
+    const knownToShow = regionNames.filter(reg => byRegion[reg] && byRegion[reg].length > 0);
+    const unknownToShow = Object.keys(byRegion).filter(reg => !regionNames.includes(reg) && byRegion[reg].length > 0);
+
+    let regionsToShow = knownToShow;
     if (distAnchor && regionsToShow.length > 1) {
       regionsToShow.sort((a, b) => {
         const minA = Math.min(...byRegion[a].map(r => r._dist ?? 9999));
@@ -333,7 +338,7 @@
       });
     }
 
-    return regionsToShow.map(reg => {
+    const makeGroup = reg => {
       let rows = byRegion[reg];
       if (!rows || !rows.length) return null;
       if (sortCol && SORT_COMPARATORS[sortCol]) {
@@ -341,7 +346,8 @@
         rows = rows.slice().sort((a, b) => sortDir === 'asc' ? cmp(a, b) : cmp(b, a));
       }
       return { region: reg, rows };
-    }).filter(Boolean);
+    };
+    return [...regionsToShow.map(makeGroup), ...unknownToShow.map(makeGroup)].filter(Boolean);
   }
 
   function updateStationDetailNav() {
@@ -423,11 +429,10 @@
       const reg = grp.region;
       const rows = grp.rows;
 
-      html += `<div class="zone-group" data-region="${reg}">
-        <div class="zone-header">
-          <span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span>
-          <span class="zone-count"><span>${rows.length}</span> repetidor${rows.length !== 1 ? 'es' : ''}</span>
-        </div>
+      const zoneHeader = reg
+        ? `<div class="zone-header"><span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span><span class="zone-count"><span>${rows.length}</span> repetidor${rows.length !== 1 ? 'es' : ''}</span></div>`
+        : '';
+      html += `<div class="zone-group" data-region="${reg}">${zoneHeader}
         <table class="rpt-table">
           <thead><tr>
             ${thSort('signal','Señal')}

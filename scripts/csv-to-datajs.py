@@ -98,11 +98,14 @@ def parse_row(row: dict) -> dict:
             v = ""
         else:
             v = v.strip()
-        if k in NUMERIC_KEYS and v:
-            try:
-                node[k] = float(v)
-            except ValueError:
-                node[k] = v
+        if k in NUMERIC_KEYS:
+            if v:
+                try:
+                    node[k] = float(v)
+                except ValueError:
+                    node[k] = None
+            else:
+                node[k] = None
         elif k in ("isEcholink", "isDMR"):
             node[k] = v.lower() in ("1", "true", "yes")
         elif k == "serviceType":
@@ -188,6 +191,8 @@ def read_version_and_colors() -> tuple[str, dict]:
                     for k, v in DEFAULT_REGION_COLORS.items():
                         if k not in region_colors:
                             region_colors[k] = v
+                    # Remove keys no longer in default (e.g. band names wrongly added as regions)
+                    region_colors = {k: v for k, v in region_colors.items() if k in DEFAULT_REGION_COLORS}
                 except json.JSONDecodeError:
                     pass
             break

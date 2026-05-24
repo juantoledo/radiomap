@@ -358,3 +358,49 @@ CE1CPI RPT-ELSLV,RadioClub Copiapo RPT Ciudad El Salvador,DIEGO DE ALMAGRO,CIUDA
 CE1CPI RPT-PEDERNALES,RadioClub Copiapo RPT Salar de Pedernales,DIEGO DE ALMAGRO,SALAR DE PEDERNALES,-26.0000000000,-69.1666666667,,,VHF/FM,146.610,146.010,88.5,REGIÓN DE ATACAMA,,,,,,,,,,https://www.qsl.net/ce1cpi/,Datos aportados por CE1VPG.,norte-chico vhf
 CE1UJO,RadioClub Copiapo LINK Vallenar CE1UJO,VALLENAR,CIUDAD VALLENAR,-28.5666666667,-70.7500000000,,,VHF/FM,144.100,144.100,,REGIÓN DE ATACAMA,,,,,,,,,,https://www.qrz.com/db/CE1UJO,Datos aportados por CE1VPG.,norte-chico vhf
 CE3WPP RPT-A,CE3WPP — Cerro El Sombrero,MELIPILLA,CERRO EL SOMBRERO,-33.70309,-71.23242,,,VHF/FM,147.165,147.765,123.0,REGIÓN METROPOLITANA DE SANTIAGO,,,,,,,,,,,CTCSS salida 146.2 Hz; columna tono acceso subida 123.0 Hz.,rm vhf
+Rueda de la Amistad,Rueda de la Amistad,,,,,,,HF,7.148,7.148,,,,,,,,,,,,,7.148 MHz LSB,hf simplex 40mt lsb
+Red Chile Mar y Tierra (15 Metros),Red Chile Mar y Tierra (15 Metros),,,,,,,HF,21.315,21.315,,,,,,,,,,,,,21.315 MHz USB,hf 15mt usb
+Red Chile Mar y Tierra (20 Metros),Red Chile Mar y Tierra (20 Metros),,,,,,,HF,14.255,14.255,,,,,,,,,,,,,14.255 MHz USB,hf 20mt usb
+RECNA 40 mt,Red Chilena Nor Austral de Servicios (40 metros),,,,,,,HF,7.190,7.190,,,,,,,,,,,,,7.190 LSB,hf 40mt lsb
+RECNA 80 mt,Red Chilena Nor Austral de Servicios (80 metros),,,,,,,HF,3.738,3.738,,,,,,,,,,,,,3.738 LSB,hf 80mt lsb
+Red de Emergencia Nacional ,Red de Emergencia Nacional ,,,,,,,HF,7.085,7.085,,,,,,,,,,,,,7.085 LSB,hf 40mt lsb
+CB-01,Canal 1 Banda Ciudadana,,,,,,,HF,26.965,26.965,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-02,Canal 2 Banda Ciudadana,,,,,,,HF,26.975,26.975,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-03,Canal 3 Banda Ciudadana,,,,,,,HF,26.985,26.985,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-04,Canal 4 Banda Ciudadana,,,,,,,HF,27.005,27.005,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-05,Canal 5 Banda Ciudadana,,,,,,,HF,27.015,27.015,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-06,Canal 6 Banda Ciudadana,,,,,,,HF,27.025,27.025,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-07,Canal 7 Banda Ciudadana,,,,,,,HF,27.035,27.035,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-08,Canal 8 Banda Ciudadana,,,,,,,HF,27.055,27.055,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-09,Canal 9 Banda Ciudadana,,,,,,,HF,27.065,27.065,,,,,,,,,,,,,Canal oficial de emergencias,emergencias cb 11mt banda-ciudadana
+CB-10,Canal 10 Banda Ciudadana,,,,,,,HF,27.075,27.075,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-11,Canal 11 Banda Ciudadana,,,,,,,HF,27.085,27.085,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-12,Canal 12 Banda Ciudadana,,,,,,,HF,27.105,27.105,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-13,Canal 13 Banda Ciudadana,,,,,,,HF,27.115,27.115,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-14,Canal 14 Banda Ciudadana,,,,,,,HF,27.125,27.125,,,,,,,,,,,,,Canal de llamada (Chile),llamada cb 11mt banda-ciudadana
+CB-15,Canal 15 Banda Ciudadana,,,,,,,HF,27.135,27.135,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-16,Canal 16 Banda Ciudadana,,,,,,,HF,27.155,27.155,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-17,Canal 17 Banda Ciudadana,,,,,,,HF,27.165,27.165,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-18,Canal 18 Banda Ciudadana,,,,,,,HF,27.175,27.175,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-19,Canal 19 Banda Ciudadana,,,,,,,HF,27.185,27.185,,,,,,,,,,,,,Canal de camioneros y autopistas,camioneros autopistas cb 11mt banda-ciudadana
+CB-20,Canal 20 Banda Ciudadana,,,,,,,HF,27.205,27.205,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-21,Canal 21 Banda Ciudadana,,,,,,,HF,27.215,27.215,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-22,Canal 22 Banda Ciudadana,,,,,,,HF,27.225,27.225,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-23,Canal 23 Banda Ciudadana,,,,,,,HF,27.255,27.255,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-24,Canal 24 Banda Ciudadana,,,,,,,HF,27.235,27.235,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-25,Canal 25 Banda Ciudadana,,,,,,,HF,27.245,27.245,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-26,Canal 26 Banda Ciudadana,,,,,,,HF,27.265,27.265,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-27,Canal 27 Banda Ciudadana,,,,,,,HF,27.275,27.275,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-28,Canal 28 Banda Ciudadana,,,,,,,HF,27.285,27.285,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-29,Canal 29 Banda Ciudadana,,,,,,,HF,27.295,27.295,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-30,Canal 30 Banda Ciudadana,,,,,,,HF,27.305,27.305,,,,,,,,,,,,,,cb 11mt banda-ciudadana camioneros
+CB-31,Canal 31 Banda Ciudadana,,,,,,,HF,27.315,27.315,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-32,Canal 32 Banda Ciudadana,,,,,,,HF,27.325,27.325,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-33,Canal 33 Banda Ciudadana,,,,,,,HF,27.335,27.335,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-34,Canal 34 Banda Ciudadana,,,,,,,HF,27.345,27.345,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-35,Canal 35 Banda Ciudadana,,,,,,,HF,27.355,27.355,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-36,Canal 36 Banda Ciudadana,,,,,,,HF,27.365,27.365,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-37,Canal 37 Banda Ciudadana,,,,,,,HF,27.375,27.375,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-38,Canal 38 Banda Ciudadana,,,,,,,HF,27.385,27.385,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-39,Canal 39 Banda Ciudadana,,,,,,,HF,27.395,27.395,,,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-40,Canal 40 Banda Ciudadana,,,,,,,HF,27.405,27.405,,,,,,,,,,,,,,cb 11mt banda-ciudadana
