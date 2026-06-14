@@ -12,6 +12,7 @@
 - **Encuentra rápido** — Búsqueda por indicativo, comuna, RX/TX, tono, texto en DMR (color, slot, TG) y más.
 - **Filtra como operador** — Banda, región, tipo (**radioclubes / Echolink / DMR**) y **conferencia o red** (varias opciones = OR dentro de cada criterio).
 - **Cerca tuyo o de una repetidora** — **Cerca de mí** o repetidora de referencia, con **radio ajustable (20–100 km)** para ver solo lo que te sirve en el momento.
+- **Repetidoras en ruta** — Ingresa origen y destino (texto o clic en el mapa) y el mapa resalta las repetidoras dentro del corredor configurable a lo largo del trayecto. Funciona con los filtros activos (banda, región, tipo). Limitado al territorio chileno.
 - **Llévatelo** — **CSV** en un clic (mapa y lista, también en móvil). **Compartir** genera un enlace con filtros, búsqueda, distancia, posición del mapa y la estación abierta en el panel cuando aplica.
 - **Cómodo de noche o de día** — Tema claro/oscuro, ayuda integrada y UI pensada para pantalla chica.
 
@@ -48,6 +49,19 @@ Con la capa **Propagación** activa, el mapa muestra un **raster orientativo** d
 - **Propagación (experimental)** — Los mapas raster se generan con el motor [Signal-Server](https://github.com/juantoledo/Signal-Server) y elevación tipo **SRTM** (cita de datos en la página de documentación). Mejoran a medida que se refinan datos de transmisor/antena de los radioclubes, umbrales de la leyenda (dBm/colores) y la configuración del motor. **Documentación completa:** [Sobre propagación](https://www.radiomap.cl/propagacion.html) (también enlazada desde el mapa como «Sobre propagación»).
 - **Detalle al tocar** — Ficha con lo esencial y **nodos cercanos**; desde ahí podés exportar CSV de vecinos o compartir la vista.
 - La vista es **orientativa**; condiciones reales (terreno, antena, QRM) siempre pueden diferir — revisá el aviso en la app.
+
+---
+
+## Planificador de ruta
+
+![Radiomap — planificador de ruta Santiago–Concepción con repetidoras en corredor](images/route-planner.png)
+
+- Activalo con el botón **Ruta** (ícono `route`) en la barra de controles, junto al botón de ubicación.
+- Ingresá **Desde** y **Hasta** como texto (ciudad, dirección) o hacé clic directamente en el mapa para fijar los puntos — aparece un marcador de color inmediatamente.
+- Ajustá el **corredor** (km a cada lado del trayecto) con el slider antes de calcular.
+- Al presionar **Calcular ruta**, se consulta [OSRM](https://router.project-osrm.org/) para la geometría vial y se resaltan en el mapa todas las repetidoras dentro del corredor. Los **filtros activos** (banda, región, tipo, conferencia) se aplican sobre los resultados de la ruta.
+- **Solo Chile** — la geocodificación usa `countrycodes=cl` (Nominatim) y los puntos elegidos en el mapa se validan contra el bounding box del territorio chileno.
+- **Limpiar** restaura los marcadores normales del mapa.
 
 ---
 

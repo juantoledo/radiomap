@@ -68,6 +68,7 @@ var HELP_OVERLAY_HTML =
   '<h3>3. Uso rápido</h3>' +
   '<ul>' +
   '<li><strong>Mapa</strong> — tema ☽, filtros (☰ <span class="material-symbols-outlined help-inline-icon" aria-hidden="true">tune</span> en chico), clic en estación → panel y vecinos. <strong>Cerca de mí</strong> / <span class="material-symbols-outlined help-inline-icon" aria-hidden="true">my_location</span> y radio km.</li>' +
+  '<li><strong>Ruta</strong> — <span class="material-symbols-outlined help-inline-icon" aria-hidden="true">route</span> ingresa origen y destino (texto o clic en el mapa) y ajusta el corredor; el mapa resalta las repetidoras dentro del trayecto y aplica los filtros activos.</li>' +
   '<li><strong>Lista</strong> — misma búsqueda y filtros; tabla por región.</li>' +
   '<li><strong>CSV</strong> y <strong>compartir</strong> en la cabecera (enlace con filtros; captura opcional desde el mapa).</li>' +
   '</ul>' +
@@ -75,6 +76,10 @@ var HELP_OVERLAY_HTML =
   '<figure class="help-modal-preview">' +
   '<img class="help-modal-preview__img" src="images/web-light.png" alt="Radiomap: mapa en tema claro, filtros y cabecera" loading="lazy" width="668" height="1157">' +
   '<figcaption class="help-modal-preview__cap">Mapa en <strong>tema claro</strong> (búsqueda, filtros, compartir y CSV).</figcaption>' +
+  '</figure>' +
+  '<figure class="help-modal-preview">' +
+  '<img class="help-modal-preview__img" src="images/route-planner.png" alt="Radiomap: planificador de ruta Santiago–Concepción con repetidoras resaltadas en el corredor" loading="lazy" width="668" height="1157">' +
+  '<figcaption class="help-modal-preview__cap"><strong>Repetidores en ruta</strong> — ingresá origen y destino, ajustá el corredor y el mapa resalta las estaciones en el camino.</figcaption>' +
   '</figure>' +
   '<figure class="help-modal-preview">' +
   '<img class="help-modal-preview__img" src="images/propagation.png" alt="Ejemplo: mapa con capa de propagación experimental y leyenda dBm" loading="lazy" width="668" height="1157">' +

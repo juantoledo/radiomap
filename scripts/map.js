@@ -54,6 +54,7 @@
     zoomControl: false,
     attributionControl: true,
   });
+  window.__radiomapLeafletMap = map;
 
   const tileOpts = {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -543,6 +544,7 @@
   }
 
   function showUserLocationSidebar(lat, lon) {
+    if (window.__radiomapRoutePanelOpen) return;
     resetPropagationSidebar();
     selectedIdx = null;
     if (typeof clearRadiusRefSignal === 'function') clearRadiusRefSignal();
@@ -611,7 +613,13 @@
   function applyFilters(opts){
     opts = opts || {};
     const distAnchor = typeof getDistanceFilterAnchor === 'function' ? getDistanceFilterAnchor() : null;
-    const visibleIndices = getVisibleNodeIndices();
+    let visibleIndices = getVisibleNodeIndices();
+    // Route planner — intersect with corridor stations (respects active filters)
+    if (window.__radiomapRouteFilterSignals instanceof Set && window.__radiomapRouteFilterSignals.size > 0) {
+      visibleIndices = visibleIndices.filter(function(i) {
+        return window.__radiomapRouteFilterSignals.has(NODES[i].signal);
+      });
+    }
     visibleSet = new Set(visibleIndices);
     const visibleNodes = visibleIndices.map(function (i) { return NODES[i]; });
     var clearedSelection = false;
@@ -638,6 +646,7 @@
       fitMapToCriteriaPoints(visibleNodes, distAnchor);
     }
     if (clearedSelection) syncRadiomapMapUiToUrl();
+    if (typeof window.__radiomapOnFiltersApplied === 'function') window.__radiomapOnFiltersApplied(visibleSet);
   }
   window.applyFilters = applyFilters;
 
@@ -690,6 +699,7 @@
   }
 
   function selectRepeater(idx, interaction, openOpts){
+    if (window.__radiomapRoutePanelOpen) return;
     openOpts = openOpts || {};
     var prevIdx = selectedIdx;
     var prevSig = prevIdx !== null && NODES[prevIdx] ? NODES[prevIdx].signal : null;
@@ -972,6 +982,9 @@
   }
 
   /** Clic en el mapa (no en marcador): cerrar panel y quitar repetidora como referencia de distancia. GPS «cerca de mí» no se toca. */
+  map.on('click', function (e) {
+    if (typeof window.__radiomapMapClickHook === 'function') window.__radiomapMapClickHook(e.latlng.lat, e.latlng.lng);
+  });
   map.on('click', function () {
     var hadSelection = selectedIdx !== null;
     var hadRef = typeof getRadiusRefSignal === 'function' && !!getRadiusRefSignal();
@@ -1124,13 +1137,18 @@
   function getExportCriteria() {
     return typeof getExportFilterCriteria === 'function' ? getExportFilterCriteria() : { search: '', nearMe: !!(typeof getDistanceFilterAnchor === 'function' && getDistanceFilterAnchor()), bandas: [], regions: [], types: [], conferences: [] };
   }
-  function openExportDialog() {
+  function openExportDialog(overrideRows, overrideCriteria) {
     const dialog = document.getElementById('export-dialog');
     if (!dialog) return;
-    const visibleSignals = new Set(NODES.filter((r,i)=>visibleSet.has(i)).map(r=>r.signal));
-    const rows = NODES.filter(n=>visibleSignals.has(n.signal));
-    const exportRows = rows.length ? rows : NODES;
-    const criteria = getExportCriteria();
+    let exportRows;
+    if (overrideRows && overrideRows.length) {
+      exportRows = overrideRows;
+    } else {
+      const visibleSignals = new Set(NODES.filter((r,i)=>visibleSet.has(i)).map(r=>r.signal));
+      const rows = NODES.filter(n=>visibleSignals.has(n.signal));
+      exportRows = rows.length ? rows : NODES;
+    }
+    const criteria = overrideCriteria || getExportCriteria();
 
     document.getElementById('export-dialog-csv').onclick = function() {
       if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_csv_download', { page_type: 'map' });
@@ -1180,6 +1198,7 @@
     if (e.target === this) this.close();
   });
 
+  window.openExportDialog = openExportDialog;
   window.setMode = setMode;
   window.selectRepeater = selectRepeater;
   window.downloadNeighborsCSV = downloadNeighborsCSV;
