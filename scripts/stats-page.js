@@ -37,6 +37,13 @@
   }
   window.closeMenuStats = closeMenuStats;
 
+  if (typeof setRadiomapVersionDisplays === 'function') {
+    setRadiomapVersionDisplays(typeof VERSION !== 'undefined' ? VERSION : null);
+  } else if (typeof VERSION !== 'undefined') {
+    var _av = document.getElementById('app-version');
+    if (_av) _av.textContent = VERSION;
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var menuToggleEl = document.getElementById('menu-toggle');
     if (menuToggleEl) {
