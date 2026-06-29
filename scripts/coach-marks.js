@@ -17,7 +17,7 @@
       selector: '.header-map-tools',
       title: 'Acciones del encabezado',
       body:
-        'Tema, ayuda, compartir vista, importar/exportar CSV y Mis Estaciones. En pantallas chicas parte de esto pasa al menú ☰.',
+        'Cambia el tema visual (☽/☀), abre la ayuda, comparte un enlace con los filtros activos, importa o exporta estaciones en CSV, y gestiona Mis Estaciones. En pantallas chicas parte de estas opciones se encuentra en el menú ☰.',
     },
     {
       selector: '#btn-my-stations',
