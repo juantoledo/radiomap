@@ -17,7 +17,13 @@
       selector: '.header-map-tools',
       title: 'Acciones del encabezado',
       body:
-        'Tema, ayuda, compartir vista y descarga CSV. En pantallas chicas parte de esto pasa al menú ☰.',
+        'Tema, ayuda, compartir vista, importar/exportar CSV y Mis Estaciones. En pantallas chicas parte de esto pasa al menú ☰.',
+    },
+    {
+      selector: '#btn-my-stations',
+      title: 'Mis Estaciones',
+      body:
+        'Agrega, edita y elimina tus propias estaciones. Se guardan en el navegador — exporta el CSV para no perderlas. Los datos ingresados son responsabilidad del operador.',
     },
     {
       selector: '.map-controls-search-row',
@@ -30,6 +36,12 @@
       title: 'Cerca de mí',
       body:
         'Filtra repetidoras por distancia desde tu ubicación (o desde una repetidora de referencia en el mapa). Puedes ajustar el radio en el bloque de contadores debajo de la barra.',
+    },
+    {
+      selector: '#btn-route-toggle',
+      title: 'Ruta',
+      body:
+        'Ingresa origen y destino (texto o clic en el mapa) y ajusta el corredor; el mapa resalta las repetidoras dentro del trayecto aplicando los filtros activos.',
     },
   ];
 
