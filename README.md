@@ -1,103 +1,48 @@
 # Radiomap
 
-**El mapa y el listado de repetidoras en Chile** — repetidoras autorizadas, nodos **Echolink** y estaciones **DMR**, en un solo lugar. Pensado para salir a la ruta con la frecuencia correcta y cero fricción.
+Mapa interactivo de repetidoras, Echolink y DMR en Chile.  
+Sitio estático — sin framework, sin bundler. Leaflet + vanilla JS.
 
-[**Abrir Radiomap →**](https://www.radiomap.cl/)
-
----
-
-## Por qué usarlo
-
-- **Una vista del país** — Mapa y tabla por región, con datos consolidados desde fuentes públicas de regulación y curación propia donde hace falta.
-- **Encuentra rápido** — Búsqueda por indicativo, comuna, RX/TX, tono, texto en DMR (color, slot, TG) y más.
-- **Filtra como operador** — Banda, región, tipo (**radioclubes / Echolink / DMR**) y **conferencia o red** (varias opciones = OR dentro de cada criterio).
-- **Cerca tuyo o de una repetidora** — **Cerca de mí** o repetidora de referencia, con **radio ajustable (20–100 km)** para ver solo lo que te sirve en el momento.
-- **Repetidoras en ruta** — Ingresa origen y destino (texto o clic en el mapa) y el mapa resalta las repetidoras dentro del corredor configurable a lo largo del trayecto. Funciona con los filtros activos (banda, región, tipo). Limitado al territorio chileno.
-- **Llévatelo** — **CSV** en un clic (mapa y lista, también en móvil). **Compartir** genera un enlace con filtros, búsqueda, distancia, posición del mapa y la estación abierta en el panel cuando aplica.
-- **Cómodo de noche o de día** — Tema claro/oscuro, ayuda integrada y UI pensada para pantalla chica.
+🌐 **[radiomap.cl](https://www.radiomap.cl/)**
 
 ---
 
-## Cómo se ve
+## Funcionalidades
 
-### En el navegador (escritorio)
+| Función | Descripción |
+|---|---|
+| **Mapa** | Marcadores y círculos de cobertura ilustrativos por banda. Filtros por banda, tipo, conferencia y región. |
+| **Lista** | Tabla completa con búsqueda y los mismos filtros. |
+| **Cerca de mí** | Filtra por distancia desde tu ubicación o cualquier punto del mapa. |
+| **Ruta** | Ingresa origen y destino y ajusta el corredor; el mapa resalta las repetidoras en el trayecto. |
+| **Propagación** | Capas de cobertura calculadas con Signal-Server sobre terreno SRTM (donde hay datos). |
+| **Mis Estaciones** | Agrega, edita y elimina estaciones propias. Se almacenan en el navegador (`localStorage`); exporta el CSV desde el diálogo de importar/exportar para conservarlas. Las estaciones personalizadas son responsabilidad del operador. |
+| **Exportar** | CSV con las estaciones visibles o para radios específicas (CHIRP, Yaesu FT5DR, FTM-150, OpenGD77 — experimental). |
+| **Compartir** | URL con los filtros activos codificados en el query string. |
+| **Stats** | Distribución de estaciones por banda, tipo, región y red. |
 
-Capturas del **mapa en modo oscuro y claro** — mismo producto, distinto tema; ideal para usar de día o de noche sin cansar la vista.
+## Datos
 
-![Radiomap — mapa, tema oscuro](images/web-dark.png)
-![Radiomap — mapa, tema claro](images/web-light.png)
+- Fuente: [`data/curated_stations.csv`](data/curated_stations.csv) — curación manual sobre registros públicos de la SUBTEL.
+- Generado: [`data/data.js`](data/data.js) — producido por [`scripts/csv-to-datajs.py`](scripts/csv-to-datajs.py).
+- Los datos **no reemplazan** la ficha oficial del titular ni la autorización SUBTEL.
 
-### En el teléfono
-
-**Mapa** y **lista** optimizados para pantalla chica: controles compactos, navegación MAPA / LISTA y exportación CSV accesible desde el menú.
-
-![Radiomap — mapa en móvil](images/mobile-map.png)
-![Radiomap — lista en móvil](images/mobile-list.png)
-
-### Mapa con propagación (experimental)
-
-Con la capa **Propagación** activa, el mapa muestra un **raster orientativo** de potencia recibida (dBm) sobre el relieve, alineado a la estación seleccionada. A la izquierda aparece la **leyenda vertical** de umbrales; el panel lateral sigue mostrando la ficha técnica y **nodos cercanos**. Solo hay datos donde el repositorio incluye PNG/PGW (y DCF si existe) bajo `data/propagation/<señal>/`. Más contexto y limitaciones: [Sobre propagación](https://www.radiomap.cl/propagacion.html).
-
-![Radiomap — mapa con capa de propagación y leyenda dBm](images/propagation.png)
-
----
-
-## Mapa
-
-- **Leyenda visual** — Radioclubes (círculo), Echolink (cuadrado **e**), DMR (rombo **d**).
-- **Cómo ver la cobertura** — Marcador solo, **círculos orientativos** (radio fijo en el mapa) o ambos; donde hay **mapa de propagación** por estación, activalo desde los controles del mapa (junto al contador de filtros). Explorás Chile con zoom y pan habituales.
-- **Propagación (experimental)** — Los mapas raster se generan con el motor [Signal-Server](https://github.com/juantoledo/Signal-Server) y elevación tipo **SRTM** (cita de datos en la página de documentación). Mejoran a medida que se refinan datos de transmisor/antena de los radioclubes, umbrales de la leyenda (dBm/colores) y la configuración del motor. **Documentación completa:** [Sobre propagación](https://www.radiomap.cl/propagacion.html) (también enlazada desde el mapa como «Sobre propagación»).
-- **Detalle al tocar** — Ficha con lo esencial y **nodos cercanos**; desde ahí podés exportar CSV de vecinos o compartir la vista.
-- La vista es **orientativa**; condiciones reales (terreno, antena, QRM) siempre pueden diferir — revisá el aviso en la app.
-
----
-
-## Planificador de ruta
-
-![Radiomap — planificador de ruta Santiago–Concepción con repetidoras en corredor](images/route-planner.png)
-
-- Activalo con el botón **Ruta** (ícono `route`) en la barra de controles, junto al botón de ubicación.
-- Ingresá **Desde** y **Hasta** como texto (ciudad, dirección) o hacé clic directamente en el mapa para fijar los puntos — aparece un marcador de color inmediatamente.
-- Ajustá el **corredor** (km a cada lado del trayecto) con el slider antes de calcular.
-- Al presionar **Calcular ruta**, se consulta [OSRM](https://router.project-osrm.org/) para la geometría vial y se resaltan en el mapa todas las repetidoras dentro del corredor. Los **filtros activos** (banda, región, tipo, conferencia) se aplican sobre los resultados de la ruta.
-- **Solo Chile** — la geocodificación usa `countrycodes=cl` (Nominatim) y los puntos elegidos en el mapa se validan contra el bounding box del territorio chileno.
-- **Limpiar** restaura los marcadores normales del mapa.
-
----
-
-## Lista
-
-- Tabla **agrupada por región**: señal, banda, RX/TX, tono, potencia, club, comuna, vencimiento e insignias **Echolink/DMR** donde corresponda.
-- **Los mismos filtros y la misma búsqueda** que en el mapa, para pasar de vista geográfica a planilla sin perder contexto.
-
----
-
-## Datos y confianza
-
-La base combina **registros públicos de autorización** de repetidoras con nodos **Echolink** (p. ej. Red Chile, Red Echolink Chile, RCDR) y **DMR** según lo curado en el proyecto. Las regiones siguen la división administrativa chilena. El archivo curado vive en `data/curated_stations.csv`; si encontrás inconsistencias, el flujo del repo permite corregir y regenerar el dataset publicado.
-
----
-
-## Para desarrolladores
-
-Sitio estático (sin bundler). Para verlo en local:
+## Desarrollo local
 
 ```bash
-./scripts/serve.sh 8080
+python -m http.server 8080
+# Abre http://localhost:8080/
 ```
 
-Abrí `http://localhost:8080/` (mapa) o `/lista.html` (lista). **No uses `file://`** si querés tema y preferencias estables.
+> Sirve sobre HTTP (no `file://`) para que localStorage sea compartido entre páginas.
 
-Tras editar el CSV:
+## Colaborar
 
-```bash
-./scripts/sync-data.sh
-```
+Correcciones de datos o pull requests:  
+📧 [cd3dxz@gmail.com](mailto:cd3dxz@gmail.com) — indicativo, campo a corregir, fuente si la tienes.  
+🐙 [github.com/juantoledo/radiomap](https://github.com/juantoledo/radiomap)
 
-Más detalle: [`scripts/README.md`](scripts/README.md), [`data/README.md`](data/README.md), [`AGENTS.md`](AGENTS.md).
+## Licencia
 
-**Assets de capturas** (README y redes): `images/web-dark.png`, `images/web-light.png`, `images/mobile-map.png`, `images/mobile-list.png`, `images/propagation.png`.
-
----
-
-*Radiomap — desarrollado por [CD3DXZ](https://cd3dxz.radio)*
+Datos de uso libre con atribución. Código bajo MIT.  
+Desarrollado por [CD3DXZ](https://cd3dxz.radio).

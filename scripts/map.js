@@ -461,9 +461,17 @@
           inner = stationServiceMarkerInnerHtml(svcT, size * 0.58);
           extraClass = ' rpt-marker-service rpt-marker-service--' + svcT;
         }
+        const isUser = !!r._isUser;
+        if (isUser && !inner) {
+          inner = '<span style="color:rgba(255,215,0,0.9);font:' + (size * 0.6) + 'px/1 sans-serif;pointer-events:none">★</span>';
+        }
+        const userClass = isUser ? ' rpt-marker-user' : '';
+        const borderColor = isUser
+          ? 'rgba(255,215,0,' + (isSelected ? '0.95' : '0.8') + ')'
+          : 'rgba(255,255,255,' + (isSelected ? '0.9' : '0.35') + ')';
         const icon = L.divIcon({
           className: '',
-          html: '<div class="rpt-marker' + (isSelected?' selected':'') + extraClass + '" style="background:' + color + ';width:'+size+'px;height:'+size+'px;'+shape+';border:2px solid rgba(255,255,255,'+(isSelected?'0.9':'0.35')+');box-shadow:0 0 '+(isSelected?'8px':'3px')+' rgba('+rgb+',0.6);display:flex;align-items:center;justify-content:center;">'+inner+'</div>',
+          html: '<div class="rpt-marker' + (isSelected?' selected':'') + extraClass + userClass + '" style="background:' + color + ';width:'+size+'px;height:'+size+'px;'+shape+';border:2px solid ' + borderColor + ';box-shadow:0 0 '+(isSelected?'8px':'3px')+' rgba('+rgb+',0.6);display:flex;align-items:center;justify-content:center;">'+inner+'</div>',
           iconSize: [size, size], iconAnchor: [size/2, size/2],
         });
         const marker = L.marker([mLat, mLon], { icon, zIndexOffset: isSelected ? 1000 : 0 });
@@ -472,6 +480,7 @@
         const confT = (r.conference || '').trim();
         const echolinkLine = r.isEcholink ? '<br><span class="rpt-tooltip-meta">Echolink' + (fieldShown(confT) ? ' · ' + escapeHtml(confT) : '') + '</span>' : '';
         const dmrLine = r.isDMR && !r.isEcholink ? '<br><span class="rpt-tooltip-meta">DMR' + (fieldShown(confT) ? ' · ' + escapeHtml(confT) : '') + '</span>' : '';
+        const userLine = r._isUser ? '<br><span class="rpt-tooltip-meta">★ Mi estación</span>' : '';
         const sigLead = typeof stationServiceIconInlineHtml === 'function' ? stationServiceIconInlineHtml(r, '') : '';
         const locParts = [];
         if (fieldShown(r.comuna)) locParts.push(escapeHtml(r.comuna));
@@ -484,7 +493,7 @@
         const freqLine = freqParts.length ? '<br><span class="rpt-tooltip-freq">' + freqParts.join(' · ') + '</span>' : '';
         const tooltipHtml = '<div class="rpt-tooltip-inner">' +
           sigLead + escapeHtml(r.signal) + (fieldShown(club) ? '<br><span class="rpt-tooltip-club">' + escapeHtml(club) + '</span>' : '') +
-          locLine + freqLine + echolinkLine + dmrLine + '</div>';
+          locLine + freqLine + echolinkLine + dmrLine + userLine + '</div>';
         marker.bindTooltip(tooltipHtml, { permanent: false, direction: 'top', opacity: 1, className: 'rpt-tooltip' });
         if(visible) marker.addTo(markerLayer);
       } else {
@@ -817,6 +826,15 @@
 
     let html = '<div class="sb-detail-grid">' + rows.map(([k,v])=>'<div class="sb-row"><span class="sb-key">'+k+'</span><span class="sb-val">'+v+'</span></div>').join('') + '</div>';
 
+    if (r._isUser) {
+      html += '<div class="sb-user-actions">' +
+        '<button type="button" class="sb-edit-btn" onclick="(function(){if(window.myStations) window.myStations.openEditStation(\'' + escapeAttr(r.signal) + '\')})()">' +
+        '<span class="material-symbols-outlined" aria-hidden="true">edit</span> Editar</button>' +
+        '<button type="button" class="sb-delete-btn" onclick="(function(){if(confirm(\'¿Eliminar?\') && window.myStations) window.myStations.removeStation(\'' + escapeAttr(r.signal) + '\')})()">' +
+        '<span class="material-symbols-outlined" aria-hidden="true">delete</span> Eliminar</button>' +
+        '</div>';
+    }
+
     const filteredNeighbors = [{idx: idx, dist: 0}, ...r._neighbors.filter(n=>visibleSet.has(n.idx))].sort((a,b)=>a.dist-b.dist);
     if(filteredNeighbors.length > 0){
       html += '<div class="sb-section-title">NODOS CERCANOS <span class="sb-neighbor-actions"><a href="#" class="sb-download-neighbors" onclick="openNeighborsExportDialog();return false" title="Descargar nodos cercanos como CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span> CSV</a><a href="#" class="sb-share-neighbors" onclick="shareNeighbors();return false" title="Compartir enlace con filtros, mapa y esta repetidora (panel de nodos cercanos)"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</a></span></div>';
@@ -909,7 +927,11 @@
     (window.RADIOMAP_EXPORTERS || []).forEach(function(exp) {
       const btn = document.createElement('button');
       btn.className = 'export-dialog__option';
-      btn.textContent = exp.label;
+      btn.appendChild(document.createTextNode(exp.label));
+      const badge = document.createElement('span');
+      badge.className = 'export-dialog__badge';
+      badge.textContent = exportRows.length;
+      btn.appendChild(badge);
       btn.onclick = function() {
         if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_exporter_download', { page_type: 'map', exporter: exp.id });
         if (typeof window[exp.fn] === 'function') window[exp.fn](exportRows, criteria);
@@ -1153,6 +1175,7 @@
     document.getElementById('export-dialog-csv').onclick = function() {
       if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_csv_download', { page_type: 'map' });
       exportRepeatersCSV(exportRows, criteria);
+      if (window.myStations) window.myStations.clearPendingExport();
       dialog.close();
     };
 
@@ -1161,7 +1184,11 @@
     (window.RADIOMAP_EXPORTERS || []).forEach(function(exp) {
       const btn = document.createElement('button');
       btn.className = 'export-dialog__option';
-      btn.textContent = exp.label;
+      btn.appendChild(document.createTextNode(exp.label));
+      const badge = document.createElement('span');
+      badge.className = 'export-dialog__badge';
+      badge.textContent = exportRows.length;
+      btn.appendChild(badge);
       btn.onclick = function() {
         if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_exporter_download', { page_type: 'map', exporter: exp.id });
         if (typeof window[exp.fn] === 'function') window[exp.fn](exportRows, criteria);
@@ -1181,6 +1208,52 @@
       }
       radioList.appendChild(row);
     });
+
+    var visibleCountEl = document.getElementById('export-dialog-visible-count');
+    if (visibleCountEl) visibleCountEl.textContent = exportRows.length;
+
+    var importFileEl  = document.getElementById('export-dialog-import-file');
+    var importNameEl  = document.getElementById('export-dialog-import-filename');
+    var importBtnEl   = document.getElementById('export-dialog-import-btn');
+    var importResultEl = document.getElementById('export-dialog-import-result');
+    if (importFileEl) importFileEl.value = '';
+    if (importNameEl) importNameEl.textContent = 'Seleccionar archivo...';
+    if (importBtnEl)  importBtnEl.disabled = true;
+    if (importResultEl) { importResultEl.hidden = true; importResultEl.innerHTML = ''; }
+    if (importFileEl && importNameEl && importBtnEl) {
+      importFileEl.onchange = function() {
+        var hasFile = !!(this.files && this.files.length);
+        importNameEl.textContent = hasFile ? this.files[0].name : 'Seleccionar archivo...';
+        importBtnEl.disabled = !hasFile;
+      };
+    }
+    if (importBtnEl && importFileEl && importResultEl) {
+      importBtnEl.onclick = function() {
+        var file = importFileEl.files && importFileEl.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          var escStr = function(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+          if (typeof window.myStations === 'undefined') {
+            importResultEl.innerHTML = 'Error interno.';
+            importResultEl.className = 'export-dialog__import-result export-dialog__import-result--err';
+            importResultEl.hidden = false;
+            return;
+          }
+          var r = window.myStations.importCSV(ev.target.result);
+          var msg = '';
+          if (r.errors.length) msg += '<strong>Errores (' + r.errors.length + '):</strong> ' + escStr(r.errors.slice(0,3).join('; ')) + '. ';
+          if (r.skipped > 0) msg += r.skipped + ' fila' + (r.skipped !== 1 ? 's' : '') + ' omitida' + (r.skipped !== 1 ? 's' : '') + ' (señal ya existe). ';
+          if (r.added > 0) msg += '<strong>' + r.added + ' estación' + (r.added !== 1 ? 'es' : '') + ' agregada' + (r.added !== 1 ? 's' : '') + '.</strong>';
+          if (!msg) msg = 'No se agregó ninguna estación.';
+          importResultEl.innerHTML = msg;
+          importResultEl.className = 'export-dialog__import-result export-dialog__import-result--' + (r.added > 0 ? 'ok' : r.errors.length ? 'err' : 'warn');
+          importResultEl.hidden = false;
+          if (r.added > 0) setTimeout(function() { dialog.close(); if (window.myStations) window.myStations.releaseBeforeUnload(); location.reload(); }, 1200);
+        };
+        reader.readAsText(file, 'UTF-8');
+      };
+    }
 
     document.getElementById('export-dialog-cancel').onclick = function() { dialog.close(); };
     dialog.showModal();

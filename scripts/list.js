@@ -254,6 +254,33 @@
     dl += '</dl>';
     bodyEl.innerHTML = dl;
 
+    if (r._isUser) {
+      var userActionsWrap = document.createElement('div');
+      userActionsWrap.className = 'station-detail-user-actions';
+
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'station-detail-edit-btn';
+      editBtn.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">edit</span> Editar';
+      editBtn.addEventListener('click', function () {
+        if (typeof window.myStations !== 'undefined') window.myStations.openEditStation(r.signal);
+      });
+
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'station-detail-delete-btn';
+      delBtn.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">delete</span> Eliminar';
+      delBtn.addEventListener('click', function () {
+        if (confirm('¿Eliminar la estación "' + (r.signal || '') + '" de tus estaciones?')) {
+          if (typeof window.myStations !== 'undefined') window.myStations.removeStation(r.signal);
+        }
+      });
+
+      userActionsWrap.appendChild(editBtn);
+      userActionsWrap.appendChild(delBtn);
+      bodyEl.appendChild(userActionsWrap);
+    }
+
     try {
       mapLink.href = typeof buildMapViewURLForStation === 'function'
         ? buildMapViewURLForStation(signal)
@@ -449,6 +476,8 @@
         const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${confEsc}">Echolink</span>` : '';
         const dmrBadge = r.isDMR && !r.isEcholink ? `<span class="badge-dmr" title="${confEsc}">DMR</span>` : '';
         const svcBadge = typeof stationServiceBadgeHtml === 'function' ? stationServiceBadgeHtml(r) : '';
+        const userBadge = r._isUser ? '<span class="badge-user-station">★ Mía</span>' : '';
+        const userRowClass = r._isUser ? ' rpt-row--user' : '';
         const distHasVal = showDistance && r._dist != null && typeof r._dist === 'number' && !isNaN(r._dist);
         const distCell = showDistance
           ? `<td class="cell-dist${distHasVal ? '' : ' cell-empty'}" data-label="Distancia">${distHasVal ? r._dist + ' km' : ''}</td>`
@@ -463,8 +492,8 @@
         const bandaBadge = fieldShown(r.banda)
           ? `<span class="cell-signal-banda"><span class="badge-banda ${bc}">${escapeHtml(bandaShort)}</span></span>`
           : '';
-        html += `<tr class="rpt-row" data-signal="${sigAttr}" data-node-idx="${r._idx}">
-          <td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">${sigLead}${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}${svcBadge}</span>${bandaBadge}</span>${shareBtn}</td>
+        html += `<tr class="rpt-row${userRowClass}" data-signal="${sigAttr}" data-node-idx="${r._idx}">
+          <td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">${sigLead}${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}${svcBadge}${userBadge}</span>${bandaBadge}</span>${shareBtn}</td>
           ${distCell}
           <td class="cell-freq freq-rx${cellEmptyClass(r.rx)}" data-label="RX (MHz)">${fieldShown(r.rx) ? r.rx : ''}</td>
           <td class="cell-freq freq-tx${cellEmptyClass(r.tx)}" data-label="TX (MHz)">${fieldShown(r.tx) ? r.tx : ''}</td>
@@ -751,6 +780,7 @@
     document.getElementById('export-dialog-csv').onclick = function() {
       if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_csv_download', { page_type: 'list' });
       exportRepeatersCSV(exportRows, criteria);
+      if (window.myStations) window.myStations.clearPendingExport();
       dialog.close();
     };
 
@@ -759,7 +789,11 @@
     (window.RADIOMAP_EXPORTERS || []).forEach(function(exp) {
       const btn = document.createElement('button');
       btn.className = 'export-dialog__option';
-      btn.textContent = exp.label;
+      btn.appendChild(document.createTextNode(exp.label));
+      const badge = document.createElement('span');
+      badge.className = 'export-dialog__badge';
+      badge.textContent = exportRows.length;
+      btn.appendChild(badge);
       btn.onclick = function() {
         if (typeof window.radiomapGaEvent === 'function') window.radiomapGaEvent('radiomap_exporter_download', { page_type: 'list', exporter: exp.id });
         if (typeof window[exp.fn] === 'function') window[exp.fn](exportRows, criteria);
@@ -779,6 +813,52 @@
       }
       radioList.appendChild(row);
     });
+
+    var visibleCountEl = document.getElementById('export-dialog-visible-count');
+    if (visibleCountEl) visibleCountEl.textContent = exportRows.length;
+
+    var importFileEl  = document.getElementById('export-dialog-import-file');
+    var importNameEl  = document.getElementById('export-dialog-import-filename');
+    var importBtnEl   = document.getElementById('export-dialog-import-btn');
+    var importResultEl = document.getElementById('export-dialog-import-result');
+    if (importFileEl) importFileEl.value = '';
+    if (importNameEl) importNameEl.textContent = 'Seleccionar archivo...';
+    if (importBtnEl)  importBtnEl.disabled = true;
+    if (importResultEl) { importResultEl.hidden = true; importResultEl.innerHTML = ''; }
+    if (importFileEl && importNameEl && importBtnEl) {
+      importFileEl.onchange = function() {
+        var hasFile = !!(this.files && this.files.length);
+        importNameEl.textContent = hasFile ? this.files[0].name : 'Seleccionar archivo...';
+        importBtnEl.disabled = !hasFile;
+      };
+    }
+    if (importBtnEl && importFileEl && importResultEl) {
+      importBtnEl.onclick = function() {
+        var file = importFileEl.files && importFileEl.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          var escStr = function(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+          if (typeof window.myStations === 'undefined') {
+            importResultEl.innerHTML = 'Error interno.';
+            importResultEl.className = 'export-dialog__import-result export-dialog__import-result--err';
+            importResultEl.hidden = false;
+            return;
+          }
+          var r = window.myStations.importCSV(ev.target.result);
+          var msg = '';
+          if (r.errors.length) msg += '<strong>Errores (' + r.errors.length + '):</strong> ' + escStr(r.errors.slice(0,3).join('; ')) + '. ';
+          if (r.skipped > 0) msg += r.skipped + ' fila' + (r.skipped !== 1 ? 's' : '') + ' omitida' + (r.skipped !== 1 ? 's' : '') + ' (señal ya existe). ';
+          if (r.added > 0) msg += '<strong>' + r.added + ' estación' + (r.added !== 1 ? 'es' : '') + ' agregada' + (r.added !== 1 ? 's' : '') + '.</strong>';
+          if (!msg) msg = 'No se agregó ninguna estación.';
+          importResultEl.innerHTML = msg;
+          importResultEl.className = 'export-dialog__import-result export-dialog__import-result--' + (r.added > 0 ? 'ok' : r.errors.length ? 'err' : 'warn');
+          importResultEl.hidden = false;
+          if (r.added > 0) setTimeout(function() { dialog.close(); if (window.myStations) window.myStations.releaseBeforeUnload(); location.reload(); }, 1200);
+        };
+        reader.readAsText(file, 'UTF-8');
+      };
+    }
 
     document.getElementById('export-dialog-cancel').onclick = function() { dialog.close(); };
     dialog.showModal();

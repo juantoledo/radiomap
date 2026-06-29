@@ -71,6 +71,7 @@ var HELP_OVERLAY_HTML =
   '<li><strong>Ruta</strong> — <span class="material-symbols-outlined help-inline-icon" aria-hidden="true">route</span> ingresa origen y destino (texto o clic en el mapa) y ajusta el corredor; el mapa resalta las repetidoras dentro del trayecto y aplica los filtros activos.</li>' +
   '<li><strong>Lista</strong> — misma búsqueda y filtros; tabla por región.</li>' +
   '<li><strong>CSV</strong> y <strong>compartir</strong> en la cabecera (enlace con filtros; captura opcional desde el mapa).</li>' +
+  '<li><strong>Mis Estaciones</strong> — agrega, edita y elimina estaciones propias (ícono <span class="material-symbols-outlined help-inline-icon" aria-hidden="true">star</span> en la cabecera). Se guardan en el navegador; <strong>exporta el CSV</strong> para no perderlas. Los datos son responsabilidad del operador.</li>' +
   '</ul>' +
   '<div class="help-modal-previews">' +
   '<figure class="help-modal-preview">' +

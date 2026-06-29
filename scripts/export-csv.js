@@ -35,6 +35,8 @@ function buildExportFilename(criteria) {
     return String(s).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-áéíóúñ]/g, '').toLowerCase().slice(0, 30);
   };
   if (criteria) {
+    if (criteria.myStations) parts.push('mis-estaciones');
+    if (criteria.allStations) parts.push('todas');
     if (criteria.nearMe) parts.push('cerca-de-mi');
     const bandas = criteria.bandas || (criteria.banda ? [criteria.banda] : []);
     bandas.forEach(function (b) {
