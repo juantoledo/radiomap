@@ -30,12 +30,14 @@ jobs:
 
       - name: Bump version
         id: bump
+        env:
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
         run: |
           CURRENT=$(grep "const VERSION" data/data.js | sed "s/.*'\([^']*\)'.*/\1/")
           echo "current=$CURRENT" >> $GITHUB_OUTPUT
 
           BUMP_LEVEL="patch"
-          for msg in $(echo '${{ toJSON(github.event.commits) }}' | jq -r '.[].message'); do
+          for msg in $(echo "$COMMITS_JSON" | jq -r '.[].message'); do
             if echo "$msg" | grep -qE '^[a-zA-Z]+!|BREAKING CHANGE'; then
               BUMP_LEVEL="major"
               break
