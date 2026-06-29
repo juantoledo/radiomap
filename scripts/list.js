@@ -476,7 +476,7 @@
         const echolinkBadge = r.isEcholink ? `<span class="badge-echolink" title="${confEsc}">Echolink</span>` : '';
         const dmrBadge = r.isDMR && !r.isEcholink ? `<span class="badge-dmr" title="${confEsc}">DMR</span>` : '';
         const svcBadge = typeof stationServiceBadgeHtml === 'function' ? stationServiceBadgeHtml(r) : '';
-        const userBadge = r._isUser ? '<span class="badge-user-station">★ Mía</span>' : '';
+        const userBadge = r._isUser ? '<span class="badge-user-station">★ Agregada por mí</span>' : '';
         const userRowClass = r._isUser ? ' rpt-row--user' : '';
         const distHasVal = showDistance && r._dist != null && typeof r._dist === 'number' && !isNaN(r._dist);
         const distCell = showDistance

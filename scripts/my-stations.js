@@ -531,7 +531,7 @@
           '<div class="ms-panels">' +
             '<div class="ms-panel ms-panel--list" id="ms-panel-list-wrap">' +
               '<div id="ms-panel-list"></div>' +
-              '<p class="ms-disclaimer">Las estaciones personalizadas son responsabilidad del operador. Verifica frecuencias y datos antes de transmitir.</p>' +
+              '<p class="ms-disclaimer"><span class="material-symbols-outlined ms-disclaimer__icon" aria-hidden="true">info</span><span>Las estaciones personalizadas se almacenan <strong>solo en este navegador</strong> y no son visibles para otros usuarios. Son responsabilidad del operador — Radiomap no incluye información que pudiera infringir regulaciones.</span></p>' +
             '</div>' +
 
             '<div class="ms-panel ms-panel--form" id="ms-panel-form-wrap">' +
@@ -632,9 +632,6 @@
                   '<label class="ms-form-label" for="ms-f-svc">Servicio especial</label>' +
                   '<select id="ms-f-svc" class="ms-form-select">' +
                     '<option value="">— Repetidora genérica</option>' +
-                    '<option value="atc">ATC / Aéreo</option>' +
-                    '<option value="fire">Bomberos</option>' +
-                    '<option value="ambulance">SAMU / Ambulancia</option>' +
                     '<option value="sea">Marítimo</option>' +
                   '</select>' +
                 '</div>' +
