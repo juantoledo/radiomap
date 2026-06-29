@@ -433,6 +433,19 @@ html[data-theme="light"] .header-view-switch__segment--stats.current {
   color: var(--text-bright);
   box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
 }
+/* Mis Estaciones — gold to distinguish from the cyan action buttons */
+#btn-my-stations {
+  background: rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+}
+#btn-my-stations:hover {
+  background: rgba(255, 215, 0, 0.16);
+  border-color: #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+}
+#btn-my-stations .material-symbols-outlined { color: #ffd700; }
 .menu-toggle { display: none; }
 
 /* App bar (mapa, lista, propagación): marca | Mapa/Lista segmentado | acciones + menú */
@@ -3453,6 +3466,17 @@ html[data-theme="light"] .header-action-link.btn-download:hover {
   background: rgba(0, 136, 204, 0.2);
   box-shadow: 0 0 12px rgba(0, 136, 204, 0.25);
 }
+html[data-theme="light"] #btn-my-stations {
+  background: rgba(160, 120, 0, 0.08);
+  border-color: rgba(160, 120, 0, 0.45);
+  color: #9a7200;
+}
+html[data-theme="light"] #btn-my-stations:hover {
+  background: rgba(160, 120, 0, 0.15);
+  border-color: #9a7200;
+  box-shadow: 0 0 12px rgba(160, 120, 0, 0.2);
+}
+html[data-theme="light"] #btn-my-stations .material-symbols-outlined { color: #9a7200; }
 html[data-theme="light"] .header-menu .location-btn {
   color: var(--green);
 }
