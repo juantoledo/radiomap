@@ -95,16 +95,6 @@
     if (btn) { btn.classList.remove('has-pending-export'); btn.removeAttribute('data-unsaved-count'); }
   }
 
-  var CHILE_REGIONS = [
-    'REGIÓN DE ARICA Y PARINACOTA','REGIÓN DE TARAPACÁ','REGIÓN DE ANTOFAGASTA',
-    'REGIÓN DE ATACAMA','REGIÓN DE COQUIMBO','REGIÓN DE VALPARAÍSO',
-    'REGIÓN METROPOLITANA','REGIÓN DEL LIBERTADOR GENERAL BERNARDO O\'HIGGINS',
-    'REGIÓN DEL MAULE','REGIÓN DE ÑUBLE','REGIÓN DEL BIOBÍO',
-    'REGIÓN DE LA ARAUCANÍA','REGIÓN DE LOS RÍOS','REGIÓN DE LOS LAGOS',
-    'REGIÓN DE AYSÉN DEL GENERAL CARLOS IBÁÑEZ DEL CAMPO',
-    'REGIÓN DE MAGALLANES Y DE LA ANTÁRTICA CHILENA'
-  ];
-
   // ── Storage helpers ────────────────────────────────────────────────────────
 
   function loadFromStorage() {
@@ -504,7 +494,10 @@
   // ── Modal HTML ─────────────────────────────────────────────────────────────
 
   function buildRegionOptions() {
-    return CHILE_REGIONS.map(function (r) { return '<option value="' + esc(r) + '">'; }).join('');
+    var keys = typeof REGION_COLORS !== 'undefined' && REGION_COLORS ? Object.keys(REGION_COLORS) : [];
+    var sorted = typeof window.sortRegionKeysChile === 'function' ? window.sortRegionKeysChile(keys) : keys;
+    return '<option value="">—</option>' +
+      sorted.map(function (r) { return '<option value="' + esc(r) + '">' + esc(r) + '</option>'; }).join('');
   }
 
   var _injected = false;
@@ -603,8 +596,7 @@
                 '</div>' +
                 '<div class="ms-form-field">' +
                   '<label class="ms-form-label" for="ms-f-region">Región</label>' +
-                  '<input type="text" id="ms-f-region" class="ms-form-input" list="ms-regions-list" placeholder="REGIÓN DE...">' +
-                  '<datalist id="ms-regions-list">' + buildRegionOptions() + '</datalist>' +
+                  '<select id="ms-f-region" class="ms-form-select">' + buildRegionOptions() + '</select>' +
                 '</div>' +
                 '<div class="ms-form-row">' +
                   '<div class="ms-form-field">' +
@@ -632,6 +624,9 @@
                   '<label class="ms-form-label" for="ms-f-svc">Servicio especial</label>' +
                   '<select id="ms-f-svc" class="ms-form-select">' +
                     '<option value="">— Repetidora genérica</option>' +
+                    '<option value="atc">ATC / aéreo</option>' +
+                    '<option value="fire">Bomberos</option>' +
+                    '<option value="ambulance">Ambulancia</option>' +
                     '<option value="sea">Marítimo</option>' +
                   '</select>' +
                 '</div>' +
