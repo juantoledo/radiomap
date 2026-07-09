@@ -234,7 +234,7 @@ CE4LAB-L,RCDR - San Joaquin,San Joaquin,,-33.5,-70.6166667,,,UHF/FM,433.430,433.
 CA2BSG-L,RCDR - Viña del Mar,Viña del Mar,,-33.0245,-71.5518,,,VHF/FM,145.430,145.430,,REGIÓN DE VALPARAÍSO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,valparaiso vhf simplex
 CD4BSD-L,RCDR - Constitución,Constitución,,-35.3333333,-72.4166667,,,VHF/FM,145.430,145.430,,REGIÓN DEL MAULE,,,1,RCDR,,,,,,https://www.rcdr.cl/,,centro vhf simplex
 CD4SDA-L,RCDR - Curepto,Curepto,,-35.0833333,-72.0166667,,,VHF/FM,145.430,145.430,,REGIÓN DEL MAULE,,,1,RCDR,,,,,,https://www.rcdr.cl/,,centro vhf simplex
-CD4JPX-L,RCDR - Nodo móvil (satelital),,Nodo en movimiento dentro del país,-35.5,-71.5,,,VHF/FM,145.650,145.650,,,,,1,RCDR,,,,,,https://www.rcdr.cl/,Nodo en movimiento dentro del país; enlace satelital 145.650 MHz,movil vhf simplex
+CD4JPX-L,RCDR - Nodo móvil (satelital),,Nodo en movimiento dentro del país,-35.5,-71.5,,,VHF/FM,145.650,145.650,,GLOBAL,,,1,RCDR,,,,,,https://www.rcdr.cl/,Nodo en movimiento dentro del país; enlace satelital 145.650 MHz,movil vhf simplex
 CE5UNI-L,RCDR - Concepción,Concepción,Universidad de Concepción,-36.83101365,-73.03468047,,,UHF/FM,433.430,433.430,77.0,REGIÓN DEL BIOBÍO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur uhf simplex
 CE5RPP-R,Conferencia Sur - Penco,Penco,,-36.7408,-72.9953,,,VHF/FM,146.940,146.340,88.5,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf
 CA5EHC-L,Conferencia Sur - Coronel,Coronel,,-36.9555555556,-73.1208333333,,,VHF/FM,145.550,145.550,67,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf simplex
@@ -363,59 +363,59 @@ CE1CPI RPT-ELSLV,RadioClub Copiapo RPT Ciudad El Salvador,DIEGO DE ALMAGRO,CIUDA
 CE1CPI RPT-PEDERNALES,RadioClub Copiapo RPT Salar de Pedernales,DIEGO DE ALMAGRO,SALAR DE PEDERNALES,-26.0000000000,-69.1666666667,,,VHF/FM,146.610,146.010,88.5,REGIÓN DE ATACAMA,,,,,,,,,,https://www.qsl.net/ce1cpi/,Datos aportados por CE1VPG.,norte-chico vhf
 CE1UJO,RadioClub Copiapo LINK Vallenar CE1UJO,VALLENAR,CIUDAD VALLENAR,-28.5666666667,-70.7500000000,,,VHF/FM,144.100,144.100,,REGIÓN DE ATACAMA,,,,,,,,,,https://www.qrz.com/db/CE1UJO,Datos aportados por CE1VPG.,norte-chico vhf
 CE3WPP RPT-A,CE3WPP — Cerro El Sombrero,MELIPILLA,CERRO EL SOMBRERO,-33.70309,-71.23242,,,VHF/FM,147.165,147.765,123.0,REGIÓN METROPOLITANA DE SANTIAGO,,,,,,,,,,,CTCSS salida 146.2 Hz; columna tono acceso subida 123.0 Hz.,rm vhf
-Rueda de la Amistad,Rueda de la Amistad,,,,,,,HF,7.148,7.148,,,,,,,,,,,,,7.148 MHz LSB,hf simplex 40mt lsb
-Red Chile Mar y Tierra (15 Metros),Red Chile Mar y Tierra (15 Metros),,,,,,,HF,21.315,21.315,,,,,,,,,,,,,21.315 MHz USB,hf 15mt usb
-Red Chile Mar y Tierra (20 Metros),Red Chile Mar y Tierra (20 Metros),,,,,,,HF,14.255,14.255,,,,,,,,,,,,,14.255 MHz USB,hf 20mt usb
-RECNA 40 mt,Red Chilena Nor Austral de Servicios (40 metros),,,,,,,HF,7.190,7.190,,,,,,,,,,,,,7.190 LSB,hf 40mt lsb
-RECNA 80 mt,Red Chilena Nor Austral de Servicios (80 metros),,,,,,,HF,3.738,3.738,,,,,,,,,,,,,3.738 LSB,hf 80mt lsb
-"Red de Emergencia Nacional ","Red de Emergencia Nacional ",,,,,,,HF,7.085,7.085,,,,,,,,,,,,,7.085 LSB,hf 40mt lsb
-CB-01,Canal 1 Banda Ciudadana,,,,,,,HF,26.965,26.965,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-02,Canal 2 Banda Ciudadana,,,,,,,HF,26.975,26.975,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-03,Canal 3 Banda Ciudadana,,,,,,,HF,26.985,26.985,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-04,Canal 4 Banda Ciudadana,,,,,,,HF,27.005,27.005,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-05,Canal 5 Banda Ciudadana,,,,,,,HF,27.015,27.015,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-06,Canal 6 Banda Ciudadana,,,,,,,HF,27.025,27.025,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-07,Canal 7 Banda Ciudadana,,,,,,,HF,27.035,27.035,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-08,Canal 8 Banda Ciudadana,,,,,,,HF,27.055,27.055,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-09,Canal 9 Banda Ciudadana,,,,,,,HF,27.065,27.065,,,,,,,,,,,,,Canal oficial de emergencias,emergencias cb 11mt banda-ciudadana
-CB-10,Canal 10 Banda Ciudadana,,,,,,,HF,27.075,27.075,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-11,Canal 11 Banda Ciudadana,,,,,,,HF,27.085,27.085,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-12,Canal 12 Banda Ciudadana,,,,,,,HF,27.105,27.105,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-13,Canal 13 Banda Ciudadana,,,,,,,HF,27.115,27.115,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-14,Canal 14 Banda Ciudadana,,,,,,,HF,27.125,27.125,,,,,,,,,,,,,Canal de llamada (Chile),llamada cb 11mt banda-ciudadana
-CB-15,Canal 15 Banda Ciudadana,,,,,,,HF,27.135,27.135,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-16,Canal 16 Banda Ciudadana,,,,,,,HF,27.155,27.155,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-17,Canal 17 Banda Ciudadana,,,,,,,HF,27.165,27.165,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-18,Canal 18 Banda Ciudadana,,,,,,,HF,27.175,27.175,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-19,Canal 19 Banda Ciudadana,,,,,,,HF,27.185,27.185,,,,,,,,,,,,,Canal de camioneros y autopistas,camioneros autopistas cb 11mt banda-ciudadana
-CB-20,Canal 20 Banda Ciudadana,,,,,,,HF,27.205,27.205,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-21,Canal 21 Banda Ciudadana,,,,,,,HF,27.215,27.215,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-22,Canal 22 Banda Ciudadana,,,,,,,HF,27.225,27.225,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-23,Canal 23 Banda Ciudadana,,,,,,,HF,27.255,27.255,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-24,Canal 24 Banda Ciudadana,,,,,,,HF,27.235,27.235,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-25,Canal 25 Banda Ciudadana,,,,,,,HF,27.245,27.245,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-26,Canal 26 Banda Ciudadana,,,,,,,HF,27.265,27.265,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-27,Canal 27 Banda Ciudadana,,,,,,,HF,27.275,27.275,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-28,Canal 28 Banda Ciudadana,,,,,,,HF,27.285,27.285,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-29,Canal 29 Banda Ciudadana,,,,,,,HF,27.295,27.295,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-30,Canal 30 Banda Ciudadana,,,,,,,HF,27.305,27.305,,,,,,,,,,,,,,cb 11mt banda-ciudadana camioneros
-CB-31,Canal 31 Banda Ciudadana,,,,,,,HF,27.315,27.315,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-32,Canal 32 Banda Ciudadana,,,,,,,HF,27.325,27.325,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-33,Canal 33 Banda Ciudadana,,,,,,,HF,27.335,27.335,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-34,Canal 34 Banda Ciudadana,,,,,,,HF,27.345,27.345,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-35,Canal 35 Banda Ciudadana,,,,,,,HF,27.355,27.355,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-36,Canal 36 Banda Ciudadana,,,,,,,HF,27.365,27.365,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-37,Canal 37 Banda Ciudadana,,,,,,,HF,27.375,27.375,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-38,Canal 38 Banda Ciudadana,,,,,,,HF,27.385,27.385,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-39,Canal 39 Banda Ciudadana,,,,,,,HF,27.395,27.395,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-CB-40,Canal 40 Banda Ciudadana,,,,,,,HF,27.405,27.405,,,,,,,,,,,,,,cb 11mt banda-ciudadana
-27.455 USB,Canal Encuentro Internacional Latino,,,,,,,HF,27.455,27.455,,,,,,,,,,,,,27.455 MHz USB,11mt banda-ciudadana encuentro
-27.555 USB,Canal Encuentro Internacional,,,,,,,HF,27.555,27.555,,,,,,,,,,,,,27.555 MHz USB,11mt banda-ciudadana encuentro
-27.625,Canal Encuentro Alemania y Países Nórdicos,,,,,,,HF,27.625,27.625,,,,,,,,,,,,,27.625 MHz,11mt banda-ciudadana encuentro
-26.555 LSB,Canal de Encuentro Caribe/América Central,,,,,,,HF,26.555,26.555,,,,,,,,,,,,,26.555 MHz LSB,11mt banda-ciudadana encuentro caribe
-28.575 USB,Frecuencia Encuentro Inglaterra,,,,,,,HF,28.575,28.575,,,,,,,,,,,,,28.575 MHz USB,10mt banda-ciudadana encuentro inglaterra
-29.250 C4FM,Canal Encuentro Internacional C4FM,,,,,,,HF,29.250,29.250,,,,,,,,,,,,,29.250 MHz C4FM,10mt banda-ciudadana encuentro c4fm
-7.100 LSB,Cadena Peruana de Socorro,,,,,,,HF,7.100,7.100,,,,,,,,,,,,,7.100 MHz LSB,40mt perú
+Rueda de la Amistad,Rueda de la Amistad,,,,,,,HF,7.148,7.148,,GLOBAL,,,,,,,,,,,7.148 MHz LSB,hf simplex 40mt lsb
+Red Chile Mar y Tierra (15 Metros),Red Chile Mar y Tierra (15 Metros),,,,,,,HF,21.315,21.315,,GLOBAL,,,,,,,,,,,21.315 MHz USB,hf 15mt usb
+Red Chile Mar y Tierra (20 Metros),Red Chile Mar y Tierra (20 Metros),,,,,,,HF,14.255,14.255,,GLOBAL,,,,,,,,,,,14.255 MHz USB,hf 20mt usb
+RECNA 40 mt,Red Chilena Nor Austral de Servicios (40 metros),,,,,,,HF,7.190,7.190,,GLOBAL,,,,,,,,,,,7.190 LSB,hf 40mt lsb
+RECNA 80 mt,Red Chilena Nor Austral de Servicios (80 metros),,,,,,,HF,3.738,3.738,,GLOBAL,,,,,,,,,,,3.738 LSB,hf 80mt lsb
+Red de Emergencia Nacional ,Red de Emergencia Nacional ,,,,,,,HF,7.085,7.085,,GLOBAL,,,,,,,,,,,7.085 LSB,hf 40mt lsb
+CB-01,Canal 1 Banda Ciudadana,,,,,,,HF,26.965,26.965,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-02,Canal 2 Banda Ciudadana,,,,,,,HF,26.975,26.975,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-03,Canal 3 Banda Ciudadana,,,,,,,HF,26.985,26.985,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-04,Canal 4 Banda Ciudadana,,,,,,,HF,27.005,27.005,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-05,Canal 5 Banda Ciudadana,,,,,,,HF,27.015,27.015,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-06,Canal 6 Banda Ciudadana,,,,,,,HF,27.025,27.025,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-07,Canal 7 Banda Ciudadana,,,,,,,HF,27.035,27.035,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-08,Canal 8 Banda Ciudadana,,,,,,,HF,27.055,27.055,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-09,Canal 9 Banda Ciudadana,,,,,,,HF,27.065,27.065,,GLOBAL,,,,,,,,,,,Canal oficial de emergencias,emergencias cb 11mt banda-ciudadana
+CB-10,Canal 10 Banda Ciudadana,,,,,,,HF,27.075,27.075,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-11,Canal 11 Banda Ciudadana,,,,,,,HF,27.085,27.085,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-12,Canal 12 Banda Ciudadana,,,,,,,HF,27.105,27.105,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-13,Canal 13 Banda Ciudadana,,,,,,,HF,27.115,27.115,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-14,Canal 14 Banda Ciudadana,,,,,,,HF,27.125,27.125,,GLOBAL,,,,,,,,,,,Canal de llamada (Chile),llamada cb 11mt banda-ciudadana
+CB-15,Canal 15 Banda Ciudadana,,,,,,,HF,27.135,27.135,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-16,Canal 16 Banda Ciudadana,,,,,,,HF,27.155,27.155,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-17,Canal 17 Banda Ciudadana,,,,,,,HF,27.165,27.165,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-18,Canal 18 Banda Ciudadana,,,,,,,HF,27.175,27.175,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-19,Canal 19 Banda Ciudadana,,,,,,,HF,27.185,27.185,,GLOBAL,,,,,,,,,,,Canal de camioneros y autopistas,camioneros autopistas cb 11mt banda-ciudadana
+CB-20,Canal 20 Banda Ciudadana,,,,,,,HF,27.205,27.205,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-21,Canal 21 Banda Ciudadana,,,,,,,HF,27.215,27.215,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-22,Canal 22 Banda Ciudadana,,,,,,,HF,27.225,27.225,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-23,Canal 23 Banda Ciudadana,,,,,,,HF,27.255,27.255,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-24,Canal 24 Banda Ciudadana,,,,,,,HF,27.235,27.235,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-25,Canal 25 Banda Ciudadana,,,,,,,HF,27.245,27.245,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-26,Canal 26 Banda Ciudadana,,,,,,,HF,27.265,27.265,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-27,Canal 27 Banda Ciudadana,,,,,,,HF,27.275,27.275,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-28,Canal 28 Banda Ciudadana,,,,,,,HF,27.285,27.285,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-29,Canal 29 Banda Ciudadana,,,,,,,HF,27.295,27.295,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-30,Canal 30 Banda Ciudadana,,,,,,,HF,27.305,27.305,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana camioneros
+CB-31,Canal 31 Banda Ciudadana,,,,,,,HF,27.315,27.315,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-32,Canal 32 Banda Ciudadana,,,,,,,HF,27.325,27.325,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-33,Canal 33 Banda Ciudadana,,,,,,,HF,27.335,27.335,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-34,Canal 34 Banda Ciudadana,,,,,,,HF,27.345,27.345,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-35,Canal 35 Banda Ciudadana,,,,,,,HF,27.355,27.355,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-36,Canal 36 Banda Ciudadana,,,,,,,HF,27.365,27.365,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-37,Canal 37 Banda Ciudadana,,,,,,,HF,27.375,27.375,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-38,Canal 38 Banda Ciudadana,,,,,,,HF,27.385,27.385,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-39,Canal 39 Banda Ciudadana,,,,,,,HF,27.395,27.395,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+CB-40,Canal 40 Banda Ciudadana,,,,,,,HF,27.405,27.405,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
+27.455 USB,Canal Encuentro Internacional Latino,,,,,,,HF,27.455,27.455,,GLOBAL,,,,,,,,,,,27.455 MHz USB,11mt banda-ciudadana encuentro
+27.555 USB,Canal Encuentro Internacional,,,,,,,HF,27.555,27.555,,GLOBAL,,,,,,,,,,,27.555 MHz USB,11mt banda-ciudadana encuentro
+27.625,Canal Encuentro Alemania y Países Nórdicos,,,,,,,HF,27.625,27.625,,GLOBAL,,,,,,,,,,,27.625 MHz,11mt banda-ciudadana encuentro
+26.555 LSB,Canal de Encuentro Caribe/América Central,,,,,,,HF,26.555,26.555,,GLOBAL,,,,,,,,,,,26.555 MHz LSB,11mt banda-ciudadana encuentro caribe
+28.575 USB,Frecuencia Encuentro Inglaterra,,,,,,,HF,28.575,28.575,,GLOBAL,,,,,,,,,,,28.575 MHz USB,10mt banda-ciudadana encuentro inglaterra
+29.250 C4FM,Canal Encuentro Internacional C4FM,,,,,,,HF,29.250,29.250,,GLOBAL,,,,,,,,,,,29.250 MHz C4FM,10mt banda-ciudadana encuentro c4fm
+7.100 LSB,Cadena Peruana de Socorro,,,,,,,HF,7.100,7.100,,GLOBAL,,,,,,,,,,,7.100 MHz LSB,40mt perú
 CE5RMC RPT-A,RADIOCLUB MANQUIMAVIDA,CHIGUAYANTE,CERRO MANQUIMÁVIDA,-36.916499,-73.005663,,,VHF/FM,147.060,147.660,100,REGIÓN DEL BIOBÍO,,,1,,,,,,,,,sur vhf
 CE7JLR-L,RCDR - Aysén,Puerto Aysén,,-45.4020998,-72.6983477,,,VHF/FM,146.460,146.460,,REGIÓN DE AYSÉN DEL GENERAL CARLOS IBÁÑEZ DEL CAMPO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
 CE6VPX-L,RCDR - Paillaco,Paillaco,,-40.0719057,-72.8800317,,,VHF/FM,146.460,146.460,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex

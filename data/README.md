@@ -61,7 +61,7 @@ Los `README.md` dentro de cada carpeta de señal documentan corridas concretas (
 | `banda` | Banda de servicio (ej. `VHF/FM`, `UHF/FM`). |
 | `rx`, `tx` | Frecuencias de recepción y transmisión (MHz). |
 | `tono` | Tono subaudible / DCS si aplica. |
-| `region` | Región (texto alineado a la división administrativa chilena). |
+| `region` | Región (texto alineado a la división administrativa chilena). Usar `GLOBAL` para estaciones/redes no atadas a una región específica, sea de alcance nacional (redes HF nacionales, estaciones móviles) o internacional (frecuencias de encuentro con otros países); distinto de `ATC — NACIONAL (Chile)`, reservado para frecuencias aeronáuticas ATC de alcance nacional. |
 | `otorga`, `vence` | Fechas de otorgamiento y vencimiento de la autorización. |
 | `isEcholink` | `1`, `true` o `yes` = nodo Echolink; vacío u otro = no. |
 | `conference` | Nombre de la **conferencia o red** (Echolink, DMR u otro): ej. `Red Chile`, `RCDR`, `SUR`, `Zona DMR CL`. Vacío si no aplica. |
