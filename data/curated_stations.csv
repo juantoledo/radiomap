@@ -78,9 +78,8 @@ CE4SCL RPT-A,RADIO CLUB DE SAN CARLOS,SAN CARLOS,CERRO VALLE EL VALIENTE,-36.508
 CE5BIO RPT-A,RADIO CLUB DEL BIO BIO,PEMUCO,SECTOR COREA PEMUCO,-37.0228694444,-71.705875,25,6,VHF/FM,147.240,147.840,123,REGIÓN DE NUBLE,10-02-2025,10-02-2030,1,,,,,,,https://www.ce5bio.cl/,,centro vhf
 CE3BIO RPT-B,RADIO CLUB DEL BIO BIO,PEMUCO,SECTOR COREA PEMUCO,-37.0228694444,-71.7067083333,10,6,UHF/FM,433.800,438.800,123,REGIÓN DE NUBLE,10-02-2025,10-02-2030,,,,,,,,https://www.ce5bio.cl/,,centro uhf
 CE1DDA RPT-A,RADIO CLUB DESIERTO ATACAMA,COPIAPÓ,COPIAPO,-27.4065358333,-70.3999961111,7,3,VHF/FM,147.900,147.300,77,REGIÓN DE ATACAMA,02-08-2023,26-04-2028,,,,,,,,,,norte-chico vhf
-CE1LOA RPT-C,RADIO CLUB EL LOA,CALAMA,CERRO LIMÓN VERDE,-22.7583333333,-68.9911111111,10,6,VHF/FM,146.700,146.100,88.5,REGIÓN DE ANTOFAGASTA,17-03-2023,29-12-2027,,,,,,,,,,gran-norte vhf
-CE1LOA RPT-B,RADIO CLUB EL LOA,CALAMA,CERRO MONTECARLOS,-22.3263888889,-68.9916666667,10,6,VHF/FM,147.180,147.780,,REGIÓN DE ANTOFAGASTA,17-03-2023,29-12-2027,,,,,,,,,,gran-norte vhf
-CE1LOA RPT-A,RADIO CLUB EL LOA,CALAMA,CERRO LIMON VERDE,-22.7583333333,-68.9911111111,10,6,VHF/FM,146.700,146.100,88.5,REGIÓN DE ANTOFAGASTA,17-03-2023,29-12-2027,,,,,,,,,,gran-norte vhf
+CE1LOA RPT-B,RADIO CLUB EL LOA,CALAMA,CERRO MONTECARLOS,-22.3263888889,-68.9916666667,10,6,VHF/FM,147.180,147.780,88.5,REGIÓN DE ANTOFAGASTA,17-03-2023,29-12-2027,,,,,,,,,,gran-norte vhf
+CE1LOA RPT-A,RADIO CLUB EL LOA,CALAMA,CERRO LIMON VERDE,-22.7583333333,-68.9911111111,10,6,VHF/FM,146.100,146.700,88.5,REGIÓN DE ANTOFAGASTA,17-03-2023,29-12-2027,,,,,,,,,,gran-norte vhf
 CE1ESV RPT-B,RADIO CLUB EL SALVADOR,DIEGO DE ALMAGRO,LLANO DE BORAX CORDILLERA DE DOMEYCO,-26.3082777778,-69.2823333333,12,12,VHF/FM,146.610,146.010,88.5,REGIÓN DE ATACAMA,19-02-2025,19-02-2030,,,,,,,,,,norte-chico vhf
 CE1ESV RPT-C,RADIO CLUB EL SALVADOR,DIEGO DE ALMAGRO,CERRO CONTRERAS EL SALVADOR,-26.3519444444,-69.5652777778,8,6.5,VHF/FM,147.330,147.930,88.5,REGIÓN DE ATACAMA,19-02-2025,19-02-2030,,,,,,,,,,norte-chico vhf
 CE2ESV RPT-A,RADIO CLUB EL SALVADOR,DIEGO DE ALMAGRO,CERRO EL SALADO,-26.3780555556,-70.2802777778,8,6,VHF/FM,147.390,147.990,79.7,REGIÓN DE ATACAMA,19-02-2025,19-02-2030,,,,,,,,,,norte-chico vhf
@@ -239,7 +238,6 @@ CE5UNI-L,RCDR - Concepción,Concepción,Universidad de Concepción,-36.83101365,
 CE5RPP-R,Conferencia Sur - Penco,Penco,,-36.7408,-72.9953,,,VHF/FM,146.940,146.340,88.5,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf
 CA5EHC-L,Conferencia Sur - Coronel,Coronel,,-36.9555555556,-73.1208333333,,,VHF/FM,145.550,145.550,67,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf simplex
 CE5VKK-L,Conferencia Sur - Concepción,Concepción,,-36.8269,-73.0503,,,VHF/FM,147.500,147.500,123,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf simplex
-CA1ILI-L,Conferencia Sur - Iquique,Iquique,,-20.2166667,-70.1666667,,,UHF/FM,439.200,439.200,136.5,REGIÓN DE TARAPACÁ,,,1,SUR,,,,,,https://conferenciasur.cl/,,gran-norte uhf simplex
 CE5UFR-L,Conferencia Sur - Puerto Montt,Puerto Montt,,-41.4688888889,-72.9630555556,,,VHF/FM,,,,REGIÓN DE LOS LAGOS,,,1,SUR,,,,,,https://conferenciasur.cl/,,los-lagos vhf
 CA3HRS-L,Conferencia Sur - Cabrero,Cabrero,,-37.0333,-72.4,,,VHF/FM,145.550,145.550,67,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf simplex
 CA2RDP-L,Conferencia Sur - La Serena,La Serena,,-29.9388888889,-71.2233333333,,,VHF/FM,145.680,145.680,88.5,REGIÓN DE COQUIMBO,,,1,SUR,,,,,,https://conferenciasur.cl/,,norte-chico vhf simplex
@@ -252,7 +250,6 @@ CE3RDV,RADIO CLUB VALLES DEL MAIPO,Buin,Centro urbano,-33.7333333333,-70.7333333
 CE3BIO,RADIO CLUB DEL BIOBIO,LOS ANGELES,LOS ANGELES CENTRO,-37.4697305556,-72.3536611111,,,VHF/FM,146.790,146.190,,REGIÓN DEL BIOBÍO,,,,,1,,1,1,,https://www.ce5bio.cl/,,sur vhf
 CE3SER-VHF,CE3SER — Simplex VHF (emergencias RC Chile),Santiago,Centro urbano,-33.45,-70.6666667,,,VHF/FM,146.520,146.520,,REGIÓN METROPOLITANA DE SANTIAGO,,,,,,,,,,https://www.ce3ser.cl/,,emergencias encuentro rm vhf simplex
 CE3SER-UHF,CE3SER — Simplex UHF (emergencias RC Chile),Santiago,Centro urbano,-33.45,-70.6666667,,,UHF/FM,433.520,433.520,,REGIÓN METROPOLITANA DE SANTIAGO,,,,,,,,,,https://www.ce3ser.cl/,,emergencias encuentro rm uhf simplex
-ZDMR Iquique,Zona DMR CL — Iquique,Iquique,Simplex VHF · CA1ILI,-20.2144,-70.1525,,,VHF/DMR,145.780,145.780,,REGIÓN DE TARAPACÁ,,,,Zona DMR CL,1,,1,2,730 7300444 7301,https://zonadmr.cl/nodos/,,gran-norte vhf simplex
 ZDMR Punitaqui,Zona DMR CL — Punitaqui,Punitaqui,Simplex VHF · CA2FHD,-30.7828,-71.2247,,,VHF/DMR,145.680,145.680,,REGIÓN DE COQUIMBO,,,,Zona DMR CL,1,,1,2,730 7300444,https://zonadmr.cl/nodos/,,norte-chico vhf simplex
 ZDMR Vicuña,Zona DMR CL — Vicuña,Vicuña,Simplex VHF · CE2DRB,-30.0319,-70.7081,,,VHF/DMR,145.650,145.650,,REGIÓN DE COQUIMBO,,,,Zona DMR CL,1,,1,2,730 7300444,https://zonadmr.cl/nodos/,,norte-chico vhf simplex
 ZDMR Isla Negra,Zona DMR CL — Isla Negra,Isla Negra,Simplex VHF · CE2JJF,-33.7889,-71.7028,,,VHF/DMR,144.600,144.600,,REGIÓN DE VALPARAÍSO,,,,Zona DMR CL,1,,1,2,730 7300444 7301,https://zonadmr.cl/nodos/,,valparaiso vhf simplex
@@ -368,7 +365,7 @@ Red Chile Mar y Tierra (15 Metros),Red Chile Mar y Tierra (15 Metros),,,,,,,HF,2
 Red Chile Mar y Tierra (20 Metros),Red Chile Mar y Tierra (20 Metros),,,,,,,HF,14.255,14.255,,GLOBAL,,,,,,,,,,,14.255 MHz USB,hf 20mt usb
 RECNA 40 mt,Red Chilena Nor Austral de Servicios (40 metros),,,,,,,HF,7.190,7.190,,GLOBAL,,,,,,,,,,,7.190 LSB,hf 40mt lsb
 RECNA 80 mt,Red Chilena Nor Austral de Servicios (80 metros),,,,,,,HF,3.738,3.738,,GLOBAL,,,,,,,,,,,3.738 LSB,hf 80mt lsb
-Red de Emergencia Nacional ,Red de Emergencia Nacional ,,,,,,,HF,7.085,7.085,,GLOBAL,,,,,,,,,,,7.085 LSB,hf 40mt lsb
+"Red de Emergencia Nacional ","Red de Emergencia Nacional ",,,,,,,HF,7.085,7.085,,GLOBAL,,,,,,,,,,,7.085 LSB,hf 40mt lsb
 CB-01,Canal 1 Banda Ciudadana,,,,,,,HF,26.965,26.965,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
 CB-02,Canal 2 Banda Ciudadana,,,,,,,HF,26.975,26.975,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
 CB-03,Canal 3 Banda Ciudadana,,,,,,,HF,26.985,26.985,,GLOBAL,,,,,,,,,,,,cb 11mt banda-ciudadana
@@ -420,3 +417,9 @@ CE5RMC RPT-A,RADIOCLUB MANQUIMAVIDA,CHIGUAYANTE,CERRO MANQUIMÁVIDA,-36.916499,-
 CE7JLR-L,RCDR - Aysén,Puerto Aysén,,-45.4020998,-72.6983477,,,VHF/FM,146.460,146.460,,REGIÓN DE AYSÉN DEL GENERAL CARLOS IBÁÑEZ DEL CAMPO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
 CE6VPX-L,RCDR - Paillaco,Paillaco,,-40.0719057,-72.8800317,,,VHF/FM,146.430,146.430,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
 CD5HXO-L,RCDR - Chicureo,Colina,Chicureo,-33.2864,-70.6494,,,VHF/FM,145.550,145.550,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,rm vhf simplex
+CA3MJJ-L,Red Echolink Zello - Conchalí,Conchalí,,-33.3897,-70.6672,,,VHF/FM,146.440,146.440,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
+CE3ESO-L,Red Echolink Zello - Puente Alto,Puente Alto,,-33.6109,-70.5755,,,VHF/FM,146.245,146.245,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
+CA3NEB-L,Red Echolink Zello - Las Condes,Las Condes,,-33.4166667,-70.5833333,,,UHF/FM,432.500,432.500,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm uhf simplex
+CD4PQW-L,Red Echolink Zello - Rancagua,Rancagua,,-34.1749722222,-70.7455361111,,,VHF/FM,145.530,145.530,,REGIÓN DEL LIBERTADOR GENERAL BERNARDO O'HIGGINS,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro vhf simplex
+CE4NBE-L,Red Echolink Zello - Curicó,Curicó,,-34.9828,-71.2394,,,VHF/FM,146.500,146.500,,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro vhf simplex
+CE4NBE-R,Red Echolink Zello - Curicó,Curicó,,-34.9828,-71.2394,,,UHF/FM,432.500,432.500,77.0,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro uhf
