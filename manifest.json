@@ -1,0 +1,24 @@
+{
+  "name": "Radiomap — Repetidoras de radioaficionados en Chile",
+  "short_name": "Radiomap",
+  "description": "Mapa y lista de repetidoras de radioaficionados en Chile: filtros, búsqueda y propagación por estación.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "lang": "es-CL",
+  "theme_color": "#0d1520",
+  "background_color": "#0d1520",
+  "icons": [
+    {
+      "src": "images/favicon-og.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

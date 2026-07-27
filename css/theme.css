@@ -5,6 +5,19 @@
 /* ── Reset ───────────────────────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Visually hidden but readable by screen readers / crawlers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Animated conic border for propagation toggle (Chrome / Safari / recent Firefox) */
 @property --prop-rainbow-angle {
   syntax: '<angle>';

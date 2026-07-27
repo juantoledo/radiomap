@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es-MX" data-theme="dark">
+<html lang="es-CL" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://cdnjs.cloudflare.com https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com https://google.com https://cdnjs.cloudflare.com https://cloudflareinsights.com https://router.project-osrm.org https://nominatim.openstreetmap.org; frame-src https://www.googletagmanager.com; upgrade-insecure-requests">
@@ -9,14 +9,16 @@
 <script src="scripts/gtag-init.js?v=__VERSION__"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="icon" href="images/favicon.svg?v=__VERSION__" type="image/svg+xml">
-<title>Radiomap — Mapa de cobertura</title>
-<meta name="description" content="Estaciones de radio en Chile: mapa, círculos orientativos y propagación por estación, filtros y búsqueda.">
+<link rel="apple-touch-icon" href="images/favicon-og.png?v=__VERSION__">
+<link rel="manifest" href="manifest.json?v=__VERSION__">
+<title>Radiomap — Mapa de repetidoras de radioaficionados en Chile</title>
+<meta name="description" content="Mapa de repetidoras de radioaficionados en Chile: círculos orientativos y propagación por estación, filtros y búsqueda.">
 <meta name="theme-color" content="#0d1520">
 <link rel="canonical" href="https://www.radiomap.cl/">
 <meta property="og:site_name" content="Radiomap">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Radiomap — Mapa de cobertura">
-<meta property="og:description" content="Estaciones de radio en Chile: mapa, círculos orientativos y propagación, filtros y búsqueda.">
+<meta property="og:title" content="Radiomap — Mapa de repetidoras de radioaficionados en Chile">
+<meta property="og:description" content="Mapa de repetidoras de radioaficionados en Chile: círculos orientativos y propagación, filtros y búsqueda.">
 <meta property="og:url" content="https://www.radiomap.cl/">
 <meta property="og:image" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
 <meta property="og:image:secure_url" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
@@ -25,13 +27,41 @@
 <meta property="og:image:height" content="512">
 <meta property="og:image:alt" content="Radiomap — logotipo">
 <meta property="og:locale" content="es_CL">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Radiomap — Mapa de cobertura">
-<meta name="twitter:description" content="Estaciones de radio en Chile: mapa, círculos orientativos y propagación, filtros y búsqueda.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Radiomap — Mapa de repetidoras de radioaficionados en Chile">
+<meta name="twitter:description" content="Mapa de repetidoras de radioaficionados en Chile: círculos orientativos y propagación, filtros y búsqueda.">
 <meta name="twitter:image" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
 <meta name="twitter:image:alt" content="Radiomap — logotipo">
 <meta name="twitter:site" content="@radiomap_cl">
 <meta name="twitter:creator" content="@CD3DXZ">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Radiomap",
+  "alternateName": "Radiomap Chile",
+  "url": "https://www.radiomap.cl/",
+  "description": "Mapa de repetidoras de radioaficionados en Chile: círculos orientativos, propagación por estación, filtros y búsqueda.",
+  "inLanguage": "es-CL"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Repetidoras de radioaficionados en Chile",
+  "description": "Listado curado de estaciones repetidoras de radioaficionados en Chile (VHF/UHF/HF), incluyendo redes Echolink y DMR, por región.",
+  "url": "https://www.radiomap.cl/",
+  "spatialCoverage": {
+    "@type": "Place",
+    "name": "Chile"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Radiomap"
+  }
+}
+</script>
 <script src="scripts/theme.js?v=__VERSION__"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,6 +91,7 @@
 <script defer src="scripts/coach-marks.js?v=__VERSION__"></script>
 </head>
 <body class="page-map">
+<h1 class="sr-only">Radiomap — Mapa de repetidoras de radioaficionados en Chile</h1>
 <div id="app">
 
 <!-- HEADER -->
