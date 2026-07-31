@@ -2228,14 +2228,6 @@ html[data-theme="light"] .near-radius-floater {
 /* ── Lista page: main content & table ────────────────────────────────────── */
 body.page-list main { padding: 24px 32px; }
 .zone-group { margin-bottom: 32px; overflow: hidden; }
-.zone-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-}
 .zone-badge {
   font-family: var(--font-display);
   font-size: var(--fs-sm);
@@ -3998,14 +3990,16 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     border-top: none;
   }
   .location-btn--controls,
-  .route-toggle-btn {
+  .route-toggle-btn,
+  .global-toggle-btn {
     width: 36px;
     height: 36px;
     min-width: 36px;
     min-height: 36px;
   }
   .location-btn--controls .material-symbols-outlined,
-  .route-toggle-btn .material-symbols-outlined { font-size: 20px; }
+  .route-toggle-btn .material-symbols-outlined,
+  .global-toggle-btn .material-symbols-outlined { font-size: 20px; }
   .controls .btn-clear-filters { grid-column: 1 / -1; justify-self: center; margin-left: 0; }
   .controls .controls-footer-row {
     grid-column: 1 / -1;
@@ -4787,7 +4781,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   .radiomap-toolbar-host .controls select { min-height: 36px; padding: 6px 8px; }
   body.page-list main { padding: 8px 6px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
   body.page-list .zone-group { margin-bottom: 12px; }
-  body.page-list .zone-header { margin-bottom: 4px; padding-bottom: 4px; }
+  body.page-list .global-group__summary { padding: 6px 8px; }
   body.page-list .zone-badge { font-size: var(--fs-xxs); padding: 1px 4px; }
   body.page-list .rpt-table tbody { gap: 4px; }
   body.page-list .rpt-table tbody tr.rpt-row {
@@ -5017,6 +5011,294 @@ html[data-theme="light"] .route-toggle-btn[aria-pressed="true"] {
   background: rgba(180, 100, 0, 0.24);
   border-color: #b46400;
   color: #6d3700;
+}
+.route-toggle-btn:disabled,
+.global-toggle-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.global-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.45);
+  border-radius: 8px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 22px;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  align-self: center;
+}
+.global-toggle-btn:hover {
+  background: rgba(0, 212, 255, 0.22);
+  border-color: var(--accent);
+}
+.global-toggle-btn[aria-pressed="true"] {
+  background: rgba(0, 212, 255, 0.30);
+  border-color: var(--accent);
+  color: #baf3ff;
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.45);
+}
+html[data-theme="light"] .global-toggle-btn {
+  background: rgba(0, 136, 204, 0.10);
+  border-color: rgba(0, 136, 204, 0.50);
+  color: var(--accent);
+}
+html[data-theme="light"] .global-toggle-btn:hover {
+  background: rgba(0, 136, 204, 0.18);
+  border-color: var(--accent);
+}
+html[data-theme="light"] .global-toggle-btn[aria-pressed="true"] {
+  background: rgba(0, 136, 204, 0.24);
+  border-color: var(--accent);
+  color: #004a70;
+}
+
+/* Global stations panel — translucent overlay on top of the map (map stays visible/legible underneath) while the Global toggle is active.
+   Uses the same open/close convention as #sidebar (class + inert, never display:none) so it can transition smoothly. */
+.global-panel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: rgba(13, 21, 32, 0.52);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  opacity: 0;
+  transform: translateY(6px) scale(0.99);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+html[data-theme="light"] .global-panel-overlay {
+  background: rgba(255, 255, 255, 0.60);
+}
+.global-panel-overlay.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .global-panel-overlay { transition: opacity 0.01s linear; transform: none; }
+}
+.global-panel-overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 14px 16px;
+  background: rgba(13, 21, 32, 0.55);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+html[data-theme="light"] .global-panel-overlay__header {
+  background: rgba(255, 255, 255, 0.65);
+}
+.global-panel-overlay__title {
+  margin: 0;
+  font-size: var(--fs-md, 1rem);
+  color: var(--text);
+}
+.global-panel-overlay__count {
+  color: var(--text-dim);
+  font-weight: normal;
+  font-size: var(--fs-sm);
+}
+.global-panel-overlay__close {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.global-panel-overlay__close:hover { color: var(--accent); border-color: var(--accent); }
+.global-panel-overlay__body {
+  flex: 1 1 auto;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+}
+.global-panel-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Collapsible <details> sections — shared structure for BOTH every top-level region zone on lista.html
+   (.global-group alone) AND the map's Global-panel / GLOBAL-zone categories (.global-group.global-subgroup,
+   which additionally get the narrower fixed-width GLOBAL-only column set: Señal/Red-Club/Banda/RX/TX/Tono/Notas).
+   CB channels collapsed by default — see GLOBAL_GROUPS in scripts/global-groups.js. */
+.global-group {
+  max-width: 1180px;
+  margin: 0 auto 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface2);
+}
+.global-panel-overlay .global-group { background: rgba(17, 28, 42, 0.35); }
+html[data-theme="light"] .global-panel-overlay .global-group { background: rgba(232, 238, 244, 0.45); }
+.global-group__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+.global-group__summary::-webkit-details-marker { display: none; }
+.global-group__summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--text-dim);
+  transition: transform 0.15s ease;
+}
+.global-group[open] > .global-group__summary::before { transform: rotate(90deg); }
+.global-group__title { flex: 1 1 auto; }
+.global-group__count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  background: var(--surface2);
+  border-radius: 999px;
+  padding: 2px 9px;
+  flex-shrink: 0;
+}
+/* GLOBAL-only sub-tables (Señal/Red-Club/Banda/RX/TX/Tono/Notas) — narrower fixed layout, not used by regular region tables. */
+.global-subgroup .rpt-table {
+  table-layout: fixed;
+  min-width: 760px;
+  width: 100%;
+  background: transparent;
+}
+.global-panel-overlay .global-subgroup .rpt-table thead tr { background: rgba(17, 28, 42, 0.55); }
+html[data-theme="light"] .global-panel-overlay .global-subgroup .rpt-table thead tr { background: rgba(232, 238, 244, 0.7); }
+body.page-list .global-subgroup .rpt-table thead tr { background: var(--surface); }
+.global-subgroup .col-signal { width: 110px; }
+.global-subgroup .col-club { width: 220px; }
+.global-subgroup .col-banda { width: 80px; }
+.global-subgroup .col-rx, .global-subgroup .col-tx { width: 138px; }
+.global-subgroup .col-tono { width: 70px; }
+.global-subgroup .cell-freq { overflow: hidden; text-overflow: ellipsis; }
+.global-subgroup .cell-club { min-width: 160px; white-space: normal; word-break: break-word; }
+.global-subgroup .cell-notes { white-space: normal; min-width: 220px; max-width: 420px; word-break: break-word; }
+
+/* Map overlay chrome — shrink header/close/body padding on narrow viewports */
+@media (max-width: 640px) {
+  .global-panel-overlay__header { padding: 8px 10px; }
+  .global-panel-overlay__title { font-size: var(--fs-sm); }
+  .global-panel-overlay__close { width: 28px; height: 28px; min-width: 28px; }
+  .global-panel-overlay__close .material-symbols-outlined { font-size: 18px; }
+  .global-panel-overlay__body { padding: 8px; }
+}
+
+/* Every collapsible section (region-level and GLOBAL sub-categories) gets tighter chrome on narrow viewports. */
+@media (max-width: 768px) {
+  .global-group { margin-bottom: 8px; }
+  .global-group__summary { padding: 8px 10px; font-size: var(--fs-sm); }
+}
+
+/* GLOBAL-only sub-tables: card rows instead of a horizontally-scrolled table — same technique as
+   body.page-list .rpt-table (which already handles the standard 8-column region tables on its own).
+   Breakpoint matches lista.html's own card breakpoint. */
+@media (max-width: 768px) {
+  .global-subgroup .global-panel-table-wrap { overflow-x: visible; padding: 6px; }
+  .global-subgroup .rpt-table {
+    display: block;
+    table-layout: auto;
+    min-width: 0;
+    width: 100%;
+    font-size: var(--fs-xs);
+  }
+  .global-subgroup .rpt-table thead { display: none; }
+  .global-subgroup .rpt-table tbody { display: flex; flex-direction: column; gap: 6px; }
+  .global-subgroup .rpt-table tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    row-gap: 2px;
+    column-gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  html[data-theme="light"] .global-subgroup .rpt-table tbody tr { background: rgba(0, 0, 0, 0.03); }
+  body.page-list .global-subgroup .rpt-table tbody tr { background: var(--surface); }
+  .global-subgroup .rpt-table tbody tr td {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0;
+    border: none;
+    min-height: 0;
+    min-width: 0;
+  }
+  .global-subgroup .rpt-table tbody tr td.cell-empty { display: none !important; }
+  .global-subgroup .rpt-table tbody tr td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-dim);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .global-subgroup .rpt-table tbody tr td.cell-signal {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-md);
+    font-weight: 700;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .global-subgroup .rpt-table tbody tr td.cell-signal::before { display: none; }
+  .global-subgroup .rpt-table tbody tr td.cell-banda { grid-column: 1 / -1; }
+  .global-subgroup .rpt-table tbody tr td.cell-banda::before { display: inline; }
+  .global-subgroup .rpt-table tbody tr td.freq-rx { grid-column: 1; }
+  .global-subgroup .rpt-table tbody tr td.freq-tx { grid-column: 2; }
+  .global-subgroup .rpt-table tbody tr td.cell-tone { grid-column: 3; }
+  .global-subgroup .rpt-table tbody tr td.freq-rx,
+  .global-subgroup .rpt-table tbody tr td.freq-tx,
+  .global-subgroup .rpt-table tbody tr td.cell-tone {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .global-subgroup .rpt-table tbody tr td.cell-club,
+  .global-subgroup .rpt-table tbody tr td.cell-notes {
+    grid-column: 1 / -1;
+    white-space: normal;
+    max-width: none;
+    min-width: 0;
+  }
+  .global-subgroup .rpt-table tbody tr td.cell-notes {
+    color: var(--text-dim);
+    font-size: var(--fs-xs);
+    border-top: 1px dashed var(--border);
+    padding-top: 4px;
+    margin-top: 2px;
+  }
 }
 
 /* Route panel — left sidebar on desktop, bottom sheet on mobile */

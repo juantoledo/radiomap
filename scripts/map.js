@@ -1,6 +1,6 @@
 /**
  * Map view — Leaflet map, circles, markers, sidebar, filters
- * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), station-service-icons.js (getStationServiceType, stationServiceIconInlineHtml, …), propagation-map.js (radiomapPropagation: overlay + leyenda dBm flotante en el mapa)
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getVisibleNodeIndices), dmr-ui.js (buildDmrDetailHtml), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), station-service-icons.js (getStationServiceType, stationServiceIconInlineHtml, …), propagation-map.js (radiomapPropagation: overlay + leyenda dBm flotante en el mapa), global-groups.js (GLOBAL_GROUPS, classifyGlobalStation — shared with list.js)
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -619,6 +619,104 @@
   }
   window.toggleNearMe = toggleNearMe;
 
+  let globalViewActive = false;
+
+  /** Renders the GLOBAL-region stations (HF nets, CB channels, national/international nets), grouped, into the panel that overlays the map. Uses GLOBAL_GROUPS/classifyGlobalStation from scripts/global-groups.js (shared with list.js). */
+  function renderGlobalPanel(){
+    var body = document.getElementById('global-panel-body');
+    var countEl = document.getElementById('global-panel-count');
+    if (!body) return;
+    var c = typeof getFilterCriteria === 'function' ? getFilterCriteria() : { q: '', bandas: [], types: [], conferences: [] };
+    c = Object.assign({}, c, { regions: [] });
+    var isFiltering = !!c.q || (c.bandas && c.bandas.length) || (c.types && c.types.length) || (c.conferences && c.conferences.length);
+    var rows = NODES.filter(function (r) {
+      return r.region === 'GLOBAL' && (typeof nodeMatchesFilterCriteria !== 'function' || nodeMatchesFilterCriteria(r, c, null));
+    }).slice().sort(function (a, b) {
+      return String(a.signal || '').localeCompare(String(b.signal || ''), 'es', { sensitivity: 'base' });
+    });
+    if (countEl) countEl.textContent = rows.length + (rows.length === 1 ? ' estación' : ' estaciones');
+    if (!rows.length) {
+      body.innerHTML = '<div class="no-results" role="status"><p class="no-results-title">Sin resultados</p><p class="no-results-lead">Ninguna estación global coincide con estos criterios.</p></div>';
+      return;
+    }
+    function cell(cls, label, v, formatted){
+      var text = fieldShown(v) ? escapeHtml(formatted != null ? formatted : v) : '';
+      var titleAttr = text ? ' title="' + text + '"' : '';
+      return '<td class="' + cls + (fieldShown(v) ? '' : ' cell-empty') + '" data-label="' + label + '"' + titleAttr + '>' + text + '</td>';
+    }
+    var byGroup = {};
+    rows.forEach(function (r) {
+      var g = classifyGlobalStation(r);
+      (byGroup[g.key] = byGroup[g.key] || []).push(r);
+    });
+    var html = '';
+    GLOBAL_GROUPS.forEach(function (g) {
+      var groupRows = byGroup[g.key];
+      if (!groupRows || !groupRows.length) return;
+      var openAttr = shouldGroupBeOpen(g.key, isFiltering) ? ' open' : '';
+      html += '<details class="global-group global-subgroup" data-group-key="' + g.key + '"' + openAttr + '>' +
+        '<summary class="global-group__summary"><span class="global-group__title">' + escapeHtml(g.title) + '</span>' +
+        '<span class="global-group__count">' + groupRows.length + '</span></summary>' +
+        '<div class="global-panel-table-wrap"><table class="rpt-table"><thead><tr>' +
+        '<th class="col-signal">Señal</th><th class="col-club">Red / Club</th><th class="col-banda">Banda</th>' +
+        '<th class="col-rx">RX (MHz)</th><th class="col-tx">TX (MHz)</th><th class="col-tono">Tono</th><th class="col-notes">Notas</th>' +
+        '</tr></thead><tbody>';
+      groupRows.forEach(function (r) {
+        html += '<tr>' +
+          '<td class="cell-signal" data-label="Señal">' + escapeHtml(r.signal || '—') + '</td>' +
+          cell('cell-club', 'Red / Club', r.nombre) +
+          cell('cell-banda', 'Banda', r.banda) +
+          cell('cell-freq freq-rx', 'RX (MHz)', r.rx) +
+          cell('cell-freq freq-tx', 'TX (MHz)', r.tx) +
+          cell('cell-tone', 'Tono', r.tono) +
+          cell('cell-notes', 'Notas', r.notes) +
+          '</tr>';
+      });
+      html += '</tbody></table></div></details>';
+    });
+    body.innerHTML = html;
+  }
+  window.renderGlobalPanel = renderGlobalPanel;
+
+  /** Toolbar's rendered height, so the Global panel starts right below it instead of covering it (same technique as #route-panel). */
+  function getToolbarHeightForOverlay(){
+    var host = document.querySelector('.radiomap-toolbar-host');
+    return host ? host.offsetHeight : 0;
+  }
+
+  function onGlobalPanelKeydown(ev){
+    if (ev.key === 'Escape' && globalViewActive) toggleGlobalView();
+  }
+
+  /** Toggles the "Global" panel (HF/CB/national nets — mostly no lat/lon, so they can't be plotted) as a translucent overlay above the map. Mirrors #sidebar's open/close convention (class + inert, not display:none) so it can transition smoothly. */
+  function toggleGlobalView(){
+    globalViewActive = !globalViewActive;
+    var btn = document.getElementById('btn-global-toggle');
+    if (btn) btn.setAttribute('aria-pressed', globalViewActive ? 'true' : 'false');
+    var overlay = document.getElementById('global-panel-overlay');
+    if (overlay) {
+      overlay.style.top = getToolbarHeightForOverlay() + 'px';
+      overlay.classList.toggle('open', globalViewActive);
+      if (globalViewActive) {
+        overlay.removeAttribute('inert');
+        overlay.removeAttribute('aria-hidden');
+      } else {
+        overlay.setAttribute('inert', '');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    }
+    var nearBtn = document.getElementById('btn-nearme');
+    var routeBtn = document.getElementById('btn-route-toggle');
+    if (nearBtn) nearBtn.disabled = globalViewActive;
+    if (routeBtn) routeBtn.disabled = globalViewActive;
+    document.removeEventListener('keydown', onGlobalPanelKeydown);
+    if (globalViewActive) {
+      renderGlobalPanel();
+      document.addEventListener('keydown', onGlobalPanelKeydown);
+    }
+  }
+  window.toggleGlobalView = toggleGlobalView;
+
   function applyFilters(opts){
     opts = opts || {};
     const distAnchor = typeof getDistanceFilterAnchor === 'function' ? getDistanceFilterAnchor() : null;
@@ -656,6 +754,7 @@
     }
     if (clearedSelection) syncRadiomapMapUiToUrl();
     if (typeof window.__radiomapOnFiltersApplied === 'function') window.__radiomapOnFiltersApplied(visibleSet);
+    if (globalViewActive) renderGlobalPanel();
   }
   window.applyFilters = applyFilters;
 

@@ -65,7 +65,10 @@ def normalize_signal_field(d: dict) -> None:
 
 
 def normalize_rx_tx_mhz_fields(d: dict) -> None:
-    """Format rx/tx to three decimal places for VHF/UHF bands (MHz)."""
+    """Format rx/tx to at least three decimal places for VHF/UHF bands (MHz).
+    Most Chilean repeaters use 12.5/25 kHz channel steps (3 decimals is exact), but some
+    GLOBAL channel plans (e.g. PMR446 sub-channels) use 6.25 kHz steps that need 5 decimals —
+    never round away precision actually present in the source CSV value."""
     banda = str(d.get("banda", ""))
     u = banda.upper()
     if "VHF" not in u and "UHF" not in u:
@@ -80,8 +83,11 @@ def normalize_rx_tx_mhz_fields(d: dict) -> None:
         if not v:
             continue
         try:
-            mhz = float(v.replace(",", "."))
-            d[key] = f"{mhz:.3f}"
+            normalized = v.replace(",", ".")
+            mhz = float(normalized)
+            decimals_in_source = len(normalized.split(".")[1]) if "." in normalized else 0
+            precision = max(3, decimals_in_source)
+            d[key] = f"{mhz:.{precision}f}"
         except ValueError:
             pass
 

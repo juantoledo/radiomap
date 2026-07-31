@@ -109,6 +109,7 @@ window.formatNearMeFilterSuffix = formatNearMeFilterSuffix;
  * Cualquier región en datos que no esté en la lista va al final, ordenada por locale es.
  */
 const CHILE_REGIONS_ADMIN_ORDER = [
+  'GLOBAL',
   'REGIÓN DE ARICA Y PARINACOTA',
   'REGIÓN DE TARAPACÁ',
   'REGIÓN DE ANTOFAGASTA',
@@ -125,7 +126,6 @@ const CHILE_REGIONS_ADMIN_ORDER = [
   'REGIÓN DE LOS LAGOS',
   'REGIÓN DE AYSÉN DEL GENERAL CARLOS IBÁÑEZ DEL CAMPO',
   'REGIÓN DE MAGALLANES Y DE LA ANTÁRTICA CHILENA',
-  'GLOBAL',
   'ATC — NACIONAL (Chile)'
 ];
 

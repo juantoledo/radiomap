@@ -108,6 +108,10 @@
       <div class="stats-kpi__value" id="stats-propagation">—</div>
       <div class="stats-kpi__label">Con propagación</div>
     </div>
+    <div class="stats-kpi" style="--kpi-c:#a78bfa">
+      <div class="stats-kpi__value" id="stats-global">—</div>
+      <div class="stats-kpi__label">Globales</div>
+    </div>
   </div>
 
   <!-- Two-column: Banda + Tipo -->
@@ -143,6 +147,12 @@
     <div id="stats-conf-chart"></div>
   </section>
 
+  <!-- Por categoría global (HF, CB, FRS, PMR446, Baofeng, encuentro, otros) -->
+  <section class="stats-section" id="stats-global-section" hidden>
+    <h2 class="stats-section__title">Estaciones globales por categoría</h2>
+    <div id="stats-global-chart"></div>
+  </section>
+
 </main>
 
 <footer class="app-footer">
@@ -155,6 +165,7 @@
 <script defer src="data/data.js?v=__VERSION__"></script>
 <script defer src="scripts/my-stations.js?v=__VERSION__"></script>
 <script defer src="scripts/help.js?v=__VERSION__"></script>
+<script defer src="scripts/global-groups.js?v=__VERSION__"></script>
 <script defer src="scripts/stats-page.js?v=__VERSION__"></script>
 </body>
 </html>

@@ -43,6 +43,12 @@
       body:
         'Ingresa origen y destino (texto o clic en el mapa) y ajusta el corredor; el mapa resalta las repetidoras dentro del trayecto aplicando los filtros activos.',
     },
+    {
+      selector: '#btn-global-toggle',
+      title: 'Estaciones globales',
+      body:
+        'Muestra redes HF, banda ciudadana (CB) y frecuencias de encuentro internacional — estaciones sin ubicación fija, agrupadas por categoría. Respeta la búsqueda y los filtros activos.',
+    },
   ];
 
   function pageOk() {

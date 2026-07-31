@@ -413,6 +413,60 @@ CB-40,Canal 40 Banda Ciudadana,,,,,,,HF,27.405,27.405,,GLOBAL,,,,,,,,,,,,cb 11mt
 28.575 USB,Frecuencia Encuentro Inglaterra,,,,,,,HF,28.575,28.575,,GLOBAL,,,,,,,,,,,28.575 MHz USB,10mt banda-ciudadana encuentro inglaterra
 29.250 C4FM,Canal Encuentro Internacional C4FM,,,,,,,HF,29.250,29.250,,GLOBAL,,,,,,,,,,,29.250 MHz C4FM,10mt banda-ciudadana encuentro c4fm
 7.100 LSB,Cadena Peruana de Socorro,,,,,,,HF,7.100,7.100,,GLOBAL,,,,,,,,,,,7.100 MHz LSB,40mt perú
+FRS-01,Canal 1 FRS (convención Motorola),,,,,,,UHF/FM,462.5625,462.5625,,GLOBAL,,,,,,,,,,,462.5625 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-02,Canal 2 FRS (convención Motorola),,,,,,,UHF/FM,462.5875,462.5875,,GLOBAL,,,,,,,,,,,462.5875 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-03,Canal 3 FRS (convención Motorola),,,,,,,UHF/FM,462.6125,462.6125,,GLOBAL,,,,,,,,,,,462.6125 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-04,Canal 4 FRS (convención Motorola),,,,,,,UHF/FM,462.6375,462.6375,,GLOBAL,,,,,,,,,,,462.6375 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-05,Canal 5 FRS (convención Motorola),,,,,,,UHF/FM,462.6625,462.6625,,GLOBAL,,,,,,,,,,,462.6625 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-06,Canal 6 FRS (convención Motorola),,,,,,,UHF/FM,462.6875,462.6875,,GLOBAL,,,,,,,,,,,462.6875 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-07,Canal 7 FRS (convención Motorola),,,,,,,UHF/FM,462.7125,462.7125,,GLOBAL,,,,,,,,,,,462.7125 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-08,Canal 8 FRS (convención Motorola),,,,,,,UHF/FM,467.5625,467.5625,,GLOBAL,,,,,,,,,,,467.5625 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-09,Canal 9 FRS (convención Motorola),,,,,,,UHF/FM,467.5875,467.5875,,GLOBAL,,,,,,,,,,,467.5875 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-10,Canal 10 FRS (convención Motorola),,,,,,,UHF/FM,467.6125,467.6125,,GLOBAL,,,,,,,,,,,467.6125 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-11,Canal 11 FRS (convención Motorola),,,,,,,UHF/FM,467.6375,467.6375,,GLOBAL,,,,,,,,,,,467.6375 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-12,Canal 12 FRS (convención Motorola),,,,,,,UHF/FM,467.6625,467.6625,,GLOBAL,,,,,,,,,,,467.6625 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-13,Canal 13 FRS (convención Motorola),,,,,,,UHF/FM,467.6875,467.6875,,GLOBAL,,,,,,,,,,,467.6875 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-14,Canal 14 FRS (convención Motorola),,,,,,,UHF/FM,467.7125,467.7125,,GLOBAL,,,,,,,,,,,467.7125 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-15,Canal 15 FRS (convención Motorola),,,,,,,UHF/FM,462.5500,462.5500,,GLOBAL,,,,,,,,,,,462.5500 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-16,Canal 16 FRS (convención Motorola),,,,,,,UHF/FM,462.5750,462.5750,,GLOBAL,,,,,,,,,,,462.5750 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-17,Canal 17 FRS (convención Motorola),,,,,,,UHF/FM,462.6000,462.6000,,GLOBAL,,,,,,,,,,,462.6000 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-18,Canal 18 FRS (convención Motorola),,,,,,,UHF/FM,462.6250,462.6250,,GLOBAL,,,,,,,,,,,462.6250 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-19,Canal 19 FRS (convención Motorola),,,,,,,UHF/FM,462.6500,462.6500,,GLOBAL,,,,,,,,,,,462.6500 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-20,Canal 20 FRS (convención Motorola),,,,,,,UHF/FM,462.6750,462.6750,,GLOBAL,,,,,,,,,,,462.6750 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-21,Canal 21 FRS (convención Motorola),,,,,,,UHF/FM,462.7000,462.7000,,GLOBAL,,,,,,,,,,,462.7000 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+FRS-22,Canal 22 FRS (convención Motorola),,,,,,,UHF/FM,462.7250,462.7250,,GLOBAL,,,,,,,,,,,462.7250 MHz FRS — radio familiar típica (ej. Motorola Talkabout),frs motorola 22ch
+PMR-01,Canal 1 PMR446,,,,,,,UHF/FM,446.00625,446.00625,,GLOBAL,,,,,,,,,,,446.00625 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-02,Canal 2 PMR446,,,,,,,UHF/FM,446.01875,446.01875,,GLOBAL,,,,,,,,,,,446.01875 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-03,Canal 3 PMR446,,,,,,,UHF/FM,446.03125,446.03125,,GLOBAL,,,,,,,,,,,446.03125 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-04,Canal 4 PMR446,,,,,,,UHF/FM,446.04375,446.04375,,GLOBAL,,,,,,,,,,,446.04375 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-05,Canal 5 PMR446,,,,,,,UHF/FM,446.05625,446.05625,,GLOBAL,,,,,,,,,,,446.05625 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-06,Canal 6 PMR446,,,,,,,UHF/FM,446.06875,446.06875,,GLOBAL,,,,,,,,,,,446.06875 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-07,Canal 7 PMR446,,,,,,,UHF/FM,446.08125,446.08125,,GLOBAL,,,,,,,,,,,446.08125 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-08,Canal 8 PMR446,,,,,,,UHF/FM,446.09375,446.09375,,GLOBAL,,,,,,,,,,,446.09375 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-09,Canal 9 PMR446,,,,,,,UHF/FM,446.10313,446.10313,,GLOBAL,,,,,,,,,,,446.10313 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-10,Canal 10 PMR446,,,,,,,UHF/FM,446.10938,446.10938,,GLOBAL,,,,,,,,,,,446.10938 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-11,Canal 11 PMR446,,,,,,,UHF/FM,446.11563,446.11563,,GLOBAL,,,,,,,,,,,446.11563 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-12,Canal 12 PMR446,,,,,,,UHF/FM,446.12188,446.12188,,GLOBAL,,,,,,,,,,,446.12188 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-13,Canal 13 PMR446,,,,,,,UHF/FM,446.12813,446.12813,,GLOBAL,,,,,,,,,,,446.12813 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-14,Canal 14 PMR446,,,,,,,UHF/FM,446.13438,446.13438,,GLOBAL,,,,,,,,,,,446.13438 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-15,Canal 15 PMR446,,,,,,,UHF/FM,446.14063,446.14063,,GLOBAL,,,,,,,,,,,446.14063 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+PMR-16,Canal 16 PMR446,,,,,,,UHF/FM,446.14688,446.14688,,GLOBAL,,,,,,,,,,,446.14688 MHz PMR446 — uso comercial habitual (radios de negocio sin licencia),pmr pmr446 16ch
+BF888S-01,Canal 1 Baofeng BF-888S,,,,,,,UHF/FM,462.125,462.125,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-02,Canal 2 Baofeng BF-888S,,,,,,,UHF/FM,462.225,462.225,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-03,Canal 3 Baofeng BF-888S,,,,,,,UHF/FM,462.325,462.325,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-04,Canal 4 Baofeng BF-888S,,,,,,,UHF/FM,462.425,462.425,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-05,Canal 5 Baofeng BF-888S,,,,,,,UHF/FM,462.525,462.525,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-06,Canal 6 Baofeng BF-888S,,,,,,,UHF/FM,462.625,462.625,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-07,Canal 7 Baofeng BF-888S,,,,,,,UHF/FM,462.725,462.725,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-08,Canal 8 Baofeng BF-888S,,,,,,,UHF/FM,462.825,462.825,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-09,Canal 9 Baofeng BF-888S,,,,,,,UHF/FM,462.925,462.925,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-10,Canal 10 Baofeng BF-888S,,,,,,,UHF/FM,463.025,463.025,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-11,Canal 11 Baofeng BF-888S,,,,,,,UHF/FM,463.125,463.125,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-12,Canal 12 Baofeng BF-888S,,,,,,,UHF/FM,463.225,463.225,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-13,Canal 13 Baofeng BF-888S,,,,,,,UHF/FM,463.525,463.525,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-14,Canal 14 Baofeng BF-888S,,,,,,,UHF/FM,450.225,450.225,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-15,Canal 15 Baofeng BF-888S,,,,,,,UHF/FM,460.325,460.325,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
+BF888S-16,Canal 16 Baofeng BF-888S,,,,,,,UHF/FM,469.950,469.950,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
 CE5RMC RPT-A,RADIOCLUB MANQUIMAVIDA,CHIGUAYANTE,CERRO MANQUIMÁVIDA,-36.916499,-73.005663,,,VHF/FM,147.060,147.660,100,REGIÓN DEL BIOBÍO,,,1,,,,,,,,,sur vhf
 CE7JLR-L,RCDR - Aysén,Puerto Aysén,,-45.4020998,-72.6983477,,,VHF/FM,146.460,146.460,,REGIÓN DE AYSÉN DEL GENERAL CARLOS IBÁÑEZ DEL CAMPO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
 CE6VPX-L,RCDR - Paillaco,Paillaco,,-40.0719057,-72.8800317,,,VHF/FM,146.430,146.430,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex

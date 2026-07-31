@@ -1,6 +1,6 @@
 /**
  * List view — table by region, filters, share
- * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getFilteredNodes), dmr-ui.js (buildDmrDetailHtml), share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), station-service-icons.js
+ * Requires: conference-colors.js (buildConferenceColorMap), utils.js (escapeHtml, escapeAttr), data/data.js (NODES, REGION_COLORS, VERSION), location-filter.js (getFilteredNodes), dmr-ui.js (buildDmrDetailHtml), share-view.js (buildShareViewURL), export-csv.js, theme.js, help.js, station-display.js (hasStationFieldValue), station-service-icons.js, global-groups.js (GLOBAL_GROUPS, classifyGlobalStation — shared with map.js)
  */
 (function() {
   if (typeof NODES === 'undefined' || !NODES.length) return;
@@ -424,6 +424,53 @@
     openStationDetail(nextRow.signal, nextRow._idx, 'list_nav');
   }
 
+  /** GLOBAL zone (HF nets, CB channels, international nets): grouped/collapsible instead of the standard region table, mirroring scripts/map.js's Global panel. */
+  function buildGlobalZoneHtml(rows) {
+    var c = typeof getFilterCriteria === 'function' ? getFilterCriteria() : { q: '', bandas: [], types: [], conferences: [] };
+    var isFiltering = !!c.q || (c.bandas && c.bandas.length) || (c.types && c.types.length) || (c.conferences && c.conferences.length);
+    var sorted = rows.slice().sort(function (a, b) {
+      return String(a.signal || '').localeCompare(String(b.signal || ''), 'es', { sensitivity: 'base' });
+    });
+    var byGroup = {};
+    sorted.forEach(function (r) {
+      var g = classifyGlobalStation(r);
+      (byGroup[g.key] = byGroup[g.key] || []).push(r);
+    });
+    function cell(cls, label, v) {
+      var text = fieldShown(v) ? escapeHtml(String(v)) : '';
+      var titleAttr = text ? ' title="' + text + '"' : '';
+      return '<td class="' + cls + cellEmptyClass(v) + '" data-label="' + label + '"' + titleAttr + '>' + text + '</td>';
+    }
+    var html = '';
+    GLOBAL_GROUPS.forEach(function (g) {
+      var groupRows = byGroup[g.key];
+      if (!groupRows || !groupRows.length) return;
+      var openAttr = shouldGroupBeOpen(g.key, isFiltering) ? ' open' : '';
+      html += '<details class="global-group global-subgroup" data-group-key="' + g.key + '"' + openAttr + '>' +
+        '<summary class="global-group__summary"><span class="global-group__title">' + escapeHtml(g.title) + '</span>' +
+        '<span class="global-group__count">' + groupRows.length + '</span></summary>' +
+        '<div class="global-panel-table-wrap"><table class="rpt-table"><thead><tr>' +
+        '<th class="col-signal">Señal</th><th class="col-club">Red / Club</th><th class="col-banda">Banda</th>' +
+        '<th class="col-rx">RX (MHz)</th><th class="col-tx">TX (MHz)</th><th class="col-tono">Tono</th><th class="col-notes">Notas</th>' +
+        '</tr></thead><tbody>';
+      groupRows.forEach(function (r) {
+        var sigAttr = (r.signal || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+        var shareBtn = '<span class="cell-signal-share"><button type="button" class="share-btn" data-signal="' + sigAttr + '" aria-label="Compartir ' + sigAttr + '" title="Compartir detalles"><span class="material-symbols-outlined" aria-hidden="true">share</span></button></span>';
+        html += '<tr class="rpt-row" data-signal="' + sigAttr + '" data-node-idx="' + r._idx + '">' +
+          '<td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">' + escapeHtml(r.signal || '—') + '</span></span>' + shareBtn + '</td>' +
+          cell('cell-club', 'Red / Club', r.nombre) +
+          cell('cell-banda', 'Banda', r.banda) +
+          cell('cell-freq freq-rx', 'RX (MHz)', r.rx) +
+          cell('cell-freq freq-tx', 'TX (MHz)', r.tx) +
+          cell('cell-tone', 'Tono', r.tono) +
+          cell('cell-notes', 'Notas', r.notes) +
+          '</tr>';
+      });
+      html += '</tbody></table></div></details>';
+    });
+    return html;
+  }
+
   function render(filtered) {
     if (typeof syncNearRadiusControl === 'function') syncNearRadiusControl();
     const main = document.getElementById('main-content');
@@ -451,15 +498,29 @@
       return `<th data-sort-col="${col}"${ariaSortAttr}>${label}<span class="sort-arrow" aria-hidden="true"></span></th>`;
     }
 
+    /** Region header as a <details> summary (badge + count), reused for every zone so the whole list is collapsible, same as the map's Global panel. */
+    function buildZoneSummaryHtml(reg, count) {
+      if (!reg) return '';
+      return `<summary class="global-group__summary"><span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span><span class="zone-count"><span>${count}</span> repetidor${count !== 1 ? 'es' : ''}</span></summary>`;
+    }
+
+    const regionFilterCriteria = typeof getFilterCriteria === 'function' ? getFilterCriteria() : { q: '', bandas: [], types: [], conferences: [] };
+    const regionIsFiltering = !!regionFilterCriteria.q || (regionFilterCriteria.bandas && regionFilterCriteria.bandas.length) || (regionFilterCriteria.types && regionFilterCriteria.types.length) || (regionFilterCriteria.conferences && regionFilterCriteria.conferences.length);
+
     let html = '';
     regionGroups.forEach(function (grp) {
       const reg = grp.region;
       const rows = grp.rows;
+      const summary = buildZoneSummaryHtml(reg, rows.length);
+      const regionGroupKey = 'region:' + reg;
+      const regionOpenAttr = (typeof shouldGroupBeOpen === 'function' ? shouldGroupBeOpen(regionGroupKey, regionIsFiltering) : true) ? ' open' : '';
 
-      const zoneHeader = reg
-        ? `<div class="zone-header"><span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span><span class="zone-count"><span>${rows.length}</span> repetidor${rows.length !== 1 ? 'es' : ''}</span></div>`
-        : '';
-      html += `<div class="zone-group" data-region="${reg}">${zoneHeader}
+      if (reg === 'GLOBAL' && typeof classifyGlobalStation === 'function') {
+        html += `<div class="zone-group" data-region="${reg}"><details class="global-group" data-group-key="${regionGroupKey}"${regionOpenAttr}>${summary}${buildGlobalZoneHtml(rows)}</details></div>`;
+        return;
+      }
+
+      html += `<div class="zone-group" data-region="${reg}"><details class="global-group" data-group-key="${regionGroupKey}"${regionOpenAttr}>${summary}
         <table class="rpt-table">
           <thead><tr>
             ${thSort('signal','Señal')}
@@ -505,7 +566,7 @@
         </tr>`;
       });
 
-      html += `</tbody></table></div>`;
+      html += `</tbody></table></details></div>`;
     });
 
     main.innerHTML = html;

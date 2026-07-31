@@ -27,6 +27,15 @@
     'SUR':                             '#06b6d4',
     'Red Echolink Chile':              '#a78bfa',
   };
+  var GLOBAL_CATEGORY_COLORS = {
+    'Frecuencias de encuentro internacional': 'var(--vhf)',
+    'Banda ciudadana (CB)':                   'var(--yellow)',
+    'FRS (Motorola, 22 canales)':              'var(--green)',
+    'PMR446 (16 canales)':                     'var(--uhf)',
+    'Baofeng BF-888S (16 canales de fábrica)': '#f97316',
+    'Redes HF nacionales':                     '#06b6d4',
+    'Otras estaciones globales':               '#a78bfa',
+  };
 
   /* ── Menu toggle ────────────────────────────────────────────────────────── */
   function closeMenuStats() {
@@ -84,6 +93,12 @@
       function (n) { return n.conference; }
     );
 
+    var globalNodes = nodes.filter(function (n) { return n.region === 'GLOBAL'; });
+    var globalCount = globalNodes.length;
+    var byGlobalCategory = typeof classifyGlobalStation === 'function'
+      ? groupBy(globalNodes, function (n) { return classifyGlobalStation(n).title; })
+      : {};
+
     /* ── KPI count-up ──────────────────────────────────────────────────────── */
     animateCount('stats-total',      total,         800);
     animateCount('stats-vhf',        vhfFmCount,    900);
@@ -91,6 +106,7 @@
     animateCount('stats-echolink',   echolinkCount, 950);
     animateCount('stats-dmr',        dmrCount,      700);
     animateCount('stats-propagation',propCount,     900);
+    animateCount('stats-global',     globalCount,   900);
 
     /* ── Charts ────────────────────────────────────────────────────────────── */
     renderBars  ('stats-banda-chart',  sortDesc(byBanda),  total, BAND_COLORS, 'var(--vhf)');
@@ -98,6 +114,11 @@
                  sortDesc(byType), total, TYPE_COLORS);
     renderBars  ('stats-region-chart', sortDesc(byRegion), total, {}, 'var(--uhf)', fmtRegion);
     renderBars  ('stats-conf-chart',   sortDesc(byConf),   total, CONF_COLORS, 'var(--green)');
+    if (globalCount > 0) {
+      var globalSection = document.getElementById('stats-global-section');
+      if (globalSection) globalSection.hidden = false;
+      renderBars('stats-global-chart', sortDesc(byGlobalCategory), globalCount, GLOBAL_CATEGORY_COLORS, '#a78bfa');
+    }
 
     /* ── Trigger bar animations ─────────────────────────────────────────────── */
     requestAnimationFrame(function () {

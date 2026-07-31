@@ -87,6 +87,7 @@
 <script defer src="scripts/exporter/opengd77/mapper.js?v=__VERSION__"></script>
 <script defer src="scripts/help.js?v=__VERSION__"></script>
 <script defer src="scripts/station-display.js?v=__VERSION__"></script>
+<script defer src="scripts/global-groups.js?v=__VERSION__"></script>
 <script defer src="scripts/propagation-map.js?v=__VERSION__"></script>
 <script defer src="scripts/analytics.js?v=__VERSION__"></script>
 <script defer src="scripts/coach-marks.js?v=__VERSION__"></script>
@@ -169,6 +170,7 @@
       </div>
       <button type="button" id="btn-nearme" onclick="toggleNearMe()" class="location-btn location-btn--controls" aria-label="Cerca de mí" title="Mostrar repetidoras cerca de mi ubicación"><span class="material-symbols-outlined" aria-hidden="true">my_location</span></button>
       <button type="button" id="btn-route-toggle" class="route-toggle-btn" aria-pressed="false" aria-label="Repetidores en ruta" title="Planificar ruta y ver repetidores en el camino"><span class="material-symbols-outlined" aria-hidden="true">route</span></button>
+      <button type="button" id="btn-global-toggle" onclick="toggleGlobalView()" class="global-toggle-btn" aria-pressed="false" aria-label="Estaciones globales" title="Ver estaciones globales (HF, banda ciudadana, redes nacionales)"><span class="material-symbols-outlined" aria-hidden="true">public</span></button>
     </div>
   </div>
   <div id="map-filter-sheet-backdrop" class="map-filter-sheet-backdrop" hidden aria-hidden="true"></div>
@@ -255,6 +257,13 @@
   <div id="map"></div>
   <div id="propagation-legend-host" class="propagation-legend-float" hidden aria-live="polite"></div>
   <div id="map-empty-overlay" class="map-empty-overlay" hidden aria-live="polite"></div>
+  <div id="global-panel-overlay" class="global-panel-overlay" inert aria-hidden="true">
+    <div class="global-panel-overlay__header">
+      <h2 class="global-panel-overlay__title">Frecuencias Globales <span id="global-panel-count" class="global-panel-overlay__count"></span></h2>
+      <button type="button" class="global-panel-overlay__close" onclick="toggleGlobalView()" aria-label="Cerrar y volver al mapa"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+    </div>
+    <div class="global-panel-overlay__body" id="global-panel-body"></div>
+  </div>
   <!-- SIDEBAR -->
   <div id="sidebar" inert aria-hidden="true">
     <div class="sidebar-panel-slide">
