@@ -92,8 +92,12 @@ window.getDistanceFilterAnchor = getDistanceFilterAnchor;
 
 function formatNearMeFilterSuffix() {
   var a = getDistanceFilterAnchor();
-  if (!a) return '';
   var km = getNearMeRadiusKm();
+  if (!a) {
+    var cc = typeof getFilterCriteria === 'function' ? getFilterCriteria().comunaCentroid : null;
+    if (cc) return ' · cerca de ' + cc.label + ' (' + km + ' km)';
+    return '';
+  }
   if (a.kind === 'gps') return ' · cerca de mí (' + km + ' km)';
   var lab = a.signal ? a.signal : 'referencia';
   return ' · cerca de ' + lab + ' (' + km + ' km)';
@@ -150,6 +154,52 @@ function haversine(la1, lo1, la2, lo2) {
   const a = Math.sin(dLa / 2) ** 2 + Math.cos(la1 * Math.PI / 180) * Math.cos(la2 * Math.PI / 180) * Math.sin(dLo / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
+/** Lowercase + strip accents, for comuna-name comparison only (search stays accent-sensitive elsewhere). */
+function normalizeComunaText(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+var __comunaCentroidsCache = null;
+
+/**
+ * Comuna centroids from the bundled Chile comuna reference (data/comunas.js), so every comuna
+ * resolves to a coordinate even if it currently has zero stations of its own.
+ * Cached in memory for the page's lifetime since COMUNAS doesn't change at runtime.
+ * @returns {Object<string, {lat:number, lon:number, label:string}>} keyed by normalizeComunaText(nombre)
+ */
+function getComunaCentroids() {
+  if (__comunaCentroidsCache) return __comunaCentroidsCache;
+  var out = {};
+  if (typeof COMUNAS !== 'undefined' && COMUNAS.length) {
+    for (var i = 0; i < COMUNAS.length; i++) {
+      var c = COMUNAS[i];
+      var key = normalizeComunaText(c.nombre);
+      if (!key) continue;
+      out[key] = { lat: c.lat, lon: c.lon, label: c.nombre };
+    }
+  }
+  __comunaCentroidsCache = out;
+  return out;
+}
+
+/**
+ * Resolves a search query to a single unambiguous comuna centroid, or null.
+ * Requires an exact match, or a unique prefix match, so ambiguous input (e.g. "san")
+ * doesn't silently widen the result set to an unpredictable set of comunas.
+ * @returns {{lat:number, lon:number, label:string}|null}
+ */
+function findMatchingComunaCentroid(q) {
+  var norm = normalizeComunaText(q);
+  if (!norm || norm.length < 3) return null;
+  var centroids = getComunaCentroids();
+  if (centroids[norm]) return centroids[norm];
+  var keys = Object.keys(centroids).filter(function (k) { return k.indexOf(norm) === 0; });
+  if (keys.length === 1) return centroids[keys[0]];
+  return null;
+}
+
+window.findMatchingComunaCentroid = findMatchingComunaCentroid;
 
 function getNearMeLocation() {
   try {
@@ -559,13 +609,14 @@ function getFilterCriteria() {
     var q = search && search.value.trim() ? search.value.trim().toLowerCase() : '';
     return {
       q: q,
+      comunaCentroid: q ? findMatchingComunaCentroid(q) : null,
       bandas: getCheckedFilterValues(getFilterCheckboxListEl('filter-banda')),
       regions: getCheckedFilterValues(getFilterCheckboxListEl('filter-region')),
       types: getCheckedFilterValues(getFilterCheckboxListEl('filter-type')),
       conferences: getCheckedFilterValues(getFilterCheckboxListEl('filter-conference'))
     };
   } catch (e) {
-    return { q: '', bandas: [], regions: [], types: [], conferences: [] };
+    return { q: '', comunaCentroid: null, bandas: [], regions: [], types: [], conferences: [] };
   }
 }
 
@@ -603,7 +654,13 @@ function nodeMatchesFilterCriteria(r, c, distAnchor) {
       r.signal, r.nombre, r.comuna, r.ubicacion, r.region, r.rx, r.tx, r.tono, r.banda,
       r.conference, r.color, r.slot, r.tg, r.website, r.notes, r.labels, r.serviceType
     ].filter(Boolean).join(' ').toLowerCase();
-    if (haystack.indexOf(c.q) < 0) return false;
+    var directMatch = haystack.indexOf(c.q) >= 0;
+    if (!directMatch) {
+      var cc = c.comunaCentroid;
+      var nearComuna = cc && typeof r.lat === 'number' && typeof r.lon === 'number' &&
+        !isNaN(r.lat) && !isNaN(r.lon) && haversine(cc.lat, cc.lon, r.lat, r.lon) <= getNearMeRadiusKm();
+      if (!nearComuna) return false;
+    }
   }
   if (distAnchor && (r.lat == null || r.lon == null || haversine(distAnchor.lat, distAnchor.lon, r.lat, r.lon) > getNearMeRadiusKm())) {
     return false;
