@@ -220,7 +220,7 @@ CE6RLA-L,Red Echolink Chile - Temuco,Temuco,,-38.75,-72.6666667,,,VHF/FM,147.560
 CA6ELP-L,RCDR - Valdivia,Valdivia,,-39.8,-73.2333333,,,VHF/FM,145.430,145.430,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,los-rios vhf simplex
 CA4JPX-L,RCDR - Nueva Imperial,Nueva Imperial,,-38.7333333,-72.95,,,VHF/FM,145.430,145.430,,REGIÓN DE LA ARAUCANÍA,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
 CA2VCR-L,RCDR - La Serena,La Serena,,-29.9,-71.25,,,VHF/FM,145.430,145.430,,REGIÓN DE COQUIMBO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,norte-chico vhf simplex
-CD2LNO-L,RCDR - Los Andes,Los Andes,,-32.8166667,-70.6166667,,,VHF/FM,145.430,145.430,,REGIÓN DE VALPARAÍSO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,valparaiso vhf simplex
+CD2LNQ-L,RCDR - Los Andes,Los Andes,,-32.8166667,-70.6166667,,,VHF/FM,145.430,145.430,,REGIÓN DE VALPARAÍSO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,valparaiso vhf simplex
 CA4SVL-L,RCDR - Rauco,Rauco,,-34.9333333,-71.3166667,,,VHF/FM,145.430,145.430,,REGIÓN DEL LIBERTADOR GENERAL BERNARDO O'HIGGINS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,centro vhf simplex
 CA3VNX-L,RCDR - El Monte,El Monte,,-33.6833333,-71.0166667,,,VHF/FM,145.530,145.530,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,rm vhf simplex
 CD6AWE-L,RCDR - Futrono,Futrono,,-40.1333333,-72.4,,,VHF/FM,145.430,145.430,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,los-rios vhf simplex
@@ -235,6 +235,7 @@ CD4BSD-L,RCDR - Constitución,Constitución,,-35.3333333,-72.4166667,,,VHF/FM,14
 CD4SDA-L,RCDR - Curepto,Curepto,,-35.0833333,-72.0166667,,,VHF/FM,145.430,145.430,,REGIÓN DEL MAULE,,,1,RCDR,,,,,,https://www.rcdr.cl/,,centro vhf simplex
 CA4JPX-L,RCDR - Nodo móvil (satelital),,Nodo en movimiento dentro del país,-35.5,-71.5,,,VHF/FM,145.650,145.650,,GLOBAL,,,1,RCDR,,,,,,https://www.rcdr.cl/,Nodo en movimiento dentro del país; enlace satelital 145.650 MHz,movil vhf simplex
 CE5UNI-L,RCDR - Concepción,Concepción,Universidad de Concepción,-36.83101365,-73.03468047,,,UHF/FM,433.430,433.430,77.0,REGIÓN DEL BIOBÍO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur uhf simplex
+RC-TALAGANTE,Radio Club Talagante - Encuentro,Talagante,,-33.6667,-70.9333,,,VHF/FM,147.100,147.100,,REGIÓN METROPOLITANA DE SANTIAGO,,,,,,,,,,https://www.radioclubtalagante.cl/,Frecuencia de encuentro VHF simplex/directo,rm vhf simplex
 CE5RPP-R,Conferencia Sur - Penco,Penco,,-36.7408,-72.9953,,,VHF/FM,146.940,146.340,88.5,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf
 CA5EHC-L,Conferencia Sur - Coronel,Coronel,,-36.9555555556,-73.1208333333,,,VHF/FM,145.550,145.550,67,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf simplex
 CE5VKK-L,Conferencia Sur - Concepción,Concepción,,-36.8269,-73.0503,,,VHF/FM,147.500,147.500,123,REGIÓN DEL BIOBÍO,,,1,SUR,,,,,,https://conferenciasur.cl/,,sur vhf simplex
@@ -469,7 +470,7 @@ BF888S-15,Canal 15 Baofeng BF-888S,,,,,,,UHF/FM,460.325,460.325,,GLOBAL,,,,,,,,,
 BF888S-16,Canal 16 Baofeng BF-888S,,,,,,,UHF/FM,469.950,469.950,,GLOBAL,,,,,,,,,,,Baofeng BF-888S — canal de fábrica por defecto; puede variar según lote/región.,baofeng bf888s default 16ch
 CE5RMC RPT-A,RADIOCLUB MANQUIMAVIDA,CHIGUAYANTE,CERRO MANQUIMÁVIDA,-36.916499,-73.005663,,,VHF/FM,147.060,147.660,100,REGIÓN DEL BIOBÍO,,,1,,,,,,,,,sur vhf
 CE7JLR-L,RCDR - Aysén,Puerto Aysén,,-45.4020998,-72.6983477,,,VHF/FM,146.460,146.460,,REGIÓN DE AYSÉN DEL GENERAL CARLOS IBÁÑEZ DEL CAMPO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
-CE6VPX-L,RCDR - Paillaco,Paillaco,,-40.0719057,-72.8800317,,,VHF/FM,146.430,146.430,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
+CE6VPX-L,RCDR - Paillaco,Paillaco,,-40.0719057,-72.8800317,,,VHF/FM,145.650,145.650,,REGIÓN DE LOS RÍOS,,,1,RCDR,,,,,,https://www.rcdr.cl/,,sur vhf simplex
 CD5HXO-L,RCDR - Chicureo,Colina,Chicureo,-33.2864,-70.6494,,,VHF/FM,145.550,145.550,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,RCDR,,,,,,https://www.rcdr.cl/,,rm vhf simplex
 CA3MJJ-L,Red Echolink Zello - Conchalí,Conchalí,,-33.3897,-70.6672,,,VHF/FM,146.440,146.440,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
 CE3ESO-L,Red Echolink Zello - Puente Alto,Puente Alto,,-33.6109,-70.5755,,,VHF/FM,146.245,146.245,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
