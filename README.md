@@ -7,6 +7,8 @@ Sitio estático — sin framework, sin bundler. Leaflet + vanilla JS.
 
 ---
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J6F024AKJE)
+
 ## Funcionalidades
 
 | Función | Descripción |
