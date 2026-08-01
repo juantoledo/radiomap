@@ -96,6 +96,7 @@ var HELP_OVERLAY_HTML =
   '</ul>' +
   '</section>' +
   '<p class="help-meta"><span id="help-version-line">Versión <span id="app-version">—</span>. </span>Agénticamente desarrollado por <a href="https://cd3dxz.radio" target="_blank" rel="noopener">CD3DXZ</a>.</p>' +
+  '<p class="help-meta help-meta-kofi"><a href="https://ko-fi.com/J6F024AKJE" target="_blank" rel="noopener noreferrer" title="Invítame un café en Ko-fi y ayuda a mantener Radiomap" aria-label="Invítame un café en Ko-fi y ayuda a mantener Radiomap" onclick="radiomapGaSupportClick(\'about\')"><img height="36" style="height:36px;border:0" src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" alt="Invítame un café en Ko-fi"></a></p>' +
   '</div>' +
   '</div>' +
   '</div>';

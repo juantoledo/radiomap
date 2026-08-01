@@ -2899,6 +2899,9 @@ body.page-map .map-empty-overlay .no-results--guided {
   line-height: 1.45;
 }
 .help-meta #app-version { color: var(--accent); }
+.help-meta-kofi { display: flex; }
+.help-meta-kofi a { display: inline-flex; opacity: 1; transition: opacity 0.15s; }
+.help-meta-kofi a:hover { opacity: 0.85; text-decoration: none; }
 
 /* Help: capturas mapa + propagación (grid responsive) */
 .help-modal-previews {
