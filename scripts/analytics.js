@@ -72,4 +72,9 @@
       share_method: share_method || 'unknown'
     });
   };
+  window.radiomapGaSupportClick = function (source) {
+    gaSend('radiomap_support_click', {
+      source: source || 'unknown'
+    });
+  };
 })();

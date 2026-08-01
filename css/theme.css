@@ -409,6 +409,18 @@ html[data-theme="light"] .header-view-switch__segment--stats.current {
   color: var(--accent);
 }
 .header-link-icon svg { width: 22px; height: 22px; vertical-align: middle; }
+.header-link-icon .material-symbols-outlined { font-size: 22px; }
+.header-link-icon.header-link-kofi {
+  width: auto;
+  height: 40px;
+  padding: 0 6px;
+  background: transparent;
+  border: none;
+}
+.header-link-icon.header-link-kofi:hover {
+  border-color: transparent;
+  opacity: 0.85;
+}
 /* Text + icon actions (Compartir, CSV) — same height as icon buttons */
 .header-action-link {
   font-family: var(--font-mono);
@@ -3482,13 +3494,6 @@ html[data-theme="light"] #btn-my-stations:hover {
   box-shadow: 0 0 12px rgba(160, 120, 0, 0.2);
 }
 html[data-theme="light"] #btn-my-stations .material-symbols-outlined { color: #9a7200; }
-html[data-theme="light"] .header-menu .location-btn {
-  color: var(--green);
-}
-html[data-theme="light"] .header-menu .location-btn:hover {
-  color: #1a5c32;
-  background: rgba(45, 138, 78, 0.14);
-}
 html[data-theme="light"] .leaflet-tile-pane { filter: none; }
 html[data-theme="light"] .leaflet-control-zoom a {
   background: var(--surface) !important;
@@ -3731,9 +3736,7 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   }
   .header-menu .header-link,
   .header-menu .theme-btn,
-  .header-menu .help-btn,
-  .header-menu .location-btn,
-  .header-menu .header-action-link {
+  .header-menu .help-btn {
     width: 100%;
     display: flex;
     align-items: center;
@@ -3751,16 +3754,6 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     min-height: 44px;
     gap: 10px;
   }
-  .header-menu .header-action-link.btn-download {
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-  }
-  .header-menu .header-action-link.btn-download:hover {
-    color: var(--accent);
-    background: rgba(0,212,255,0.08);
-    box-shadow: none;
-  }
   .header-menu .menu-item-icon {
     width: 24px;
     display: inline-flex;
@@ -3771,26 +3764,25 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   .header-menu .menu-item-icon .material-symbols-outlined { font-size: 22px; }
   .header-menu .header-link:hover,
   .header-menu .theme-btn:hover,
-  .header-menu .help-btn:hover,
-  .header-menu .header-action-link:hover {
+  .header-menu .help-btn:hover {
     background: rgba(0,212,255,0.08);
     color: var(--accent);
   }
-  .header-menu .location-btn {
-    color: var(--green);
-  }
-  .header-menu .location-btn:hover {
-    background: rgba(57, 211, 83, 0.14);
-    color: #8ef4a0;
-  }
   .header-menu .theme-btn,
-  .header-menu .help-btn,
-  .header-menu .location-btn {
+  .header-menu .help-btn {
     min-height: 44px;
     height: auto;
     width: 100%;
     display: flex;
     align-items: center;
+  }
+  .header-menu .header-link-kofi {
+    padding: 8px 14px;
+    justify-content: center;
+  }
+  .header-menu .header-link-kofi:hover {
+    background: transparent;
+    opacity: 0.85;
   }
   .controls {
     padding: 6px max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px));

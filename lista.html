@@ -54,6 +54,7 @@
   </nav>
   <div class="header-map-tools">
     <div class="header-actions">
+      <a href="https://ko-fi.com/J6F024AKJE" target="_blank" rel="noopener noreferrer" class="header-link-icon header-link-kofi" title="Invítame un café en Ko-fi y ayuda a mantener Radiomap" aria-label="Invítame un café en Ko-fi y ayuda a mantener Radiomap" onclick="radiomapGaSupportClick('header')"><img height="36" style="height:36px;border:0" src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" alt="Invítame un café en Ko-fi"></a>
       <button type="button" id="theme-toggle" onclick="toggleTheme()" aria-label="Modo claro" title="Cambiar tema" class="theme-btn"></button>
       <button type="button" id="help-btn" onclick="openHelp()" aria-label="Acerca de Radiomap" title="Acerca de Radiomap" class="help-btn"><span class="material-symbols-outlined" aria-hidden="true">help</span></button>
       <a href="#" id="btn-share-view" class="header-action-link btn-download" title="Copiar enlace con filtros y esta vista" aria-label="Compartir vista de la lista"><span class="material-symbols-outlined" aria-hidden="true">share</span><span class="header-action-link__text">Compartir</span></a>
@@ -69,23 +70,10 @@
       <button type="button" onclick="toggleTheme(); closeMenu();" class="theme-btn menu-theme-toggle" aria-label="Cambiar tema" role="menuitem"></button>
       <button type="button" onclick="openHelp(); closeMenu();" class="help-btn" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">help</span></span> Acerca</button>
     </div>
-    <div class="header-menu-group" role="group" aria-labelledby="menu-grp-location">
-      <div class="header-menu-group__label" id="menu-grp-location">Ubicación</div>
-      <button type="button" onclick="toggleNearMe(); closeMenu();" class="location-btn" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">my_location</span></span> Cerca de mí</button>
-    </div>
-    <div class="header-menu-group" role="group" aria-labelledby="menu-grp-export">
-      <div class="header-menu-group__label" id="menu-grp-export">Exportar</div>
-      <a href="#" id="btn-share-view-menu" class="header-action-link btn-download" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">share</span></span> Compartir vista</a>
-      <a href="#" id="btn-download-csv-menu" class="header-action-link btn-download" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">import_export</span></span> Importar / Exportar</a>
-    </div>
-    <div class="header-menu-group" role="group" aria-labelledby="menu-grp-mystations">
-      <div class="header-menu-group__label" id="menu-grp-mystations">Mis estaciones</div>
-      <button type="button" onclick="myStations.openManageModal(); closeMenu();" class="header-action-link btn-download" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">bookmark</span></span> Gestionar</button>
-    </div>
     <div class="header-menu-group" role="group" aria-labelledby="menu-grp-more">
       <div class="header-menu-group__label" id="menu-grp-more">Más</div>
-      <a href="estadisticas.html" class="header-link" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">bar_chart</span></span> Estadísticas</a>
       <a href="https://github.com/juantoledo/radiomap" class="header-link" target="_blank" rel="noopener" role="menuitem"><span class="menu-item-icon"><span class="material-symbols-outlined" aria-hidden="true">code</span></span> GitHub</a>
+      <a href="https://ko-fi.com/J6F024AKJE" target="_blank" rel="noopener noreferrer" class="header-link header-link-kofi" role="menuitem" onclick="radiomapGaSupportClick('menu'); closeMenu();"><img height="36" style="height:36px;border:0" src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" alt="Invítame un café en Ko-fi"></a>
     </div>
   </div>
 </header>
@@ -230,8 +218,7 @@
 <script src="scripts/exporter/ft5dr/mapper.js?v=__VERSION__"></script>
 <script src="scripts/exporter/ftm150/mapper.js?v=__VERSION__"></script>
 <script src="scripts/exporter/opengd77/mapper.js?v=__VERSION__"></script>
-<script src="scripts/help.js?v=__VERSION__"></script>
-<script src="scripts/station-display.js?v=__VERSION__"></script>
+<script src="scripts/help.js?v=__VERSION__"></script><script src="scripts/station-display.js?v=__VERSION__"></script>
 <script src="scripts/global-groups.js?v=__VERSION__"></script>
 <script src="scripts/analytics.js?v=__VERSION__"></script>
 <script src="scripts/coach-marks.js?v=__VERSION__"></script>

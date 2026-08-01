@@ -67,6 +67,7 @@ Measurement ID is in [`index.html`](index.html) / [`lista.html`](lista.html). Cu
 | `radiomap_filter_apply` | `page_type`, `filter_mode`, `conference` |
 | `radiomap_share` | `page_type`, `share_method` |
 | `radiomap_csv_download` | `page_type` |
+| `radiomap_support_click` | `page_type`, `source` |
 
 **Key events (conversions)** — mark in GA4 only for the events you care about (e.g. `radiomap_station_select`, `radiomap_share`); avoid marking every micro-event.
 
