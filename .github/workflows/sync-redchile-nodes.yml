@@ -1,0 +1,97 @@
+name: Sync Red Chile nodes
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # diario 09:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-redchile-nodes
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm install --no-save playwright@latest
+          npx playwright install --with-deps chromium
+
+      - name: Render redchile.org/#!/nodos
+        id: fetch
+        run: node scripts/ci/fetch-redchile-nodos.js /tmp/redchile-nodos.txt
+
+      - name: Create bot branch from latest main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B bot/redchile-nodes-sync origin/main
+
+      # NOTE: verify current input names (anthropic_api_key vs claude_code_oauth_token,
+      # allowed_tools syntax, prompt vs prompt_file) against the anthropics/claude-code-action
+      # README before first real run — this repo has no prior usage of the action to copy from.
+      - name: Run Claude to propose CSV updates
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_tools: "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
+          prompt_file: .github/prompts/sync-redchile-nodes.md
+
+      - name: Validate CSV structure
+        run: python scripts/ci/validate-csv.py
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- data/curated_stations.csv; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Regenerate data.js
+        if: steps.diff.outputs.changed == 'true'
+        run: python scripts/csv-to-datajs.py
+
+      - name: Commit changes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git add data/curated_stations.csv data/data.js
+          git commit -m "feat(data): sync nodes from redchile.org"
+          git push origin bot/redchile-nodes-sync --force-with-lease
+
+      - name: Open or update pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh pr view bot/redchile-nodes-sync --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "PR already open, branch push above updated it."
+          else
+            gh pr create \
+              --base main \
+              --head bot/redchile-nodes-sync \
+              --title "feat(data): sync nodes from redchile.org" \
+              --body "Automated: proposed \`data/curated_stations.csv\` updates from https://redchile.org/#!/nodos. **Bot-generated — review before merging** (verify coordinates, frequencies, and region strings against the source)."
+          fi

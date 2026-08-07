@@ -17,6 +17,8 @@ Archivos de datos para el mapa y la lista de repetidoras.
 
 Los datos parten de **registros públicos de regulación** del espectro en Chile y pueden curarse en `curated_stations.csv` para corregir errores (coordenadas, frecuencias, nombres, etc.).
 
+Adicionalmente, el workflow [`sync-redchile-nodes.yml`](../.github/workflows/sync-redchile-nodes.yml) corre a diario (y manualmente vía `workflow_dispatch`): renderiza `https://redchile.org/#!/nodos`, usa Claude ([`anthropics/claude-code-action`](https://github.com/anthropics/claude-code-action), prompt en [`.github/prompts/sync-redchile-nodes.md`](../.github/prompts/sync-redchile-nodes.md)) para proponer altas/cambios en filas de la red «Red Chile», valida la estructura con `scripts/ci/validate-csv.py`, y abre un **pull request** (nunca hace push directo a `main`). Todo cambio propuesto por el bot requiere revisión humana antes de mergear.
+
 ---
 
 ## Pipeline
