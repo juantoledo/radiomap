@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
 
 concurrency:
   group: sync-node-sources
@@ -82,17 +81,21 @@ jobs:
       # "Claude Code" GitHub App, which requires that app to be installed on
       # the repo (https://github.com/apps/claude) — this pipeline was failing
       # on that exchange ("Claude Code is not installed on this repository").
-      # Passing github_token explicitly makes the action use this workflow's
-      # own token for git/GitHub API calls instead, skipping the App
-      # requirement entirely. Verify these input names against the current
-      # anthropics/claude-code-action README if this step errors again.
+      # Passing github_token wires inputs.github_token -> OVERRIDE_GITHUB_TOKEN
+      # internally (see anthropics/claude-code-action src/github/token.ts),
+      # which short-circuits the OIDC/App exchange entirely — confirmed
+      # against the v1 action source, not just its docs.
+      #
+      # `allowed_tools` is a deprecated input (silently ignored); the current
+      # way to restrict tools is `--allowedTools` via `claude_args`.
       - name: Run Claude to propose CSV updates
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          allowed_tools: "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
           prompt: ${{ steps.load_prompt.outputs.text }}
+          claude_args: |
+            --allowedTools "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
 
       - name: Validate CSV structure
         run: python scripts/ci/validate-csv.py
