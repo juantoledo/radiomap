@@ -96,7 +96,7 @@ jobs:
           show_full_output: true
           prompt: ${{ steps.load_prompt.outputs.text }}
           claude_args: |
-            --allowedTools "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
+            --model claude-haiku-4-5-20251001 --allowedTools "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
 
       - name: Validate CSV structure
         run: python scripts/ci/validate-csv.py
