@@ -1,0 +1,122 @@
+name: Sync node sources
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # diario 09:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: sync-node-sources
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm install --no-save playwright@latest
+          npx playwright install --with-deps chromium
+
+      - name: Render each configured source
+        id: fetch
+        run: |
+          set +e
+          mkdir -p /tmp/sources
+          : > /tmp/sources-manifest.txt
+          tail -n +2 .github/sync-sources.csv | while IFS=',' read -r name url; do
+            [ -z "$name" ] && continue
+            slug=$(echo "$name" | tr '[:upper:]' '[:lower:]' | tr -s ' /' '-')
+            out="/tmp/sources/${slug}.txt"
+            echo "Fetching '$name' <- $url"
+            node scripts/ci/fetch-node-source.js "$url" "$out"
+            if [ $? -ne 0 ]; then
+              echo "::warning::Failed to render source '$name' ($url) — continuing with remaining sources"
+            fi
+            echo "${name}|${url}|${out}" >> /tmp/sources-manifest.txt
+          done
+          echo "--- manifest ---"
+          cat /tmp/sources-manifest.txt
+
+      - name: Create bot branch from latest main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B bot/node-sources-sync origin/main
+
+      # By default this action exchanges an OIDC token for a token from the
+      # "Claude Code" GitHub App, which requires that app to be installed on
+      # the repo (https://github.com/apps/claude) — this pipeline was failing
+      # on that exchange ("Claude Code is not installed on this repository").
+      # Passing github_token explicitly makes the action use this workflow's
+      # own token for git/GitHub API calls instead, skipping the App
+      # requirement entirely. Verify this input name against the current
+      # anthropics/claude-code-action README if this step errors again.
+      - name: Run Claude to propose CSV updates
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          allowed_tools: "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
+          prompt_file: .github/prompts/sync-node-sources.md
+
+      - name: Validate CSV structure
+        run: python scripts/ci/validate-csv.py
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- data/curated_stations.csv; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Regenerate data.js
+        if: steps.diff.outputs.changed == 'true'
+        run: python scripts/csv-to-datajs.py
+
+      - name: Commit changes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git add data/curated_stations.csv data/data.js
+          git commit -m "feat(data): sync nodes from configured sources"
+          git push origin bot/node-sources-sync --force-with-lease
+
+      - name: Open or update pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sources_list=$(cut -d'|' -f1 /tmp/sources-manifest.txt | sed 's/^/- /')
+          body=$(printf 'Automated: proposed `data/curated_stations.csv` updates checked against configured sources (`.github/sync-sources.csv`):\n\n%s\n\n**Bot-generated — review before merging** (verify coordinates, frequencies, and region strings against each source).' "$sources_list")
+          if gh pr view bot/node-sources-sync --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "PR already open, branch push above updated it."
+          else
+            gh pr create \
+              --base main \
+              --head bot/node-sources-sync \
+              --title "feat(data): sync nodes from configured sources" \
+              --body "$body"
+          fi
