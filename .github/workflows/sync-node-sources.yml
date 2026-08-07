@@ -93,6 +93,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          show_full_output: true
           prompt: ${{ steps.load_prompt.outputs.text }}
           claude_args: |
             --allowedTools "Read,Edit,Bash(python scripts/csv-to-datajs.py),Bash(python scripts/ci/validate-csv.py)"
