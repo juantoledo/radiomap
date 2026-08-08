@@ -571,7 +571,7 @@
       '<div class="sb-detail-grid">' +
       '<div class="sb-row"><span class="sb-key">Filtro</span><span class="sb-val">Cerca de mí</span></div>' +
       '</div>' +
-      '<p class="sb-nearme-hint">No hay repetidoras visibles aquí. Ajusta filtros o la búsqueda.</p>';
+      '<p class="sb-nearme-hint">No hay estaciones visibles aquí. Ajusta filtros o la búsqueda.</p>';
     if (typeof window.__radiomapCloseMapFilterSheet === 'function') window.__radiomapCloseMapFilterSheet();
     openSidebarAfterLayout(syncRadiomapMapUiToUrl);
   }
@@ -936,7 +936,7 @@
 
     const filteredNeighbors = [{idx: idx, dist: 0}, ...r._neighbors.filter(n=>visibleSet.has(n.idx))].sort((a,b)=>a.dist-b.dist);
     if(filteredNeighbors.length > 0){
-      html += '<div class="sb-section-title">NODOS CERCANOS <span class="sb-neighbor-actions"><a href="#" class="sb-download-neighbors" onclick="openNeighborsExportDialog();return false" title="Descargar nodos cercanos como CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span> CSV</a><a href="#" class="sb-share-neighbors" onclick="shareNeighbors();return false" title="Compartir enlace con filtros, mapa y esta repetidora (panel de nodos cercanos)"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</a></span></div>';
+      html += '<div class="sb-section-title">NODOS CERCANOS <span class="sb-neighbor-actions"><a href="#" class="sb-download-neighbors" onclick="openNeighborsExportDialog();return false" title="Descargar nodos cercanos como CSV"><span class="material-symbols-outlined" aria-hidden="true">download</span> CSV</a><a href="#" class="sb-share-neighbors" onclick="shareNeighbors();return false" title="Compartir enlace con filtros, mapa y esta estación (panel de nodos cercanos)"><span class="material-symbols-outlined" aria-hidden="true">share</span> Compartir</a></span></div>';
       html += filteredNeighbors.map(n=>{
         const nb = NODES[n.idx];
         const nc = REGION_COLORS[nb.region]||'#5e35b1';
@@ -991,7 +991,7 @@
     const filteredNeighbors = [{idx: selectedIdx, dist: 0}, ...(r._neighbors || []).filter(n=>visibleSet.has(n.idx))].sort((a,b)=>a.dist-b.dist);
     if(filteredNeighbors.length === 0) return;
     const esc = v => (v == null || v === '') ? '' : (''+v).includes(',') || (''+v).includes('"') ? '"' + (''+v).replace(/"/g, '""') + '"' : ''+v;
-    const headers = ['Repetidor','Señal nodo cercano','Club','Región','Comuna','RX (MHz)','TX (MHz)','Tono (Hz)','Banda','Etiquetas','Distancia (km)'];
+    const headers = ['Estación','Señal nodo cercano','Club','Región','Comuna','RX (MHz)','TX (MHz)','Tono (Hz)','Banda','Etiquetas','Distancia (km)'];
     const rows = filteredNeighbors.map(n=>{
       const nb = NODES[n.idx];
       return [r.signal, nb.signal, nb.nombre || getClubName(nb.signal), nb.region, nb.comuna || '', nb.rx || '', nb.tx || '', nb.tono || '', nb.banda || '', nb.labels || '', n.dist];
@@ -1269,6 +1269,7 @@
       const rows = NODES.filter(n=>visibleSignals.has(n.signal));
       exportRows = rows.length ? rows : NODES;
     }
+    exportRows = exportRows.filter(r => r.serviceType !== 'broadcast');
     const criteria = overrideCriteria || getExportCriteria();
 
     document.getElementById('export-dialog-csv').onclick = function() {

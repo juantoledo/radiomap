@@ -145,6 +145,7 @@
     nodes.forEach(function (node) {
       if (node.lat == null || node.lon == null
         || typeof node.lat !== 'number' || typeof node.lon !== 'number') return;
+      if (node.serviceType === 'broadcast') return;
       var dist = minDistToPolyline(node.lat, node.lon, coords);
       if (dist > corridorKm) return;
       results.push({

@@ -30,6 +30,12 @@
   }
 }
 
+/* Heartbeat pulse for icons inside enabled toggle buttons (search-nearme-wrap) */
+@keyframes radiomap-toggle-icon-heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
 /* Material Symbols Outlined — load font in HTML */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
@@ -2484,6 +2490,10 @@ body.page-list main { padding: 24px 32px; }
   border: 1px solid #0277bd;
   color: #81d4fa;
 }
+.badge-service--broadcast {
+  border: 1px solid #43a047;
+  color: #a5d6a7;
+}
 /* Etiquetas internas (CSV): #hashtag por token, color estable por texto */
 .station-label-tags {
   display: flex;
@@ -3986,7 +3996,8 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   }
   .location-btn--controls,
   .route-toggle-btn,
-  .global-toggle-btn {
+  .global-toggle-btn,
+  .broadcast-toggle-btn {
     width: 36px;
     height: 36px;
     min-width: 36px;
@@ -3994,7 +4005,8 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   }
   .location-btn--controls .material-symbols-outlined,
   .route-toggle-btn .material-symbols-outlined,
-  .global-toggle-btn .material-symbols-outlined { font-size: 20px; }
+  .global-toggle-btn .material-symbols-outlined,
+  .broadcast-toggle-btn .material-symbols-outlined { font-size: 20px; }
   .controls .btn-clear-filters { grid-column: 1 / -1; justify-self: center; margin-left: 0; }
   .controls .controls-footer-row {
     grid-column: 1 / -1;
@@ -4988,10 +5000,19 @@ html[data-theme="light"] #export-dialog::backdrop {
   border-color: #ffa800;
 }
 .route-toggle-btn[aria-pressed="true"] {
-  background: rgba(255, 168, 0, 0.30);
-  border-color: #ffa800;
+  animation: radiomap-prop-border-spin 1.35s linear infinite;
+  transition: color 0.15s, box-shadow 0.15s;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #ffa800, rgba(255, 168, 0, 0.15), #ffa800) border-box;
   color: #ffd580;
   box-shadow: 0 0 0 1px rgba(255, 168, 0, 0.45);
+}
+.route-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
+  animation: radiomap-toggle-icon-heartbeat 1.2s ease-in-out infinite;
 }
 html[data-theme="light"] .route-toggle-btn {
   background: rgba(180, 100, 0, 0.10);
@@ -5003,14 +5024,68 @@ html[data-theme="light"] .route-toggle-btn:hover {
   border-color: #b46400;
 }
 html[data-theme="light"] .route-toggle-btn[aria-pressed="true"] {
-  background: rgba(180, 100, 0, 0.24);
-  border-color: #b46400;
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #b46400, rgba(180, 100, 0, 0.15), #b46400) border-box;
   color: #6d3700;
 }
 .route-toggle-btn:disabled,
-.global-toggle-btn:disabled {
+.global-toggle-btn:disabled,
+.broadcast-toggle-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.broadcast-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(67, 160, 71, 0.12);
+  border: 1px solid rgba(67, 160, 71, 0.45);
+  border-radius: 8px;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 22px;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  align-self: center;
+}
+.broadcast-toggle-btn:hover {
+  background: rgba(67, 160, 71, 0.22);
+  border-color: var(--green);
+}
+.broadcast-toggle-btn[aria-pressed="true"] {
+  animation: radiomap-prop-border-spin 1.35s linear infinite;
+  transition: color 0.15s, box-shadow 0.15s;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #43a047, rgba(67, 160, 71, 0.15), #43a047) border-box;
+  color: #c8e6c9;
+  box-shadow: 0 0 0 1px rgba(67, 160, 71, 0.45);
+}
+.broadcast-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
+  animation: radiomap-toggle-icon-heartbeat 1.2s ease-in-out infinite;
+}
+html[data-theme="light"] .broadcast-toggle-btn {
+  background: rgba(46, 125, 50, 0.10);
+  border-color: rgba(46, 125, 50, 0.50);
+  color: #2e7d32;
+}
+html[data-theme="light"] .broadcast-toggle-btn:hover {
+  background: rgba(46, 125, 50, 0.18);
+  border-color: #2e7d32;
+}
+html[data-theme="light"] .broadcast-toggle-btn[aria-pressed="true"] {
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #2e7d32, rgba(46, 125, 50, 0.15), #2e7d32) border-box;
+  color: #1b5e20;
 }
 
 .global-toggle-btn {
@@ -5035,10 +5110,19 @@ html[data-theme="light"] .route-toggle-btn[aria-pressed="true"] {
   border-color: var(--accent);
 }
 .global-toggle-btn[aria-pressed="true"] {
-  background: rgba(0, 212, 255, 0.30);
-  border-color: var(--accent);
+  animation: radiomap-prop-border-spin 1.35s linear infinite;
+  transition: color 0.15s, box-shadow 0.15s;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #00d4ff, rgba(0, 212, 255, 0.15), #00d4ff) border-box;
   color: #baf3ff;
   box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.45);
+}
+.global-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
+  animation: radiomap-toggle-icon-heartbeat 1.2s ease-in-out infinite;
 }
 html[data-theme="light"] .global-toggle-btn {
   background: rgba(0, 136, 204, 0.10);
@@ -5050,9 +5134,20 @@ html[data-theme="light"] .global-toggle-btn:hover {
   border-color: var(--accent);
 }
 html[data-theme="light"] .global-toggle-btn[aria-pressed="true"] {
-  background: rgba(0, 136, 204, 0.24);
-  border-color: var(--accent);
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), var(--accent), rgba(0, 136, 204, 0.15), var(--accent)) border-box;
   color: #004a70;
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-toggle-btn[aria-pressed="true"],
+  .broadcast-toggle-btn[aria-pressed="true"],
+  .global-toggle-btn[aria-pressed="true"],
+  .route-toggle-btn[aria-pressed="true"] .material-symbols-outlined,
+  .broadcast-toggle-btn[aria-pressed="true"] .material-symbols-outlined,
+  .global-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
+    animation: none;
+  }
 }
 
 /* Global stations panel — translucent overlay on top of the map (map stays visible/legible underneath) while the Global toggle is active.

@@ -13,7 +13,7 @@ from pathlib import Path
 
 CSV_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "curated_stations.csv"
 
-SERVICE_TYPE_ALLOWED = {"", "atc", "fire", "ambulance", "sea"}
+SERVICE_TYPE_ALLOWED = {"", "atc", "fire", "ambulance", "sea", "broadcast"}
 BOOL_ALLOWED = {"", "1", "true", "yes"}
 
 

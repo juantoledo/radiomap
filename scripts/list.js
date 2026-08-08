@@ -501,7 +501,7 @@
     /** Region header as a <details> summary (badge + count), reused for every zone so the whole list is collapsible, same as the map's Global panel. */
     function buildZoneSummaryHtml(reg, count) {
       if (!reg) return '';
-      return `<summary class="global-group__summary"><span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span><span class="zone-count"><span>${count}</span> repetidor${count !== 1 ? 'es' : ''}</span></summary>`;
+      return `<summary class="global-group__summary"><span class="zone-badge" style="border-color: ${REGION_COLORS[reg]||'#5e35b1'}; color: ${REGION_COLORS[reg]||'#5e35b1'}">${reg}</span><span class="zone-count"><span>${count}</span> estaci${count !== 1 ? 'ones' : 'ón'}</span></summary>`;
     }
 
     const regionFilterCriteria = typeof getFilterCriteria === 'function' ? getFilterCriteria() : { q: '', bandas: [], types: [], conferences: [] };
@@ -835,7 +835,7 @@
   function openExportDialog() {
     const dialog = document.getElementById('export-dialog');
     if (!dialog) return;
-    const exportRows = getFiltered();
+    const exportRows = getFiltered().filter(r => r.serviceType !== 'broadcast');
     const criteria = getExportCriteria();
 
     document.getElementById('export-dialog-csv').onclick = function() {

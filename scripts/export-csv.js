@@ -30,7 +30,7 @@ function exportRepeatersCSV(rows, criteria) {
 
 function buildExportFilename(criteria) {
   const date = new Date().toISOString().slice(0, 10);
-  const parts = ['radiomap', 'repetidores'];
+  const parts = ['radiomap', 'estaciones'];
   const sanitize = function (s) {
     return String(s).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-áéíóúñ]/g, '').toLowerCase().slice(0, 30);
   };

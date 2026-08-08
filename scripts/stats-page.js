@@ -11,13 +11,14 @@
     'VHF/AM (ATC)': '#475569',
   };
   var TYPE_COLORS = {
-    'Radioclub FM': 'var(--vhf)',
-    'Echolink':     'var(--green)',
-    'ATC / Aéreo':  '#64748b',
-    'DMR':          'var(--uhf)',
-    'Bomberos':     '#ef4444',
-    'Ambulancia':   '#f97316',
-    'Marítimo':     '#06b6d4',
+    'Radioclub FM':   'var(--vhf)',
+    'Echolink':       'var(--green)',
+    'ATC / Aéreo':    '#64748b',
+    'DMR':            'var(--uhf)',
+    'Bomberos':       '#ef4444',
+    'Ambulancia':     '#f97316',
+    'Marítimo':       '#06b6d4',
+    'AM/FM Broadcast':'#eab308',
   };
   var CONF_COLORS = {
     'Red Chile':                       'var(--vhf)',
@@ -226,9 +227,10 @@
       if      (n.isEcholink)                    t = 'Echolink';
       else if (n.isDMR)                         t = 'DMR';
       else if (n.isAir || n.serviceType==='atc')t = 'ATC / Aéreo';
-      else if (n.serviceType === 'bomberos')    t = 'Bomberos';
-      else if (n.serviceType === 'ambulancia')  t = 'Ambulancia';
-      else if (n.serviceType === 'maritimo')    t = 'Marítimo';
+      else if (n.serviceType === 'fire')        t = 'Bomberos';
+      else if (n.serviceType === 'ambulance')   t = 'Ambulancia';
+      else if (n.serviceType === 'sea')         t = 'Marítimo';
+      else if (n.serviceType === 'broadcast')   t = 'AM/FM Broadcast';
       else                                      t = 'Radioclub FM';
       types[t] = (types[t] || 0) + 1;
     }

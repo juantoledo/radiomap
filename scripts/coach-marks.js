@@ -35,13 +35,13 @@
       selector: '#btn-nearme',
       title: 'Cerca de mí',
       body:
-        'Filtra repetidoras por distancia desde tu ubicación (o desde una repetidora de referencia en el mapa). Puedes ajustar el radio en el bloque de contadores debajo de la barra.',
+        'Filtra estaciones por distancia desde tu ubicación (o desde una estación de referencia en el mapa). Puedes ajustar el radio en el bloque de contadores debajo de la barra.',
     },
     {
       selector: '#btn-route-toggle',
       title: 'Ruta',
       body:
-        'Ingresa origen y destino (texto o clic en el mapa) y ajusta el corredor; el mapa resalta las repetidoras dentro del trayecto aplicando los filtros activos.',
+        'Ingresa origen y destino (texto o clic en el mapa) y ajusta el corredor; el mapa resalta las estaciones dentro del trayecto aplicando los filtros activos.',
     },
     {
       selector: '#btn-global-toggle',

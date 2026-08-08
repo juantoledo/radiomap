@@ -80,7 +80,7 @@ var HELP_OVERLAY_HTML =
   '</figure>' +
   '<figure class="help-modal-preview">' +
   '<img class="help-modal-preview__img" src="images/route-planner.png" alt="Radiomap: planificador de ruta Santiago–Concepción con repetidoras resaltadas en el corredor" loading="lazy" width="668" height="1157">' +
-  '<figcaption class="help-modal-preview__cap"><strong>Repetidores en ruta</strong> — ingresá origen y destino, ajustá el corredor y el mapa resalta las estaciones en el camino.</figcaption>' +
+  '<figcaption class="help-modal-preview__cap"><strong>Estaciones en ruta</strong> — ingresá origen y destino, ajustá el corredor y el mapa resalta las estaciones en el camino.</figcaption>' +
   '</figure>' +
   '<figure class="help-modal-preview">' +
   '<img class="help-modal-preview__img" src="images/propagation.png" alt="Ejemplo: mapa con capa de propagación experimental y leyenda dBm" loading="lazy" width="668" height="1157">' +

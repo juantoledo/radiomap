@@ -191,7 +191,7 @@
       if (lonStr && isNaN(lon)) { errors.push('Fila ' + (li + 1) + ' (' + sig + '): lon inválida'); continue; }
 
       var svcRaw = (get('servicetype') || get('servicio (icono)') || '').toLowerCase();
-      var validSvc = ['atc', 'fire', 'ambulance', 'sea'];
+      var validSvc = ['atc', 'fire', 'ambulance', 'sea', 'broadcast'];
       var serviceType = validSvc.indexOf(svcRaw) >= 0 ? svcRaw : '';
 
       newStations.push({
@@ -438,7 +438,7 @@
     var lonStr = val('ms-f-lon');
     var lat = latStr ? parseFloat(latStr) : null;
     var lon = lonStr ? parseFloat(lonStr) : null;
-    var validSvc = ['atc', 'fire', 'ambulance', 'sea'];
+    var validSvc = ['atc', 'fire', 'ambulance', 'sea', 'broadcast'];
     var svcRaw = val('ms-f-svc');
     return {
       signal:      val('ms-f-signal'),
@@ -623,11 +623,12 @@
                 '<div class="ms-form-field">' +
                   '<label class="ms-form-label" for="ms-f-svc">Servicio especial</label>' +
                   '<select id="ms-f-svc" class="ms-form-select">' +
-                    '<option value="">— Repetidora genérica</option>' +
+                    '<option value="">— Estación genérica</option>' +
                     '<option value="atc">ATC / aéreo</option>' +
                     '<option value="fire">Bomberos</option>' +
                     '<option value="ambulance">Ambulancia</option>' +
                     '<option value="sea">Marítimo</option>' +
+                    '<option value="broadcast">AM/FM</option>' +
                   '</select>' +
                 '</div>' +
               '</div>' +
@@ -744,7 +745,7 @@
       openForm(signal);
     },
     exportCSV: function () {
-      var stored = loadFromStorage();
+      var stored = loadFromStorage().filter(function (r) { return r.serviceType !== 'broadcast'; });
       if (!stored.length) { alert('No tienes estaciones propias guardadas.'); return; }
       if (typeof exportRepeatersCSV === 'function') exportRepeatersCSV(stored, { myStations: true });
       clearPendingExport();

@@ -11,14 +11,14 @@
 <link rel="icon" href="images/favicon.svg?v=__VERSION__" type="image/svg+xml">
 <link rel="apple-touch-icon" href="images/favicon-og.png?v=__VERSION__">
 <link rel="manifest" href="manifest.json?v=__VERSION__">
-<title>Radiomap — Mapa de repetidoras de radioaficionados en Chile</title>
-<meta name="description" content="Mapa de repetidoras de radioaficionados en Chile: círculos orientativos y propagación por estación, filtros y búsqueda.">
+<title>Radiomap — Mapa de estaciones de radioaficionados en Chile</title>
+<meta name="description" content="Mapa de estaciones de radioaficionados en Chile: círculos orientativos y propagación por estación, filtros y búsqueda.">
 <meta name="theme-color" content="#0d1520">
 <link rel="canonical" href="https://www.radiomap.cl/">
 <meta property="og:site_name" content="Radiomap">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Radiomap — Mapa de repetidoras de radioaficionados en Chile">
-<meta property="og:description" content="Mapa de repetidoras de radioaficionados en Chile: círculos orientativos y propagación, filtros y búsqueda.">
+<meta property="og:title" content="Radiomap — Mapa de estaciones de radioaficionados en Chile">
+<meta property="og:description" content="Mapa de estaciones de radioaficionados en Chile: círculos orientativos y propagación, filtros y búsqueda.">
 <meta property="og:url" content="https://www.radiomap.cl/">
 <meta property="og:image" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
 <meta property="og:image:secure_url" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
@@ -28,8 +28,8 @@
 <meta property="og:image:alt" content="Radiomap — logotipo">
 <meta property="og:locale" content="es_CL">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Radiomap — Mapa de repetidoras de radioaficionados en Chile">
-<meta name="twitter:description" content="Mapa de repetidoras de radioaficionados en Chile: círculos orientativos y propagación, filtros y búsqueda.">
+<meta name="twitter:title" content="Radiomap — Mapa de estaciones de radioaficionados en Chile">
+<meta name="twitter:description" content="Mapa de estaciones de radioaficionados en Chile: círculos orientativos y propagación, filtros y búsqueda.">
 <meta name="twitter:image" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
 <meta name="twitter:image:alt" content="Radiomap — logotipo">
 <meta name="twitter:site" content="@radiomap_cl">
@@ -41,7 +41,7 @@
   "name": "Radiomap",
   "alternateName": "Radiomap Chile",
   "url": "https://www.radiomap.cl/",
-  "description": "Mapa de repetidoras de radioaficionados en Chile: círculos orientativos, propagación por estación, filtros y búsqueda.",
+  "description": "Mapa de estaciones de radioaficionados en Chile: círculos orientativos, propagación por estación, filtros y búsqueda.",
   "inLanguage": "es-CL"
 }
 </script>
@@ -49,8 +49,8 @@
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  "name": "Repetidoras de radioaficionados en Chile",
-  "description": "Listado curado de estaciones repetidoras de radioaficionados en Chile (VHF/UHF/HF), incluyendo redes Echolink y DMR, por región.",
+  "name": "Estaciones de radioaficionados en Chile",
+  "description": "Listado curado de estaciones de radioaficionados en Chile (VHF/UHF/HF), incluyendo redes Echolink y DMR, por región.",
   "url": "https://www.radiomap.cl/",
   "spatialCoverage": {
     "@type": "Place",
@@ -92,7 +92,7 @@
 <script defer src="scripts/coach-marks.js?v=__VERSION__"></script>
 </head>
 <body class="page-map">
-<h1 class="sr-only">Radiomap — Mapa de repetidoras de radioaficionados en Chile</h1>
+<h1 class="sr-only">Radiomap — Mapa de estaciones de radioaficionados en Chile</h1>
 <div id="app">
 
 <!-- HEADER -->
@@ -155,9 +155,10 @@
         <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
         <input type="text" id="search" placeholder="Buscar señal, club, comuna, frecuencias...">
       </div>
-      <button type="button" id="btn-nearme" onclick="toggleNearMe()" class="location-btn location-btn--controls" aria-label="Cerca de mí" title="Mostrar repetidoras cerca de mi ubicación"><span class="material-symbols-outlined" aria-hidden="true">my_location</span></button>
-      <button type="button" id="btn-route-toggle" class="route-toggle-btn" aria-pressed="false" aria-label="Repetidores en ruta" title="Planificar ruta y ver repetidores en el camino"><span class="material-symbols-outlined" aria-hidden="true">route</span></button>
+      <button type="button" id="btn-nearme" onclick="toggleNearMe()" class="location-btn location-btn--controls" aria-label="Cerca de mí" title="Mostrar estaciones cerca de mi ubicación"><span class="material-symbols-outlined" aria-hidden="true">my_location</span></button>
+      <button type="button" id="btn-route-toggle" class="route-toggle-btn" aria-pressed="false" aria-label="Estaciones en ruta" title="Planificar ruta y ver estaciones en el camino"><span class="material-symbols-outlined" aria-hidden="true">route</span></button>
       <button type="button" id="btn-global-toggle" onclick="toggleGlobalView()" class="global-toggle-btn" aria-pressed="false" aria-label="Estaciones globales" title="Ver estaciones globales (HF, banda ciudadana, redes nacionales)"><span class="material-symbols-outlined" aria-hidden="true">public</span></button>
+      <button type="button" id="btn-broadcast-toggle" onclick="toggleBroadcastVisibility()" class="broadcast-toggle-btn" aria-pressed="false" aria-label="Mostrar estaciones AM/FM" title="Mostrar estaciones de radiodifusión AM/FM"><span class="material-symbols-outlined" aria-hidden="true">radio</span></button>
     </div>
   </div>
   <div id="map-filter-sheet-backdrop" class="map-filter-sheet-backdrop" hidden aria-hidden="true"></div>
@@ -209,6 +210,7 @@
             <label class="filter-checkbox-row"><input type="checkbox" data-filter-value="fire"> Bomberos</label>
             <label class="filter-checkbox-row"><input type="checkbox" data-filter-value="ambulance"> Ambulancia</label>
             <label class="filter-checkbox-row"><input type="checkbox" data-filter-value="sea"> Marítimo</label>
+            <label class="filter-checkbox-row"><input type="checkbox" data-filter-value="broadcast"> AM/FM Broadcast</label>
           </div>
         </section>
         <section class="filter-section" aria-labelledby="filter-heading-conference">
@@ -226,14 +228,14 @@
   <div class="controls-footer-row controls-footer-row--map-toolbar">
     <div class="filter-count-wrap">
       <div class="filter-count">Mostrando <span id="shown-count">172</span> de <span id="total-count">172</span> · <span id="regions-count">13</span> regiones · <span id="clubs-count">—</span> clubes<span id="filter-nearme"></span></div>
-      <div id="near-radius-floater" class="near-radius-floater" hidden aria-hidden="true" title="Distancia máxima desde la referencia (ubicación o repetidora elegida)">
+      <div id="near-radius-floater" class="near-radius-floater" hidden aria-hidden="true" title="Distancia máxima desde la referencia (ubicación o estación elegida)">
         <div class="near-radius-floater__head">
           <label class="near-radius-floater__label" for="near-radius-slider">Radio</label>
           <span id="near-radius-value" class="near-radius-floater__value">100 km</span>
         </div>
         <div class="near-radius-floater__slider-row">
           <span class="near-radius-floater__ticks" aria-hidden="true">20</span>
-          <input type="range" id="near-radius-slider" class="near-radius-floater__slider" min="20" max="100" step="1" value="100" aria-valuemin="20" aria-valuemax="100" aria-valuenow="100" aria-label="Distancia máxima desde la referencia (ubicación o repetidora elegida), en kilómetros">
+          <input type="range" id="near-radius-slider" class="near-radius-floater__slider" min="20" max="100" step="1" value="100" aria-valuemin="20" aria-valuemax="100" aria-valuenow="100" aria-label="Distancia máxima desde la referencia (ubicación o estación elegida), en kilómetros">
           <span class="near-radius-floater__ticks" aria-hidden="true">100</span>
         </div>
       </div>
@@ -282,7 +284,7 @@
   <!-- ROUTE PANEL -->
   <div id="route-panel" class="route-panel" hidden aria-hidden="true" aria-label="Planificador de ruta">
     <div class="route-panel__header">
-      <h2 class="route-panel__title"><span class="material-symbols-outlined" aria-hidden="true">route</span> Repetidores en ruta</h2>
+      <h2 class="route-panel__title"><span class="material-symbols-outlined" aria-hidden="true">route</span> Estaciones en ruta</h2>
       <button type="button" id="btn-route-panel-close" class="route-panel__close" aria-label="Cerrar planificador de ruta"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
     </div>
     <div class="route-panel__body">
@@ -305,7 +307,7 @@
         <label class="route-label" for="route-corridor">Corredor <span id="route-corridor-value" class="route-corridor-value">30 km</span></label>
         <input type="range" id="route-corridor" class="route-corridor-slider" min="5" max="80" step="5" value="30"
           aria-valuemin="5" aria-valuemax="80" aria-valuenow="30"
-          aria-label="Distancia máxima desde la ruta para incluir repetidoras">
+          aria-label="Distancia máxima desde la ruta para incluir estaciones">
       </div>
       <div class="route-actions">
         <button type="button" id="btn-route-calculate" class="route-btn route-btn--primary">Calcular ruta</button>

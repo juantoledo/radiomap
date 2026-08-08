@@ -53,7 +53,7 @@ def ordered_region_colors(region_colors: dict) -> dict:
 NUMERIC_KEYS = ("lat", "lon")
 
 # Servicios / iconos especiales (CSV `serviceType`); vacío = repetidor genérico
-SERVICE_TYPE_ALLOWED = frozenset({"atc", "fire", "ambulance", "sea"})
+SERVICE_TYPE_ALLOWED = frozenset({"atc", "fire", "ambulance", "sea", "broadcast"})
 
 
 def normalize_signal_field(d: dict) -> None:

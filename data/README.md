@@ -68,7 +68,7 @@ Los `README.md` dentro de cada carpeta de señal documentan corridas concretas (
 | `isEcholink` | `1`, `true` o `yes` = nodo Echolink; vacío u otro = no. |
 | `conference` | Nombre de la **conferencia o red** (Echolink, DMR u otro): ej. `Red Chile`, `RCDR`, `SUR`, `Zona DMR CL`. Vacío si no aplica. |
 | `isDMR` | `1`, `true` o `yes` = estación / repetidor DMR; vacío u otro = no. |
-| `serviceType` | Servicio / icono especial en mapa y lista: `atc` (ATC / aeronáutico), `fire` (bomberos), `ambulance` (ambulancia / emergencia médica), `sea` (marítimo / costa). **Un valor como máximo**; vacío = repetidor genérico. En `data.js` se deriva `isAir === true` cuando `serviceType` es `atc` (compatibilidad con propagación y filtros). |
+| `serviceType` | Servicio / icono especial en mapa y lista: `atc` (ATC / aeronáutico), `fire` (bomberos), `ambulance` (ambulancia / emergencia médica), `sea` (marítimo / costa), `broadcast` (radiodifusión AM/FM). **Un valor como máximo**; vacío = repetidor genérico. En `data.js` se deriva `isAir === true` cuando `serviceType` es `atc` (compatibilidad con propagación y filtros). Las estaciones `broadcast` se excluyen de toda exportación (CSV genérico y formatos de radio) — ver `scripts/export-csv.js` y `scripts/exporter/`. |
 | `color` | Código o etiqueta de **color** (CC) DMR. Vacío si no aplica. Varios valores: **separar con espacio** (ej. `1`). |
 | `slot` | **Slot** de tiempo DMR. Varios slots: **solo espacios** (ej. `1 2`), sin «y». |
 | `tg` | **Talkgroups** DMR. Varios TG: **solo espacios** (ej. `730 7300444 7301`), sin guiones. Sin filtro dedicado en la app. |

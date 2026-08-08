@@ -7,6 +7,29 @@ const NEAR_ME_RADIUS_MAX_KM = 100;
 const NEAR_ME_RADIUS_DEFAULT_KM = 100;
 const NEAR_ME_RADIUS_STORAGE_KEY = 'ra-nearme-radius-km';
 
+/** Master show/hide switch for serviceType=broadcast (AM/FM) stations; off by default, transversal across map/list via sessionStorage. */
+const BROADCAST_VISIBLE_STORAGE_KEY = 'ra-broadcast-visible';
+
+function readBroadcastVisibleFromStorage() {
+  try {
+    return sessionStorage.getItem(BROADCAST_VISIBLE_STORAGE_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+}
+
+var broadcastVisible = readBroadcastVisibleFromStorage();
+
+function isBroadcastVisible() {
+  return broadcastVisible;
+}
+
+function syncBroadcastToggleButton() {
+  var btn = document.getElementById('btn-broadcast-toggle');
+  if (btn) btn.setAttribute('aria-pressed', broadcastVisible ? 'true' : 'false');
+}
+window.syncBroadcastToggleButton = syncBroadcastToggleButton;
+
 function clampNearMeRadiusKm(n) {
   var x = parseInt(n, 10);
   if (isNaN(x)) return NEAR_ME_RADIUS_DEFAULT_KM;
@@ -299,7 +322,7 @@ function setCheckedFilterValues(listId, values) {
 }
 
 /** CSV `serviceType` filters — hide row when no station has that type (e.g. no Bomberos → hide Bomberos). */
-var FILTER_TYPE_SERVICE_IDS = ['atc', 'fire', 'ambulance', 'sea'];
+var FILTER_TYPE_SERVICE_IDS = ['atc', 'fire', 'ambulance', 'sea', 'broadcast'];
 
 /**
  * Hide tipo rows for service icons (ATC, bomberos, ambulancia, marítimo) when no station matches.
@@ -317,19 +340,17 @@ function syncFilterTypeOptionsAvailability() {
           var t = String(r.serviceType || '')
             .trim()
             .toLowerCase();
-          if (t === 'atc' || t === 'fire' || t === 'ambulance' || t === 'sea') return t;
+          if (FILTER_TYPE_SERVICE_IDS.indexOf(t) >= 0) return t;
           return r.isAir ? 'atc' : '';
         };
 
-  var counts = { atc: 0, fire: 0, ambulance: 0, sea: 0 };
+  var counts = {};
+  FILTER_TYPE_SERVICE_IDS.forEach(function (id) { counts[id] = 0; });
 
   for (var i = 0; i < NODES.length; i++) {
     var r = NODES[i];
     var svc = getSvc(r) || '';
-    if (svc === 'atc') counts.atc++;
-    else if (svc === 'fire') counts.fire++;
-    else if (svc === 'ambulance') counts.ambulance++;
-    else if (svc === 'sea') counts.sea++;
+    if (Object.prototype.hasOwnProperty.call(counts, svc)) counts[svc]++;
   }
 
   listEl.querySelectorAll('label.filter-checkbox-row:not(.filter-checkbox-row--all)').forEach(function (label) {
@@ -397,6 +418,7 @@ function buildUnifiedFilterSummaryText() {
         if (v === 'fire') return 'Bomberos';
         if (v === 'ambulance') return 'Ambulancia';
         if (v === 'sea') return 'Marítimo';
+        if (v === 'broadcast') return 'AM/FM Broadcast';
         if (v === 'radioclub') return 'Radioclubes';
       }
       return v;
@@ -455,6 +477,7 @@ function updateFilterMultiselectSummaries() {
     if (v === 'fire') return 'Bomberos';
     if (v === 'ambulance') return 'Ambulancia';
     if (v === 'sea') return 'Marítimo';
+    if (v === 'broadcast') return 'AM/FM Broadcast';
     if (v === 'radioclub') return 'Radioclubes';
     return v;
   });
@@ -498,6 +521,7 @@ function saveFilterState() {
 
 function loadFilterState() {
   try {
+    syncBroadcastToggleButton();
     const params = new URLSearchParams(window.location.search);
     const useUrl = urlHasShareParams();
     const searchEl = document.getElementById('search');
@@ -621,6 +645,8 @@ function getFilterCriteria() {
 }
 
 function nodeMatchesFilterCriteria(r, c, distAnchor) {
+  var svc = typeof getStationServiceType === 'function' ? (getStationServiceType(r) || '') : (r.isAir ? 'atc' : '');
+  if (svc === 'broadcast' && !broadcastVisible) return false;
   if (c.regions && c.regions.length) {
     var okReg = c.regions.some(function (reg) {
       return r.region === reg;
@@ -632,7 +658,6 @@ function nodeMatchesFilterCriteria(r, c, distAnchor) {
     if (!c.bandas.some(function (x) { return x === 'HF' ? b === 'HF' : b.indexOf(x) >= 0; })) return false;
   }
   if (c.types && c.types.length) {
-    var svc = typeof getStationServiceType === 'function' ? (getStationServiceType(r) || '') : (r.isAir ? 'atc' : '');
     var okType = c.types.some(function (t) {
       if (t === 'echolink') return !!r.isEcholink;
       if (t === 'dmr') return !!r.isDMR;
@@ -640,6 +665,7 @@ function nodeMatchesFilterCriteria(r, c, distAnchor) {
       if (t === 'fire') return svc === 'fire';
       if (t === 'ambulance') return svc === 'ambulance';
       if (t === 'sea') return svc === 'sea';
+      if (t === 'broadcast') return svc === 'broadcast';
       if (t === 'radioclub') return !r.isEcholink && !r.isDMR && !svc;
       return false;
     });
@@ -734,12 +760,12 @@ function buildGuidedEmptyStateHtml() {
   var hints = [];
   if (f.hasSearch) hints.push('Borra o acorta el texto en el campo de búsqueda.');
   if (f.hasFilters) hints.push('Relaja los filtros: banda, región, tipo (Echolink / DMR / radioclub) o conferencia.');
-  if (f.hasNear) hints.push('Desactiva el filtro por distancia (ubicación o repetidora de referencia), o amplía el radio (hasta ' + NEAR_ME_RADIUS_MAX_KM + ' km).');
+  if (f.hasNear) hints.push('Desactiva el filtro por distancia (ubicación o estación de referencia), o amplía el radio (hasta ' + NEAR_ME_RADIUS_MAX_KM + ' km).');
   if (hints.length === 0) hints.push('Amplía la búsqueda o quita filtros.');
   var items = hints.map(function (h) { return '<li>' + h + '</li>'; }).join('');
   return '<div class="no-results no-results--guided" role="status">' +
     '<p class="no-results-title">Sin resultados</p>' +
-    '<p class="no-results-lead">Ninguna repetidora coincide con estos criterios.</p>' +
+    '<p class="no-results-lead">Ninguna estación coincide con estos criterios.</p>' +
     '<ul class="no-results-list">' + items + '</ul>' +
     '<button type="button" class="btn-clear-filters no-results-cta" onclick="clearAllFilters()">' +
     '<span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span> Limpiar filtros</button>' +
@@ -757,10 +783,22 @@ function onFilterCheckboxChange(ev) {
   syncCheckboxGroup(list, input);
   updateFilterMultiselectSummaries();
   saveFilterState();
-  if (typeof window.applyFilters === 'function') window.applyFilters();
+  if (typeof window.applyFilters === 'function') window.applyFilters({ skipFitBounds: true });
   if (typeof window.__radiomapListMultiselectChange === 'function') window.__radiomapListMultiselectChange();
   if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
 }
+
+function toggleBroadcastVisibility() {
+  broadcastVisible = !broadcastVisible;
+  try { sessionStorage.setItem(BROADCAST_VISIBLE_STORAGE_KEY, broadcastVisible ? '1' : '0'); } catch (e) { /* ignore */ }
+  syncBroadcastToggleButton();
+  if (typeof window.applyFilters === 'function') window.applyFilters({ skipFitBounds: true });
+  if (typeof window.__radiomapListMultiselectChange === 'function') window.__radiomapListMultiselectChange();
+  if (typeof window.radiomapGaScheduleFilterApply === 'function') window.radiomapGaScheduleFilterApply();
+}
+
+window.isBroadcastVisible = isBroadcastVisible;
+window.toggleBroadcastVisibility = toggleBroadcastVisibility;
 
 function onDocumentClickCloseDropdowns(ev) {
   if (!ev.target.closest) return;
