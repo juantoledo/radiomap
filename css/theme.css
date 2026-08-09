@@ -1023,6 +1023,11 @@ html[data-theme="light"] .map-filter-sheet-panel__clear:hover {
   font-size: var(--fs-xs) !important;
 }
 .leaflet-control-attribution a { color: var(--text-dim) !important; }
+.leaflet-control-scale-line {
+  background: rgba(8,12,20,0.7) !important;
+  color: var(--text-dim) !important;
+  border-color: var(--border) !important;
+}
 
 /* Leyenda dBm (propagación .dcf) — flotante, centro vertical, borde izquierdo del mapa */
 #propagation-legend-host.propagation-legend-float {
@@ -3522,6 +3527,11 @@ html[data-theme="light"] .leaflet-control-attribution {
   color: var(--text-dim) !important;
 }
 html[data-theme="light"] .leaflet-control-attribution a { color: var(--accent) !important; }
+html[data-theme="light"] .leaflet-control-scale-line {
+  background: rgba(255,255,255,0.9) !important;
+  color: var(--text-dim) !important;
+  border-color: var(--border) !important;
+}
 html[data-theme="light"] .leaflet-tooltip.rpt-tooltip,
 html[data-theme="light"] .rpt-tooltip { border-color: var(--border) !important; }
 html[data-theme="light"] #legend {

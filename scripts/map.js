@@ -48,14 +48,21 @@
     r._neighbors.sort((a,b)=>a.dist-b.dist);
   });
 
+  /** Chile continental + Isla de Pascua + Juan Fernández — mismos límites que CHILE_BBOX en route-planner.js. */
+  const MAP_MAX_BOUNDS = L.latLngBounds([-56.0, -110.0], [-17.0, -65.5]);
+
   const map = L.map('map', {
     center: [-33.5, -70.6],
     zoom: 5,
     zoomControl: false,
     attributionControl: true,
-    renderer: L.canvas(),
+    preferCanvas: true,
+    maxBounds: MAP_MAX_BOUNDS,
+    maxBoundsViscosity: 1.0,
   });
   window.__radiomapLeafletMap = map;
+
+  L.control.scale({ position: 'bottomleft', metric: true, imperial: false, maxWidth: 120 }).addTo(map);
 
   const tileOpts = {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -71,6 +78,11 @@
       tileOpts
     ).addTo(map);
   }
+
+  /** Panes explícitos (por debajo de markerPane=600) para el orden propagación → círculos → anillo «cerca de mí», antes implícito en el orden de creación de estos layerGroups. */
+  map.createPane('radiomapPropagationPane').style.zIndex = 410;
+  map.createPane('radiomapCirclePane').style.zIndex = 420;
+  map.createPane('radiomapNearRadiusPane').style.zIndex = 430;
 
   /** Raster de propagación (sobre teselas, bajo círculos y marcadores). */
   const propagationLayerGroup = L.layerGroup().addTo(map);
@@ -247,6 +259,7 @@
       fillOpacity: 1,
       interactive: false,
       bubblingMouseEvents: false,
+      pane: 'radiomapNearRadiusPane',
     }).addTo(nearRadiusFilterLayer);
   }
 
@@ -438,6 +451,7 @@
           color: 'rgba('+rgb+','+strokeOp+')',
           fillColor: 'rgba('+rgb+','+fillOp+')',
           fillOpacity: 1, weight: weight, dashArray: dashArr, interactive: false,
+          pane: 'radiomapCirclePane',
         });
         circle.addTo(circleLayer);
       }
@@ -1183,7 +1197,7 @@
     propagationToggleOn = true;
     propagationActiveSignal = r.signal;
     if (btn) btn.disabled = true;
-    rp.showPropagationOverlay(propagationLayerGroup, r.signal, { opacity: 0.45 })
+    rp.showPropagationOverlay(propagationLayerGroup, r.signal, { opacity: 0.45, pane: 'radiomapPropagationPane' })
       .then(function () {
         if (btn) {
           btn.setAttribute('aria-pressed', 'true');
@@ -1230,7 +1244,7 @@
       btn.disabled = true;
       propagationToggleOn = true;
       propagationActiveSignal = r.signal;
-      rp.showPropagationOverlay(propagationLayerGroup, r.signal, { opacity: 0.45 })
+      rp.showPropagationOverlay(propagationLayerGroup, r.signal, { opacity: 0.45, pane: 'radiomapPropagationPane' })
         .then(function () {
           btn.setAttribute('aria-pressed', 'true');
           btn.classList.add('is-pressed');

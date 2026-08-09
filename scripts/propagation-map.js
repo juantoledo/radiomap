@@ -205,7 +205,7 @@
   /**
    * @param {L.LayerGroup} layerGroup
    * @param {string} signal
-   * @param {{ opacity?: number }} [options]
+   * @param {{ opacity?: number, pane?: string }} [options]
    * @returns {Promise<void>}
    */
   function showPropagationOverlay(layerGroup, signal, options) {
@@ -227,10 +227,9 @@
       })
       .then(function (o) {
         var bounds = latLngBoundsFromWorldFile(o.wf, o.dim.w, o.dim.h);
-        L.imageOverlay(pngUrl, bounds, {
-          opacity: opacity,
-          interactive: false,
-        }).addTo(layerGroup);
+        var imgOpts = { opacity: opacity, interactive: false };
+        if (options.pane) imgOpts.pane = options.pane;
+        L.imageOverlay(pngUrl, bounds, imgOpts).addTo(layerGroup);
       });
   }
 
