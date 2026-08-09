@@ -53,6 +53,7 @@
     zoom: 5,
     zoomControl: false,
     attributionControl: true,
+    renderer: L.canvas(),
   });
   window.__radiomapLeafletMap = map;
 
@@ -413,7 +414,7 @@
 
     NODES.forEach(r=>{
       if (r.lat == null || r.lon == null) return;
-      const visible = visibleSet.has(r._idx);
+      if (!visibleSet.has(r._idx)) return;
       const confTrim = (r.conference || '').trim();
       let color = REGION_COLORS[r.region] || '#5e35b1';
       let rgb = hexToRgb(color);
@@ -438,7 +439,7 @@
           fillColor: 'rgba('+rgb+','+fillOp+')',
           fillOpacity: 1, weight: weight, dashArray: dashArr, interactive: false,
         });
-        if(visible) circle.addTo(circleLayer);
+        circle.addTo(circleLayer);
       }
 
       if(currentMode === 'markers' || currentMode === 'both'){
@@ -495,7 +496,7 @@
           sigLead + escapeHtml(r.signal) + (fieldShown(club) ? '<br><span class="rpt-tooltip-club">' + escapeHtml(club) + '</span>' : '') +
           locLine + freqLine + echolinkLine + dmrLine + userLine + '</div>';
         marker.bindTooltip(tooltipHtml, { permanent: false, direction: 'top', opacity: 1, className: 'rpt-tooltip' });
-        if(visible) marker.addTo(markerLayer);
+        marker.addTo(markerLayer);
       } else {
         const icon = L.divIcon({
           className: '',
@@ -504,7 +505,7 @@
         });
         const clickTarget = L.marker([mLat, mLon], { icon, opacity: 0 });
         clickTarget.on('click', ()=>selectRepeater(r._idx, 'map_marker'));
-        if(visible) clickTarget.addTo(markerLayer);
+        clickTarget.addTo(markerLayer);
       }
     });
     updateMapEmptyOverlay();
