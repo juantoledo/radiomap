@@ -55,7 +55,7 @@ Shared URL / filtros / "cerca de mí" / export: [`scripts/share-view.js`](script
 
 ## GA4 analytics
 
-Measurement ID is in [`index.html`](index.html) / [`lista.html`](lista.html). Custom events are sent from [`scripts/analytics.js`](scripts/analytics.js).
+Measurement ID is in [`index.html`](index.html) / [`lista.html`](lista.html) / [`propagacion.html`](propagacion.html) / [`estadisticas.html`](estadisticas.html). Custom events are sent from [`scripts/analytics.js`](scripts/analytics.js). `page_type` is derived from the `<body>` class: `page-map`→`map`, `page-list`→`list`, `page-propagacion`→`propagacion`, `page-stats`→`stats`, anything else→`other`.
 
 **Reports to pin or bookmark** (built-in dimensions, no code): Page path and query string, engagement rate, average engagement time, session default channel group, country/region, device category.
 
@@ -67,7 +67,14 @@ Measurement ID is in [`index.html`](index.html) / [`lista.html`](lista.html). Cu
 | `radiomap_filter_apply` | `page_type`, `filter_mode`, `conference` |
 | `radiomap_share` | `page_type`, `share_method` |
 | `radiomap_csv_download` | `page_type` |
+| `radiomap_exporter_download` | `page_type`, `exporter` |
 | `radiomap_support_click` | `page_type`, `source` |
+| `radiomap_propagation_toggle` | `page_type`, `state`, `signal` |
+| `radiomap_geolocation_error` | `page_type`, `error_code` |
+
+`radiomap_station_select`'s `interaction` uses a fixed set of values — reuse one of these rather than inventing a new one: `select` (default), `map_marker`, `list_row` (default on lista), `list_nav`, `neighbor`, `near_me`, `url_signal`.
+
+`radiomap_propagation_toggle`'s `state` is `on`/`off`; `signal` is only present when `state` is `on`. `radiomap_geolocation_error`'s `error_code` is `denied`, `unavailable`, `timeout`, or `unknown`.
 
 **Key events (conversions)** — mark in GA4 only for the events you care about (e.g. `radiomap_station_select`, `radiomap_share`); avoid marking every micro-event.
 

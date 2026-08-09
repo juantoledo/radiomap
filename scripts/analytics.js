@@ -6,6 +6,8 @@
   function pageType() {
     if (document.body && document.body.classList.contains('page-list')) return 'list';
     if (document.body && document.body.classList.contains('page-map')) return 'map';
+    if (document.body && document.body.classList.contains('page-propagacion')) return 'propagacion';
+    if (document.body && document.body.classList.contains('page-stats')) return 'stats';
     return 'other';
   }
 
@@ -75,6 +77,17 @@
   window.radiomapGaSupportClick = function (source) {
     gaSend('radiomap_support_click', {
       source: source || 'unknown'
+    });
+  };
+  window.radiomapGaPropagationToggle = function (state, signal) {
+    gaSend('radiomap_propagation_toggle', {
+      state: state === 'on' ? 'on' : 'off',
+      signal: state === 'on' && signal ? String(signal).slice(0, 32) : undefined
+    });
+  };
+  window.radiomapGaGeolocationError = function (errorCode) {
+    gaSend('radiomap_geolocation_error', {
+      error_code: errorCode || 'unknown'
     });
   };
 })();

@@ -121,6 +121,7 @@
   }
 
   function resetPropagationSidebar() {
+    var wasOn = propagationToggleOn;
     propagationToggleOn = false;
     propagationActiveSignal = null;
     var propWrap = document.getElementById('propagation-actions-wrap');
@@ -135,6 +136,7 @@
       window.radiomapPropagation.clearPropagationOverlay(propagationLayerGroup);
     }
     removePropagationLegend();
+    if (wasOn && typeof window.radiomapGaPropagationToggle === 'function') window.radiomapGaPropagationToggle('off');
   }
 
   /** Nodo usado para el botón Propagación (panel abierto o propagación activa con panel cerrado). */
@@ -1210,6 +1212,7 @@
         closeMenuMap();
         if (rDone) syncPropagationSidebarUI(rDone);
         syncRadiomapMapUiToUrl();
+        if (typeof window.radiomapGaPropagationToggle === 'function') window.radiomapGaPropagationToggle('on', propagationActiveSignal);
       })
       .catch(function (err) {
         console.error(err);
@@ -1239,6 +1242,7 @@
         btn.classList.remove('is-pressed');
         syncPropagationSidebarUI(nodeForPropagationControl());
         syncRadiomapMapUiToUrl();
+        if (typeof window.radiomapGaPropagationToggle === 'function') window.radiomapGaPropagationToggle('off');
         return;
       }
       btn.disabled = true;
@@ -1254,6 +1258,7 @@
           closeMenuMap();
           if (rDone) syncPropagationSidebarUI(rDone);
           syncRadiomapMapUiToUrl();
+          if (typeof window.radiomapGaPropagationToggle === 'function') window.radiomapGaPropagationToggle('on', propagationActiveSignal);
         })
         .catch(function (err) {
           console.error(err);

@@ -279,7 +279,11 @@ function requestNearMeLocation(onSuccess, onError) {
       setNearMeLocation(lat, lon);
       if (onSuccess) onSuccess(lat, lon);
     },
-    function () {
+    function (err) {
+      if (typeof window.radiomapGaGeolocationError === 'function') {
+        const codes = { 1: 'denied', 2: 'unavailable', 3: 'timeout' };
+        window.radiomapGaGeolocationError(codes[err && err.code] || 'unknown');
+      }
       if (onError) onError();
     },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
