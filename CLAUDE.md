@@ -17,7 +17,7 @@ Scopes: `scripts/*.js`, `data/*`, `css/theme.css`, `*.html`, `.github/workflows/
 ## Stack and layout
 
 - **Static site**: no app bundler. Entry pages are [`index.html`](index.html) (mapa) and [`lista.html`](lista.html) (lista).
-- **Map**: Leaflet from CDN; global `NODES` and related constants come from [`data/data.js`](data/data.js).
+- **Map**: Leaflet from CDN; global `NODES` and related constants come from [`data/data.js`](data/data.js). Basemap tiles are CARTO raster tiles (`basemaps.cartocdn.com`), which require an API key — the `CARTO_API_KEY` constant near the top of [`scripts/map.js`](scripts/map.js) (free key from https://carto.com/basemaps/apikey/, fair-use ~5M tiles/month). Keep it when editing that block.
 - **Cache bust**: script/link tags use `?v=__VERSION__`; GitHub Actions replaces `__VERSION__` on deploy.
 - **Local dev**: serve over HTTP (e.g. `./scripts/serve.sh 8080`) — not `file://` — so theme and storage behave correctly.
 

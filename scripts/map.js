@@ -64,17 +64,19 @@
 
   L.control.scale({ position: 'bottomleft', metric: true, imperial: false, maxWidth: 120 }).addTo(map);
 
+  /** Free CARTO Basemaps key (fair-use ~5M tiles/month), required by basemaps.cartocdn.com raster tiles — see https://carto.com/basemaps/apikey/. */
+  const CARTO_API_KEY = 'cb1_2e5t_1_0d278fbfe1a5c0d6b6afbcc2';
   const tileOpts = {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
   };
-  let currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', tileOpts).addTo(map);
+  let currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=' + CARTO_API_KEY, tileOpts).addTo(map);
 
   function setMapTiles(theme) {
     map.removeLayer(currentTileLayer);
     currentTileLayer = L.tileLayer(
-      theme === 'light' ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      (theme === 'light' ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png') + '?key=' + CARTO_API_KEY,
       tileOpts
     ).addTo(map);
   }
