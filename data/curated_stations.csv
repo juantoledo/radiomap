@@ -476,6 +476,7 @@ CA3NEB-L,Red Echolink Zello - Las Condes,Las Condes,,-33.4166667,-70.5833333,,,U
 CD4PQW-L,Red Echolink Zello - Rancagua,Rancagua,,-34.1749722222,-70.7455361111,,,VHF/FM,145.530,145.530,,REGIÓN DEL LIBERTADOR GENERAL BERNARDO O'HIGGINS,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro vhf simplex
 CE4NBE-L,Red Echolink Zello - Curicó,Curicó,,-34.9828,-71.2394,,,VHF/FM,146.500,146.500,,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro vhf simplex
 CE4NBE-R,Red Echolink Zello - Curicó,Curicó,,-34.9828,-71.2394,,,UHF/FM,432.500,432.500,77.0,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro uhf
+CD3CIN-L,Red Echolink Zello - Ñuñoa,Ñuñoa,,-33.4333,-70.6166,,,VHF/FM,146.740,146.740,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
 
 CE3AAA-HF,Red de Emergencia de Radioaficionados Defensa Civil de Chile,,,,,,,HF,7.095,7.095,,GLOBAL,,,,,,,,,,https://www.defensacivil.cl,7.095 MHz,emergencia hf simplex
 CE3AAA-VHF,Red de Emergencia de Radioaficionados Defensa Civil de Chile,,,,,,,VHF/FM,147.320,147.320,,GLOBAL,,,,,,,,,,https://www.defensacivil.cl,147.320 MHz,emergencia vhf simplex
