@@ -47,5 +47,8 @@ Correcciones de datos o pull requests:
 
 ## Licencia
 
-Datos de uso libre con atribución. Código bajo MIT.  
+Código y datos bajo [Creative Commons Atribución-NoComercial-CompartirIgual 4.0 (CC BY-NC-SA 4.0)](LICENSE) ([resumen en español](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es)).
+
+Uso, copia y modificación libres con atribución, siempre que no sea con fines comerciales; las versiones derivadas deben compartirse bajo la misma licencia. Para uso comercial, solicita permiso previo: 📧 [cd3dxz@gmail.com](mailto:cd3dxz@gmail.com).
+
 Desarrollado por [CD3DXZ](https://cd3dxz.radio).

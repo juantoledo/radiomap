@@ -19,6 +19,10 @@ Los datos parten de **registros públicos de regulación** del espectro en Chile
 
 Adicionalmente, el workflow [`sync-node-sources.yml`](../.github/workflows/sync-node-sources.yml) corre a diario (y manualmente vía `workflow_dispatch`): por cada `name,url` listado en [`.github/sync-sources.csv`](../.github/sync-sources.csv) (ej. Red Chile, RCDR), renderiza esa URL, usa Claude ([`anthropics/claude-code-action`](https://github.com/anthropics/claude-code-action), prompt en [`.github/prompts/sync-node-sources.md`](../.github/prompts/sync-node-sources.md)) para proponer altas/cambios en las filas de esa red (matching por `nombre`/`conference`), valida la estructura con `scripts/ci/validate-csv.py`, y abre un único **pull request** combinado (nunca hace push directo a `main`). Todo cambio propuesto por el bot requiere revisión humana antes de mergear. **Para agregar una fuente nueva, basta con agregar una fila a `.github/sync-sources.csv`.** Requiere el secret `ANTHROPIC_API_KEY`; el paso pasa `github_token` explícitamente para que `claude-code-action` use el token del propio workflow en vez de requerir la Claude Code GitHub App instalada en el repo.
 
+### Licencia de los datos
+
+Los hechos base (indicativos, frecuencias, coordenadas de registro) provienen de registros públicos de la SUBTEL y no son propiedad de este proyecto. La **compilación curada y enriquecida** en `curated_stations.csv` (correcciones, notas, campos DMR/Echolink, datos de propagación, etc.) está cubierta por la licencia del repositorio — ver [`LICENSE`](../LICENSE) en la raíz (CC BY-NC-SA 4.0: uso libre con atribución, sin fines comerciales sin permiso previo).
+
 ---
 
 ## Pipeline
