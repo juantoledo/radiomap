@@ -1,5 +1,12 @@
 # Radiomap
 
+[![Deploy](https://github.com/juantoledo/radiomap/actions/workflows/deploy.yml/badge.svg)](https://github.com/juantoledo/radiomap/actions/workflows/deploy.yml)
+[![Version](https://img.shields.io/github/v/tag/juantoledo/radiomap?label=version&sort=semver)](https://github.com/juantoledo/radiomap/tags)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE)
+[![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?logo=leaflet&logoColor=white)](https://leafletjs.com/)
+[![Python](https://img.shields.io/badge/data%20pipeline-Python-3776AB?logo=python&logoColor=white)](scripts/csv-to-datajs.py)
+[![GitHub Pages](https://img.shields.io/badge/hosted-GitHub%20Pages-222?logo=githubpages&logoColor=white)](https://www.radiomap.cl/)
+
 Mapa interactivo de repetidoras, Echolink y DMR en Chile.  
 Sitio estático — sin framework, sin bundler. Leaflet + vanilla JS.
 
