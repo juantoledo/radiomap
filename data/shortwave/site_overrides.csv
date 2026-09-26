@@ -1,0 +1,4 @@
+# Correcciones manuales de sitios de transmisión (prioridad sobre README.TXT de EiBi).
+# itu = país del transmisor (código EiBi/ITU); code = código de sitio EiBi (vacío = sitio por defecto del país).
+# Las líneas que empiezan con # se ignoran.
+itu,code,lat,lon,name,note

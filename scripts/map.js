@@ -48,17 +48,12 @@
     r._neighbors.sort((a,b)=>a.dist-b.dist);
   });
 
-  /** Chile continental + Isla de Pascua + Juan Fernández — mismos límites que CHILE_BBOX en route-planner.js. */
-  const MAP_MAX_BOUNDS = L.latLngBounds([-56.0, -110.0], [-17.0, -65.5]);
-
   const map = L.map('map', {
     center: [-33.5, -70.6],
     zoom: 5,
     zoomControl: false,
     attributionControl: true,
     preferCanvas: true,
-    maxBounds: MAP_MAX_BOUNDS,
-    maxBoundsViscosity: 1.0,
   });
   window.__radiomapLeafletMap = map;
 

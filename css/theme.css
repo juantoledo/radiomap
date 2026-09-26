@@ -4007,7 +4007,8 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   .location-btn--controls,
   .route-toggle-btn,
   .global-toggle-btn,
-  .broadcast-toggle-btn {
+  .broadcast-toggle-btn,
+  .shortwave-toggle-btn {
     width: 36px;
     height: 36px;
     min-width: 36px;
@@ -4016,7 +4017,8 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
   .location-btn--controls .material-symbols-outlined,
   .route-toggle-btn .material-symbols-outlined,
   .global-toggle-btn .material-symbols-outlined,
-  .broadcast-toggle-btn .material-symbols-outlined { font-size: 20px; }
+  .broadcast-toggle-btn .material-symbols-outlined,
+  .shortwave-toggle-btn .material-symbols-outlined { font-size: 20px; }
   .controls .btn-clear-filters { grid-column: 1 / -1; justify-self: center; margin-left: 0; }
   .controls .controls-footer-row {
     grid-column: 1 / -1;
@@ -5155,7 +5157,9 @@ html[data-theme="light"] .global-toggle-btn[aria-pressed="true"] {
   .global-toggle-btn[aria-pressed="true"],
   .route-toggle-btn[aria-pressed="true"] .material-symbols-outlined,
   .broadcast-toggle-btn[aria-pressed="true"] .material-symbols-outlined,
-  .global-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
+  .global-toggle-btn[aria-pressed="true"] .material-symbols-outlined,
+  .shortwave-toggle-btn[aria-pressed="true"],
+  .shortwave-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
     animation: none;
   }
 }
@@ -6577,3 +6581,188 @@ html[data-theme="light"] .export-pending-bar__close:hover { background: rgba(0,0
 }
 /* Map page: fixed footer is ~31–49px tall; push snackbar above it */
 body.page-map .export-pending-bar { bottom: 60px; }
+
+/* ── Onda corta (EiBi) — botón, marcadores por sitio, panel flotante y popup ─────────── */
+.shortwave-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 107, 53, 0.12);
+  border: 1px solid rgba(255, 107, 53, 0.45);
+  border-radius: 8px;
+  color: var(--accent2);
+  cursor: pointer;
+  font-size: 22px;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  align-self: center;
+}
+.shortwave-toggle-btn:hover {
+  background: rgba(255, 107, 53, 0.22);
+  border-color: var(--accent2);
+}
+.shortwave-toggle-btn:disabled {
+  opacity: 0.45;
+  cursor: progress;
+}
+.shortwave-toggle-btn[aria-pressed="true"] {
+  animation: radiomap-prop-border-spin 1.35s linear infinite;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #ff6b35, rgba(255, 107, 53, 0.15), #ff6b35) border-box;
+  color: #ffd2c0;
+  box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.45);
+}
+.shortwave-toggle-btn[aria-pressed="true"] .material-symbols-outlined {
+  animation: radiomap-toggle-icon-heartbeat 1.2s ease-in-out infinite;
+}
+html[data-theme="light"] .shortwave-toggle-btn {
+  background: rgba(216, 67, 21, 0.10);
+  border-color: rgba(216, 67, 21, 0.50);
+  color: #bf360c;
+}
+html[data-theme="light"] .shortwave-toggle-btn:hover {
+  background: rgba(216, 67, 21, 0.18);
+  border-color: #bf360c;
+}
+html[data-theme="light"] .shortwave-toggle-btn[aria-pressed="true"] {
+  background:
+    linear-gradient(var(--surface2), var(--surface2)) padding-box,
+    conic-gradient(from var(--prop-rainbow-angle), #d84315, rgba(216, 67, 21, 0.15), #d84315) border-box;
+  color: #bf360c;
+}
+
+.sw-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.85);
+  border: 2px solid #fff3ee;
+  color: #1a0a04;
+  font: 700 11px/1 var(--font-sans);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.25), 0 1px 4px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+.sw-marker--approx {
+  background: rgba(255, 107, 53, 0.45);
+  border-style: dashed;
+  color: #fff3ee;
+}
+html[data-theme="light"] .sw-marker { border-color: #fff; }
+html[data-theme="light"] .sw-marker--approx { color: #3e1204; }
+
+#shortwave-panel-host.sw-panel {
+  /* Abajo a la derecha: arriba flotan los controles del mapa y a la izquierda la leyenda de propagación / escala. */
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right, 0px));
+  bottom: 28px;
+  z-index: 650;
+  width: min(290px, calc(100% - 20px));
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent2);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font-size: var(--fs-xxs);
+}
+#shortwave-panel-host.sw-panel[hidden] { display: none !important; }
+.sw-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-bright);
+  font-size: var(--fs-xs);
+}
+.sw-panel__head .material-symbols-outlined { color: var(--accent2); font-size: 20px; }
+.sw-panel__head strong { flex: 1; }
+.sw-panel__close {
+  display: flex;
+  background: none;
+  border: none;
+  padding: 2px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.sw-panel__close:hover { color: var(--text-bright); }
+.sw-panel__close .material-symbols-outlined { color: inherit; font-size: 18px; }
+.sw-panel__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  margin: 6px 0;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.sw-panel__clock { font-family: var(--font-mono); font-weight: 400; color: var(--text-dim); }
+.sw-panel__chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.sw-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.sw-chip:hover { border-color: var(--accent2); }
+.sw-chip[aria-pressed="true"] {
+  border-color: var(--accent2);
+  background: rgba(255, 107, 53, 0.18);
+  color: var(--text-bright);
+}
+.sw-panel__lang {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--text-dim);
+}
+.sw-panel__lang select {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text);
+  font: inherit;
+}
+.sw-panel__lang select:focus { outline: 2px solid var(--accent2); outline-offset: 1px; }
+.sw-panel__note, .sw-panel__attr { margin: 8px 0 0; color: var(--text-dim); line-height: 1.35; }
+.sw-panel__attr { margin-top: 4px; }
+.sw-panel__attr a { color: var(--accent); }
+
+#map .sw-popup .leaflet-popup-content-wrapper,
+#map .sw-popup .leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+#map .sw-popup .leaflet-popup-content { margin: 10px 12px; font-family: var(--font-sans); font-size: var(--fs-xxs); }
+#map .sw-popup a.leaflet-popup-close-button { color: var(--text-dim); }
+.sw-popup__head { color: var(--text-bright); font-size: var(--fs-xs); padding-right: 14px; }
+.sw-popup__country { color: var(--text-dim); font-weight: 400; }
+.sw-popup__note { color: var(--text-dim); margin: 4px 0; }
+.sw-popup__list { list-style: none; margin: 6px 0 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.sw-popup__item { padding: 5px 0; border-top: 1px solid var(--border); }
+.sw-popup__khz { font-family: var(--font-mono); font-weight: 700; color: var(--accent2); }
+.sw-popup__station { font-weight: 600; color: var(--text-bright); }
+.sw-popup__meta, .sw-popup__time { color: var(--text-dim); }
+.sw-popup__time { font-family: var(--font-mono); font-size: 0.7rem; }
+@media (max-width: 768px) {
+  #shortwave-panel-host.sw-panel { right: 6px; left: 6px; bottom: 24px; width: auto; padding: 8px 10px; }
+  .sw-panel__note { display: none; }
+}

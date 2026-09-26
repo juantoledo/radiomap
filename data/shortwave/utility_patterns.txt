@@ -1,0 +1,100 @@
+# Una expresión regular por línea (sin distinguir mayúsculas), comparada contra la columna Station de EiBi.
+# Coincidencia = estación utilitaria (aeronáutica, marítima, meteo, balizas, señales horarias, números…) → se excluye.
+# Las filas con idioma que empieza con «-» (-CW, -HF, -TS, -TY) o P >= 90 ya se excluyen sin necesidad de patrón.
+# Aeronáuticas
+Volmet
+Aeradio
+HFDL
+San Francisco R(adio|\.)
+New York Radio
+Gander Radio
+Iceland Radio
+Santa Maria Radio
+Piarco Radio
+Bodo Radio
+(Tokyo|Naha|Mumbai|Kolkata|Delhi|Chennai|Colombo|Auckland|Brisbane|Nadi|Tahiti|Dakar|Mogadishu) Radio
+Seychelles Control
+Trenton (Volmet|Military)
+# Militares / gubernamentales
+\bNavy\b
+Air Force
+AF Transport
+US Navy
+Israeli Navy
+Search and Rescue
+# Marítimas (radios costeras, guardacostas, NAVTEX, facsímil meteorológico)
+Coast ?g(uar)?d
+Coastguard
+USCG
+NAVTEX
+Maritime
+Kystradio
+Meteo
+Met ?Fax
+\bFax\b
+Meterolog
+Weather Bureau
+Mini Atlantique Weather
+CROSS
+Pinneberg
+Romaradio
+Olimpia Radio
+Lyngby Radio
+Stockholm Radio
+Reykjavik Radio
+Valentia Radio
+Oostende Radio
+Varna Radio
+Turk Radio
+Seoul Radio
+(Tianjin|Shanghai|Guangzhou) Radio
+(Valencia|Coru.a|Palma|Arrecife|Las Palmas|Cabo de Gata|Cabo la Nao) Radio
+(Iqaluit|Halifax|Sydney|Prince Rupert) (Radio|Meteo)
+Placentia
+Les Escoumins
+Port aux Basques
+Bermuda Harbor
+Cayman
+(Magellanes|Antofagasta|Valpara.so) Radio
+Puerto Montt R
+Cape Town Radio
+(Ben Thuy|Ca Mau|Can Tho|Da Nang|Hai Phong|Ho Chi Minh City R|Hon Gai|Hue|Kien Giang|Mong Cai|Nha Trang|Phan Rang|Phan Tiet|Phu Yen|Quy Nhon|Vung Tau) Radio
+Ho Chi Minh City R
+Duyen Hai
+Kagoshima
+Itoman
+Rio Vista
+Riverhead Radio
+Mobile Radio
+Seattle
+(Wiluna|Charleville)
+Hopen Island
+Bj.rn.ya
+Stornoway|Shetland|Belfast|Aberdeen|Falmouth|Humber
+Malin Head
+Netherlands Coastgd
+# Balizas, marcadores de canal, interferencia y rarezas
+Channel Marker
+Beacon
+Jammer
+Firedrake
+Squeaky Wheel
+The Buzzer
+The Pip
+Stalingrad clock
+Spy Numbers
+RFID
+Propag\.? ?Studies
+HF Trading
+Teleswitch
+# Señales horarias (por si no traen idioma -TS)
+^(WWV|WWVH|CHU|RWM|BPM|JJY|MSF|DCF77|RBU|BPC|BPL|WWVB)\b
+Time Signal
+ItalCable
+MIKES
+Observatorio Nac
+LOL Buenos Aires
+HLA Taedok
+# Otras militares / datos
+USB/FSK
+Ejercito del Aire

@@ -32,6 +32,10 @@ jobs:
       - name: Build data.js from CSV
         run: python scripts/csv-to-datajs.py
 
+      - name: Build shortwave.js from EiBi (tags that include it)
+        run: |
+          if [ -f scripts/eibi-to-shortwavejs.py ]; then python scripts/eibi-to-shortwavejs.py --strict; fi
+
       - name: Inject cache-busting version into HTML
         run: |
           V=$(grep "const VERSION" data/data.js | sed "s/.*'\([^']*\)'.*/\1/")

@@ -159,6 +159,7 @@
       <button type="button" id="btn-route-toggle" class="route-toggle-btn" aria-pressed="false" aria-label="Estaciones en ruta" title="Planificar ruta y ver estaciones en el camino"><span class="material-symbols-outlined" aria-hidden="true">route</span></button>
       <button type="button" id="btn-global-toggle" onclick="toggleGlobalView()" class="global-toggle-btn" aria-pressed="false" aria-label="Estaciones globales" title="Ver estaciones globales (HF, banda ciudadana, redes nacionales)"><span class="material-symbols-outlined" aria-hidden="true">public</span></button>
       <button type="button" id="btn-broadcast-toggle" onclick="toggleBroadcastVisibility()" class="broadcast-toggle-btn" aria-pressed="false" aria-label="Mostrar estaciones AM/FM" title="Mostrar estaciones de radiodifusión AM/FM"><span class="material-symbols-outlined" aria-hidden="true">radio</span></button>
+      <button type="button" id="btn-shortwave-toggle" class="shortwave-toggle-btn" aria-pressed="false" aria-label="Mostrar emisoras de onda corta al aire" title="Onda corta: emisoras internacionales probablemente al aire ahora (horarios EiBi)"><span class="material-symbols-outlined" aria-hidden="true">settings_input_antenna</span></button>
     </div>
   </div>
   <div id="map-filter-sheet-backdrop" class="map-filter-sheet-backdrop" hidden aria-hidden="true"></div>
@@ -245,6 +246,7 @@
   </div>
   <div id="map"></div>
   <div id="propagation-legend-host" class="propagation-legend-float" hidden aria-live="polite"></div>
+  <div id="shortwave-panel-host" class="sw-panel" hidden aria-live="polite"></div>
   <div id="map-empty-overlay" class="map-empty-overlay" hidden aria-live="polite"></div>
   <div id="global-panel-overlay" class="global-panel-overlay" inert aria-hidden="true">
     <div class="global-panel-overlay__header">
@@ -335,6 +337,8 @@
 
 <script defer src="scripts/map.js?v=__VERSION__"></script>
 <script defer src="scripts/route-planner.js?v=__VERSION__"></script>
+<script defer src="scripts/shortwave-live.js?v=__VERSION__"></script>
+<script defer src="scripts/shortwave-map.js?v=__VERSION__"></script>
 
 <dialog id="export-dialog" aria-labelledby="export-dialog-title">
   <div class="export-dialog__inner">

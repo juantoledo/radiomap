@@ -501,7 +501,7 @@ function parseMultiParam(params, key) {
 
 function urlHasShareParams() {
   const params = new URLSearchParams(window.location.search);
-  const keys = ['search', 'banda', 'region', 'echolink', 'echolinkConference', 'type', 'conference', 'near', 'nearRadius', 'mlat', 'mlon', 'zoom', 'mode', 'signal', 'sb', 'prop', 'nosb'];
+  const keys = ['search', 'banda', 'region', 'echolink', 'echolinkConference', 'type', 'conference', 'near', 'nearRadius', 'mlat', 'mlon', 'zoom', 'mode', 'signal', 'sb', 'prop', 'nosb', 'sw'];
   return keys.some(function (k) { return params.has(k); });
 }
 

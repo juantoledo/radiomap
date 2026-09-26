@@ -85,6 +85,11 @@
       signal: state === 'on' && signal ? String(signal).slice(0, 32) : undefined
     });
   };
+  window.radiomapGaShortwaveToggle = function (state) {
+    gaSend('radiomap_shortwave_toggle', {
+      state: state === 'on' ? 'on' : 'off'
+    });
+  };
   window.radiomapGaGeolocationError = function (errorCode) {
     gaSend('radiomap_geolocation_error', {
       error_code: errorCode || 'unknown'

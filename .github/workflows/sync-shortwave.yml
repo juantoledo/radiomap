@@ -1,0 +1,113 @@
+name: Sync shortwave (EiBi)
+
+# Descarga semanalmente el horario EiBi de la temporada vigente (sked-<a|b><yy>.csv + README.TXT con
+# coordenadas de transmisores) y, si cambió, abre un PR con data/shortwave/source/* y data/shortwave.js
+# regenerado. Nunca hace push a main. eibispace.de se consulta por http: su certificado https está vencido.
+
+on:
+  schedule:
+    - cron: "30 6 * * 1" # lunes 06:30 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-shortwave
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Current EiBi season
+        id: season
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime as dt
+          def last_sunday(y, m):
+              d = dt.date(y + (m == 12), m % 12 + 1, 1) - dt.timedelta(days=1)
+              return d - dt.timedelta(days=(d.weekday() + 1) % 7)
+          t = dt.date.today()
+          if last_sunday(t.year, 3) <= t < last_sunday(t.year, 10):
+              code = f"a{t.year % 100:02d}"
+          elif t >= last_sunday(t.year, 10):
+              code = f"b{t.year % 100:02d}"
+          else:
+              code = f"b{(t.year - 1) % 100:02d}"  # enero–marzo: temporada B iniciada el año anterior
+          print(f"code={code}")
+          PY
+
+      - name: Download EiBi files
+        id: dl
+        run: |
+          mkdir -p /tmp/eibi
+          f="sked-${{ steps.season.outputs.code }}.csv"
+          if ! curl -sS --fail -m 120 -o "/tmp/eibi/$f" "http://www.eibispace.de/dx/$f"; then
+            echo "::notice::$f aún no publicado; se mantiene la temporada actual."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          curl -sS --fail -m 120 -o /tmp/eibi/README.TXT "http://www.eibispace.de/dx/README.TXT"
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "file=$f" >> "$GITHUB_OUTPUT"
+
+      - name: Detect changes
+        id: diff
+        if: steps.dl.outputs.available == 'true'
+        run: |
+          f="${{ steps.dl.outputs.file }}"
+          changed=false
+          if [ ! -f "data/shortwave/source/$f" ] || ! cmp -s "/tmp/eibi/$f" "data/shortwave/source/$f"; then changed=true; fi
+          if ! cmp -s /tmp/eibi/README.TXT data/shortwave/source/README.TXT; then changed=true; fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+      - name: Create bot branch from latest main
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B bot/shortwave-sync origin/main
+
+      - name: Replace source files and regenerate
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git rm -q --ignore-unmatch data/shortwave/source/sked-*.csv
+          cp "/tmp/eibi/${{ steps.dl.outputs.file }}" /tmp/eibi/README.TXT data/shortwave/source/
+          python scripts/ci/test_eibi_mapper.py
+          python scripts/eibi-to-shortwavejs.py --strict | tee /tmp/eibi/report.txt
+
+      - name: Commit changes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git add data/shortwave/source data/shortwave.js
+          git commit -m "feat(shortwave): sync EiBi ${{ steps.dl.outputs.file }}"
+          git push origin bot/shortwave-sync --force-with-lease
+
+      - name: Open or update pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          body=$(printf 'Automated: EiBi shortwave schedule `%s` (http://www.eibispace.de/dx/) differs from the committed copy.\n\nGenerator report:\n```\n%s\n```\n\n**Bot-generated — review before merging** (check unresolved sites / unknown day tokens above; add fixes to `data/shortwave/site_overrides.csv` or `utility_patterns.txt`).' "${{ steps.dl.outputs.file }}" "$(cat /tmp/eibi/report.txt)")
+          if gh pr view bot/shortwave-sync --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "PR already open, branch push above updated it."
+          else
+            gh pr create \
+              --base main \
+              --head bot/shortwave-sync \
+              --title "feat(shortwave): sync EiBi ${{ steps.dl.outputs.file }}" \
+              --body "$body"
+          fi

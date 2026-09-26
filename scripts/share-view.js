@@ -107,6 +107,9 @@
       else p.delete('prop');
     }
 
+    if (window.radiomapShortwave && window.radiomapShortwave.isOn()) p.set('sw', '1');
+    else p.delete('sw');
+
     ensureNearRadiusInParams(p);
     url.search = p.toString();
     return url.toString();

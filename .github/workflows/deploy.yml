@@ -28,6 +28,11 @@ jobs:
       - name: Build data.js from CSV
         run: python scripts/csv-to-datajs.py
 
+      - name: Build shortwave.js from EiBi
+        run: |
+          python scripts/ci/test_eibi_mapper.py
+          python scripts/eibi-to-shortwavejs.py --strict
+
       - name: Bump version
         id: bump
         env:
@@ -63,7 +68,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/data.js
+          git add data/data.js data/shortwave.js
           git diff --staged --quiet || git commit -m "chore(release): bump version to ${{ steps.bump.outputs.new }}"
           git push
 
@@ -88,6 +93,11 @@ jobs:
 
       - name: Build data.js from CSV
         run: python scripts/csv-to-datajs.py
+
+      - name: Build shortwave.js from EiBi
+        run: |
+          python scripts/ci/test_eibi_mapper.py
+          python scripts/eibi-to-shortwavejs.py --strict
 
       - name: Inject cache-busting version into HTML
         run: |

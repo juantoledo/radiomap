@@ -14,6 +14,8 @@ Scopes: `scripts/*.js`, `data/*`, `css/theme.css`, `*.html`, `.github/workflows/
 6. **Deploy** — Push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): regenerates `data.js`, bumps `VERSION`, replaces `__VERSION__` in HTML. Conventional commits drive semver (`feat` → minor, breaking → major). To publish **an existing tag** to Pages (no version bump), run [`.github/workflows/deploy-tag.yml`](.github/workflows/deploy-tag.yml) manually (**Actions** → **Deploy tag to Pages** → **Run workflow**) and enter the tag (e.g. `v1.2.3`). [`.github/workflows/sync-node-sources.yml`](.github/workflows/sync-node-sources.yml) runs daily (and via manual dispatch): for each `name,url` row in [`.github/sync-sources.csv`](.github/sync-sources.csv) it renders that source, has Claude propose `curated_stations.csv` updates for that network only, validates structure with `scripts/ci/validate-csv.py`, and opens one combined PR (never pushes to `main` directly) — review bot PRs like any other CSV change. To add a source, add a row to `.github/sync-sources.csv`. Requires the `ANTHROPIC_API_KEY` secret; the step passes `github_token` explicitly so `claude-code-action` uses this workflow's own token instead of requiring the Claude Code GitHub App to be installed.
 7. **Security (CSP / SRI)** — [`index.html`](index.html) and [`lista.html`](lista.html) set a **Content-Security-Policy** (meta) and `referrer`. GA4 bootstraps from [`scripts/gtag-init.js`](scripts/gtag-init.js) (not inline). **Leaflet** and dynamically loaded **html2canvas** use **SRI** (`integrity` + `crossorigin`) against fixed cdnjs versions. `script-src` still includes **`'unsafe-inline'`** because of legacy **`onclick=`** attributes in HTML; removing those would allow tightening CSP. If GA or cdnjs change endpoints or file bytes, update CSP **`connect-src`** / **`script-src`** or SRI hashes accordingly.
 
+8. **Onda corta (EiBi)** — Datos **separados** de `curated_stations.csv`: horario EiBi en [`data/shortwave/source/`](data/shortwave/source/) (**un solo** `sked-*.csv` + `README.TXT` crudos, Latin-1, sin editar) → [`scripts/eibi-to-shortwavejs.py`](scripts/eibi-to-shortwavejs.py) → `data/shortwave.js` (global **`SHORTWAVE`**; no editar a mano). Columnas mapeadas **por nombre de cabecera** (`COLUMN_ALIASES`); coordenadas de transmisores desde el README de EiBi, correcciones en `data/shortwave/site_overrides.csv`, exclusión de utilitarias en `data/shortwave/utility_patterns.txt`. Tests: `python scripts/ci/test_eibi_mapper.py` (corren en deploy antes de `--strict`). [`.github/workflows/sync-shortwave.yml`](.github/workflows/sync-shortwave.yml) descarga semanalmente la temporada vigente por **http** y abre PR. UI solo en el mapa: botón `#btn-shortwave-toggle` → [`scripts/shortwave-map.js`](scripts/shortwave-map.js) (carga diferida, pasa a vista mundial y al desactivar vuelve a la vista anterior) + lógica pura en [`scripts/shortwave-live.js`](scripts/shortwave-live.js). Detalle: [`data/shortwave/README.md`](data/shortwave/README.md).
+
 ## Stack and layout
 
 - **Static site**: no app bundler. Entry pages are [`index.html`](index.html) (mapa) and [`lista.html`](lista.html) (lista).
@@ -70,11 +72,12 @@ Measurement ID is in [`index.html`](index.html) / [`lista.html`](lista.html) / [
 | `radiomap_exporter_download` | `page_type`, `exporter` |
 | `radiomap_support_click` | `page_type`, `source` |
 | `radiomap_propagation_toggle` | `page_type`, `state`, `signal` |
+| `radiomap_shortwave_toggle` | `page_type`, `state` |
 | `radiomap_geolocation_error` | `page_type`, `error_code` |
 
 `radiomap_station_select`'s `interaction` uses a fixed set of values — reuse one of these rather than inventing a new one: `select` (default), `map_marker`, `list_row` (default on lista), `list_nav`, `neighbor`, `near_me`, `url_signal`.
 
-`radiomap_propagation_toggle`'s `state` is `on`/`off`; `signal` is only present when `state` is `on`. `radiomap_geolocation_error`'s `error_code` is `denied`, `unavailable`, `timeout`, or `unknown`.
+`radiomap_propagation_toggle`'s and `radiomap_shortwave_toggle`'s `state` is `on`/`off`; `signal` is only present when `state` is `on`. `radiomap_geolocation_error`'s `error_code` is `denied`, `unavailable`, `timeout`, or `unknown`.
 
 **Key events (conversions)** — mark in GA4 only for the events you care about (e.g. `radiomap_station_select`, `radiomap_share`); avoid marking every micro-event.
 
