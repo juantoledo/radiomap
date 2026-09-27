@@ -8,13 +8,6 @@
 
   var E = { KHZ: 0, START: 1, END: 2, DAYS: 3, STATION: 4, LANG: 5, TARGET: 6, SITE: 7, SEASON: 8, FROM: 9, TO: 10, HEARD: 11 };
 
-  /** Zonas objetivo que incluyen (o pasan por) Sudamérica / América. */
-  var AMERICAS_TARGETS = {
-    Am: 1, LAm: 1, SAm: 1, CAm: 1, Car: 1, NAm: 1, ENA: 1, WNA: 1, CNA: 1, SAO: 1, Glo: 1,
-    CHL: 1, ARG: 1, B: 1, BOL: 1, PRU: 1, CLM: 1, VEN: 1, EQA: 1, PRG: 1, URG: 1, MEX: 1, CUB: 1,
-    CTR: 1, GTM: 1, HND: 1, NCG: 1, PNR: 1, SLV: 1, DOM: 1, HTI: 1, USA: 1, CAN: 1
-  };
-
   function lastSundayUtc(year, monthIdx) {
     var d = new Date(Date.UTC(year, monthIdx + 1, 0, 1, 0)); // último día del mes, 01:00 UTC
     d.setUTCDate(d.getUTCDate() - d.getUTCDay());
@@ -85,12 +78,8 @@
     return dayMatches(daysTable[entry[E.DAYS]], slotDay) ? 'live' : null;
   }
 
-  function isAimedAtAmericas(target) {
-    return !!(target && AMERICAS_TARGETS[target]);
-  }
-
   /**
-   * Emisiones al aire, filtradas. opts: { americasOnly, lang: null | 'S' | ['S','P'] }
+   * Emisiones al aire, filtradas. opts: { lang: null | 'S' | ['S','P'] }
    * → [{ entry, status }]
    */
   function liveEntries(sw, now, opts) {
@@ -99,7 +88,6 @@
     var out = [];
     for (var i = 0; i < sw.entries.length; i++) {
       var en = sw.entries[i];
-      if (opts.americasOnly && !isAimedAtAmericas(en[E.TARGET])) continue;
       if (langs && langs.indexOf(en[E.LANG]) === -1) continue;
       var st = isOnAir(en, sw.days, now);
       if (!st) continue;
@@ -126,12 +114,40 @@
     return order;
   }
 
+  /** Minúsculas sin tildes («Bogotá» → «bogota») para buscar texto. */
+  function foldText(s) {
+    var t = String(s == null ? '' : s).toLowerCase();
+    return t.normalize ? t.normalize('NFD').replace(/[̀-ͯ]/g, '') : t;
+  }
+
+  /**
+   * ¿La emisión coincide con el texto de búsqueda? q ya pasado por foldText.
+   * Solo dígitos → prefijo de kHz («95» → 9500–9599). Si no: emisora, país (nombre o código ITU),
+   * sitio, idiomas o zona objetivo contienen q.
+   */
+  function matchesQuery(sw, entry, q) {
+    if (!q) return true;
+    if (/^\d+$/.test(q)) return String(entry[E.KHZ]).indexOf(q) === 0;
+    var st = sw.stations[entry[E.STATION]] || [];
+    var site = sw.sites[entry[E.SITE]] || [];
+    var hay = [st[0], site[0], sw.countries[site[0]], site[2], entry[E.TARGET], sw.targets[entry[E.TARGET]]];
+    String(entry[E.LANG] || '').split(',').forEach(function (c) {
+      c = c.trim();
+      if (c) hay.push(sw.langs[c]);
+    });
+    for (var i = 0; i < hay.length; i++) {
+      if (hay[i] && foldText(hay[i]).indexOf(q) !== -1) return true;
+    }
+    return false;
+  }
+
   var api = {
     FIELDS: E,
+    foldText: foldText,
+    matchesQuery: matchesQuery,
     isOnAir: isOnAir,
     dayMatches: dayMatches,
     isNorthernSummer: isNorthernSummer,
-    isAimedAtAmericas: isAimedAtAmericas,
     liveEntries: liveEntries,
     groupBySite: groupBySite
   };

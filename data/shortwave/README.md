@@ -34,7 +34,7 @@ Si EiBi renombra una columna, solo hay que agregar el alias.
 | `ITU` | `itu` | País de la emisora. |
 | `Station` | `station` | |
 | `Lng` | `lang` | Los códigos `-CW`, `-HF`, `-TS` y `-TY` son utilitarios y se excluyen. `-MX` (música) se conserva. |
-| `Target` | `target` | Zona objetivo. El filtro «Dirigidas a América» usa esta columna. |
+| `Target` | `target` | Zona objetivo (se muestra en el popup). |
 | `Remarks` | `site` | Sitio de transmisión: vacío, `k`, `/CYP` o `/OMA-a`. |
 | `P` | `persistence` | Ver la tabla de códigos más abajo. |
 | `Start` / `Stop` | `start` / `stop` | `DDMM`. En `Stop`, un sufijo `[MMYY]` indica la fecha de la última escucha. |

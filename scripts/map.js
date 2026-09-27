@@ -528,7 +528,10 @@
   function updateMapEmptyOverlay() {
     const el = document.getElementById('map-empty-overlay');
     if (!el) return;
-    if (visibleSet.size === 0) {
+    // Con onda corta activa, la búsqueda puede no coincidir con repetidores pero sí con emisoras: no tapar el mapa.
+    var sw = window.radiomapShortwave;
+    var shortwaveMatches = !!(sw && sw.isOn() && sw.shownCount() > 0);
+    if (visibleSet.size === 0 && !shortwaveMatches) {
       el.innerHTML = typeof buildGuidedEmptyStateHtml === 'function'
         ? buildGuidedEmptyStateHtml()
         : '<div class="no-results no-results--guided"><p class="no-results-title">Sin resultados</p><button type="button" class="btn-clear-filters" onclick="clearAllFilters()">Limpiar filtros</button></div>';
@@ -538,6 +541,7 @@
       el.innerHTML = '';
     }
   }
+  window.radiomapUpdateMapEmptyOverlay = updateMapEmptyOverlay;
 
   function setMode(mode){
     currentMode = mode;
@@ -763,7 +767,12 @@
     if (selectedIdx !== null && NODES[selectedIdx]) {
       syncPropagationSidebarUI(NODES[selectedIdx]);
     }
-    if (!opts.skipFitBounds) {
+    // Con onda corta activa, el buscador también filtra esa capa: encuadrar sus coincidencias, no volver a Chile.
+    var shortwaveOn = !!(window.radiomapShortwave && window.radiomapShortwave.isOn());
+    if (shortwaveOn) {
+      if (!opts.skipFitBounds) window.radiomapShortwave.onSearch();
+      else window.radiomapShortwave.render();
+    } else if (!opts.skipFitBounds) {
       fitMapToCriteriaPoints(visibleNodes, distAnchor);
     }
     if (clearedSelection) syncRadiomapMapUiToUrl();

@@ -6707,22 +6707,6 @@ html[data-theme="light"] .sw-marker--approx { color: #3e1204; }
   color: var(--text-bright);
 }
 .sw-panel__clock { font-family: var(--font-mono); font-weight: 400; color: var(--text-dim); }
-.sw-panel__chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.sw-chip {
-  padding: 3px 8px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface2);
-  color: var(--text);
-  font: inherit;
-  cursor: pointer;
-}
-.sw-chip:hover { border-color: var(--accent2); }
-.sw-chip[aria-pressed="true"] {
-  border-color: var(--accent2);
-  background: rgba(255, 107, 53, 0.18);
-  color: var(--text-bright);
-}
 .sw-panel__lang {
   display: flex;
   align-items: center;

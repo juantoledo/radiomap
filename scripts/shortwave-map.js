@@ -18,7 +18,8 @@
   var layer = null;
   var savedView = null;
   var timer = null;
-  var filters = { americasOnly: true, lang: null };
+  var shownCount = 0;
+  var filters = { lang: null };
 
   var fmtChile = null;
   try {
@@ -41,6 +42,13 @@
 
   function live() {
     return window.radiomapShortwaveLive;
+  }
+
+  /** Texto del buscador del mapa (#search), normalizado; también filtra la capa de onda corta. */
+  function searchQuery() {
+    var el = document.getElementById('search');
+    var v = el && el.value ? el.value.trim() : '';
+    return v ? live().foldText(v) : '';
   }
 
   /** Hora de evaluación: ahora, o `?swnow=` (ISO) para verificar horarios. */
@@ -163,14 +171,16 @@
     var ref = now();
     // Idiomas: se cuentan sobre lo que está al aire con los demás filtros, para poblar el selector.
     var F = live().FIELDS;
-    var all = live().liveEntries(sw, ref, { americasOnly: filters.americasOnly });
+    var all = live().liveEntries(sw, ref, {});
     var langCounts = {};
     all.forEach(function (it) {
       langsOf(it.entry[F.LANG]).forEach(function (c) { langCounts[c] = (langCounts[c] || 0) + 1; });
     });
-    var shown = filters.lang
-      ? all.filter(function (it) { return langsOf(it.entry[F.LANG]).indexOf(filters.lang) !== -1; })
-      : all;
+    var q = searchQuery();
+    var shown = all.filter(function (it) {
+      if (filters.lang && langsOf(it.entry[F.LANG]).indexOf(filters.lang) === -1) return false;
+      return live().matchesQuery(sw, it.entry, q);
+    });
     updateLangSelect(sw, langCounts, all.length);
     var groups = live().groupBySite(shown);
     ensureLayer(map).clearLayers();
@@ -193,16 +203,19 @@
       });
       mk.addTo(layer);
     });
-    updatePanel(total, groups.length, ref);
+    updatePanel(total, groups.length, ref, q);
+    shownCount = total;
+    syncMapEmptyOverlay();
     return bounds;
+  }
+
+  /** El aviso «Sin resultados» del mapa (map.js) considera también las emisoras visibles. */
+  function syncMapEmptyOverlay() {
+    if (typeof window.radiomapUpdateMapEmptyOverlay === 'function') window.radiomapUpdateMapEmptyOverlay();
   }
 
   function panelHost() {
     return document.getElementById('shortwave-panel-host');
-  }
-
-  function chip(attr, value, label, pressed) {
-    return '<button type="button" class="sw-chip" ' + attr + '="' + esc(value) + '" aria-pressed="' + (pressed ? 'true' : 'false') + '">' + esc(label) + '</button>';
   }
 
   function buildPanel() {
@@ -216,9 +229,6 @@
       '<button type="button" class="sw-panel__close" data-sw-close aria-label="Ocultar onda corta"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>' +
       '</div>' +
       '<div class="sw-panel__stats"><span data-sw-count>…</span><span class="sw-panel__clock" data-sw-clock></span></div>' +
-      '<div class="sw-panel__chips">' +
-      chip('data-sw-toggle', 'americasOnly', 'Dirigidas a América', filters.americasOnly) +
-      '</div>' +
       '<label class="sw-panel__lang">Idioma <select data-sw-lang-select></select></label>' +
       '<p class="sw-panel__note">Según horarios publicados; oírlas depende de la propagación.</p>' +
       '<p class="sw-panel__attr">Datos: <a href="http://www.eibispace.de/" target="_blank" rel="noopener">EiBi</a>' + esc(season) + '</p>';
@@ -250,24 +260,19 @@
   function onPanelClick(ev) {
     var t = ev.target.closest ? ev.target.closest('button') : null;
     if (!t) return;
-    if (t.hasAttribute('data-sw-close')) {
-      disable();
-      return;
-    }
-    if (t.hasAttribute('data-sw-toggle')) {
-      var k = t.getAttribute('data-sw-toggle');
-      filters[k] = !filters[k];
-      t.setAttribute('aria-pressed', filters[k] ? 'true' : 'false');
-      render();
-      return;
-    }
+    if (t.hasAttribute('data-sw-close')) disable();
   }
 
-  function updatePanel(total, sites, ref) {
+  function updatePanel(total, sites, ref, q) {
     var host = panelHost();
     if (!host) return;
     var c = host.querySelector('[data-sw-count]');
-    if (c) c.textContent = total + (total === 1 ? ' emisión' : ' emisiones') + ' · ' + sites + (sites === 1 ? ' sitio' : ' sitios');
+    if (c) {
+      var el = document.getElementById('search');
+      var raw = q && el ? el.value.trim() : '';
+      c.textContent = total + (total === 1 ? ' emisión' : ' emisiones') + ' · ' + sites + (sites === 1 ? ' sitio' : ' sitios') +
+        (raw ? ' · «' + raw + '»' : '');
+    }
     var k = host.querySelector('[data-sw-clock]');
     if (k) {
       var utc = hhmm(ref.getUTCHours() * 60 + ref.getUTCMinutes()) + ' UTC';
@@ -358,10 +363,20 @@
       if (savedView) map.setView(savedView.center, savedView.zoom, { animate: false });
     }
     savedView = null;
+    shownCount = 0;
+    syncMapEmptyOverlay();
     persist();
     syncUrl();
     syncButton();
     if (typeof window.radiomapGaShortwaveToggle === 'function') window.radiomapGaShortwaveToggle('off');
+  }
+
+  /** Llamado por applyFilters (map.js) cuando cambia la búsqueda: refiltra y encuadra lo que coincide. */
+  function onSearch() {
+    var map = getMap();
+    if (!on || !map) return;
+    var bounds = render();
+    if (bounds && bounds.isValid()) map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 4, duration: 0.5 });
   }
 
   function toggle() {
@@ -387,7 +402,9 @@
     disable: disable,
     toggle: toggle,
     isOn: function () { return on; },
-    render: render
+    shownCount: function () { return on ? shownCount : 0; },
+    render: render,
+    onSearch: onSearch
   };
 
   // Se carga después de map.js (necesita window.__radiomapLeafletMap).
