@@ -795,6 +795,18 @@
       searchEl.setSelectionRange(start + 1, start + 1);
       searchEl.dispatchEvent(new Event('input', { bubbles: true }));
     });
+
+    // Ctrl/⌘+F → buscador. Si ya está enfocado, se deja pasar la búsqueda nativa del navegador.
+    searchEl.setAttribute('aria-keyshortcuts', 'Control+F Meta+F');
+    document.addEventListener('keydown', function focusSearchOnCtrlF(e) {
+      if (e.defaultPrevented) return;
+      if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey) return;
+      if (e.key !== 'f' && e.key !== 'F') return;
+      if (document.activeElement === searchEl) return;
+      e.preventDefault();
+      searchEl.focus();
+      searchEl.select();
+    });
   }
   window.__radiomapListMultiselectChange = function () {
     render(getFiltered());
