@@ -107,8 +107,14 @@
       else p.delete('prop');
     }
 
-    if (window.radiomapShortwave && window.radiomapShortwave.isOn()) p.set('sw', '1');
+    var swApi = window.radiomapShortwave;
+    var swParams = swApi && swApi.isOn() && typeof swApi.shareParams === 'function' ? swApi.shareParams() : {};
+    if (swApi && swApi.isOn()) p.set('sw', '1');
     else p.delete('sw');
+    ['swlang', 'swband', 'swtgt'].forEach(function (k) {
+      if (swParams[k]) p.set(k, swParams[k]);
+      else p.delete(k);
+    });
 
     ensureNearRadiusInParams(p);
     url.search = p.toString();

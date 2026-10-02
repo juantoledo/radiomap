@@ -132,6 +132,18 @@
     return fieldShown(v) ? '' : ' cell-empty';
   }
 
+  /** `data-svc` en la fila (CSV `serviceType`) para que las tarjetas móviles adapten su encabezado. */
+  function svcDataAttr(r) {
+    const t = r && r.serviceType != null ? String(r.serviceType).trim().toLowerCase() : '';
+    return t ? ' data-svc="' + escapeAttr(t) + '"' : '';
+  }
+
+  /** Emisoras y ATC: el nombre es más útil que el indicativo como titular de la tarjeta móvil. */
+  function isNameFirstRow(r) {
+    const t = r && r.serviceType != null ? String(r.serviceType).trim().toLowerCase() : '';
+    return (t === 'broadcast' || t === 'atc') && fieldShown(r.nombre);
+  }
+
   function openStationDetail(signal, nodeIdxOpt, gaInteraction) {
     let r = null;
     if (nodeIdxOpt != null && nodeIdxOpt !== '') {
@@ -456,7 +468,7 @@
       groupRows.forEach(function (r) {
         var sigAttr = (r.signal || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
         var shareBtn = '<span class="cell-signal-share"><button type="button" class="share-btn" data-signal="' + sigAttr + '" aria-label="Compartir ' + sigAttr + '" title="Compartir detalles"><span class="material-symbols-outlined" aria-hidden="true">share</span></button></span>';
-        html += '<tr class="rpt-row" data-signal="' + sigAttr + '" data-node-idx="' + r._idx + '">' +
+        html += '<tr class="rpt-row" tabindex="0" data-signal="' + sigAttr + '" data-node-idx="' + r._idx + '"' + svcDataAttr(r) + '>' +
           '<td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">' + escapeHtml(r.signal || '—') + '</span></span>' + shareBtn + '</td>' +
           cell('cell-club', 'Red / Club', r.nombre) +
           cell('cell-banda', 'Banda', r.banda) +
@@ -481,7 +493,17 @@
     document.getElementById('filter-nearme').textContent =
       typeof formatNearMeFilterSuffix === 'function' ? formatNearMeFilterSuffix() : (getNearMeLocation() ? ' · cerca de mí' : '');
 
+    // Zona «ONDA CORTA» (shortwave-list.js): va al final; si no hay repetidoras pero sí emisoras que coinciden, se muestra sola.
+    const swHtml = window.radiomapShortwave && typeof window.radiomapShortwave.zoneHtml === 'function'
+      ? window.radiomapShortwave.zoneHtml()
+      : '';
+
     if (filtered.length === 0) {
+      if (swHtml) {
+        main.innerHTML = swHtml;
+        window.radiomapShortwave.hydrate();
+        return;
+      }
       main.innerHTML = typeof buildGuidedEmptyStateHtml === 'function'
         ? buildGuidedEmptyStateHtml()
         : '<div class="no-results">No se encontraron resultados para la búsqueda actual.</div>';
@@ -553,8 +575,10 @@
         const bandaBadge = fieldShown(r.banda)
           ? `<span class="cell-signal-banda"><span class="badge-banda ${bc}">${escapeHtml(bandaShort)}</span></span>`
           : '';
-        html += `<tr class="rpt-row${userRowClass}" data-signal="${sigAttr}" data-node-idx="${r._idx}">
-          <td class="cell-signal" data-label="Señal"><span class="cell-signal-left"><span class="cell-signal-main">${sigLead}${escapeHtml(r.signal || '—')}${webLink} ${echolinkBadge}${dmrBadge}${svcBadge}${userBadge}</span>${bandaBadge}</span>${shareBtn}</td>
+        // Tarjetas móviles: emisoras/ATC encabezan con el nombre (oculto en la tabla de escritorio vía CSS).
+        const nameTitle = isNameFirstRow(r) ? `<span class="cell-signal-title">${escapeHtml(r.nombre)}</span>` : '';
+        html += `<tr class="rpt-row${userRowClass}" tabindex="0" data-signal="${sigAttr}" data-node-idx="${r._idx}"${svcDataAttr(r)}>
+          <td class="cell-signal" data-label="Señal"><span class="cell-signal-left">${nameTitle}<span class="cell-signal-main">${sigLead}<span class="cell-signal-call">${escapeHtml(r.signal || '—')}</span>${webLink} ${echolinkBadge}${dmrBadge}${svcBadge}${userBadge}</span>${bandaBadge}</span>${shareBtn}</td>
           ${distCell}
           <td class="cell-freq freq-rx${cellEmptyClass(r.rx)}" data-label="RX (MHz)">${fieldShown(r.rx) ? r.rx : ''}</td>
           <td class="cell-freq freq-tx${cellEmptyClass(r.tx)}" data-label="TX (MHz)">${fieldShown(r.tx) ? r.tx : ''}</td>
@@ -569,7 +593,8 @@
       html += `</tbody></table></details></div>`;
     });
 
-    main.innerHTML = html;
+    main.innerHTML = html + swHtml;
+    if (swHtml) window.radiomapShortwave.hydrate();
     highlightSharedSignalRow(main);
   }
 
@@ -684,7 +709,20 @@
       return;
     }
     const tr = e.target.closest('tr.rpt-row');
-    if (!tr) return;
+    if (tr) openRowDetail(tr);
+  });
+
+  // Filas enfocables (tabindex=0): Enter / Espacio abren el detalle igual que un clic.
+  document.getElementById('main-content').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const tr = e.target.closest('tr.rpt-row');
+    if (!tr || e.target !== tr) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openRowDetail(tr);
+  });
+
+  function openRowDetail(tr) {
     const idxStr = tr.getAttribute('data-node-idx');
     const ni = idxStr != null && idxStr !== '' ? parseInt(idxStr, 10) : NaN;
     if (!isNaN(ni) && NODES[ni]) {
@@ -693,7 +731,19 @@
     }
     const sig = tr.getAttribute('data-signal');
     if (sig) openStationDetail(sig);
-  });
+  }
+
+  // Encabezados de región pegajosos: quedan justo bajo .sticky-top (su alto cambia con la barra / hoja de filtros).
+  (function syncStickyTopOffset() {
+    const top = document.querySelector('.sticky-top');
+    if (!top) return;
+    function apply() {
+      document.documentElement.style.setProperty('--list-sticky-top', Math.round(top.getBoundingClientRect().height) + 'px');
+    }
+    apply();
+    if (typeof ResizeObserver === 'function') new ResizeObserver(apply).observe(top);
+    else window.addEventListener('resize', apply);
+  })();
 
   (function initStationDetailDialog() {
     const overlay = document.getElementById('station-detail-overlay');
@@ -959,6 +1009,11 @@
   });
 
   window.__radiomapAfterClearFilters = function () {
+    render(getFiltered());
+  };
+
+  /** Re-render completo con los filtros actuales (lo usa shortwave-list.js al activar/desactivar onda corta). */
+  window.radiomapListRender = function () {
     render(getFiltered());
   };
 

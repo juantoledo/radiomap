@@ -7,7 +7,7 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-96T9SZM607"></script>
 <script src="scripts/gtag-init.js?v=__VERSION__"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" href="images/favicon.svg?v=__VERSION__" type="image/svg+xml">
 <link rel="apple-touch-icon" href="images/favicon-og.png?v=__VERSION__">
 <link rel="manifest" href="manifest.json?v=__VERSION__">
@@ -89,6 +89,7 @@
       </div>
       <button type="button" id="btn-nearme" onclick="toggleNearMe()" class="location-btn location-btn--controls" aria-label="Cerca de mí" title="Mostrar estaciones cerca de mi ubicación"><span class="material-symbols-outlined" aria-hidden="true">my_location</span></button>
       <button type="button" id="btn-broadcast-toggle" onclick="toggleBroadcastVisibility()" class="broadcast-toggle-btn" aria-pressed="false" aria-label="Mostrar estaciones AM/FM" title="Mostrar estaciones de radiodifusión AM/FM"><span class="material-symbols-outlined" aria-hidden="true">radio</span></button>
+      <button type="button" id="btn-shortwave-toggle" class="shortwave-toggle-btn" aria-pressed="false" aria-label="Mostrar emisoras de onda corta en la lista" title="Onda corta: emisoras internacionales al aire ahora y en la próxima hora (horarios EiBi)"><span class="material-symbols-outlined" aria-hidden="true">settings_input_antenna</span></button>
     </div>
   </div>
   <div id="map-filter-sheet-backdrop" class="map-filter-sheet-backdrop" hidden aria-hidden="true"></div>
@@ -222,6 +223,10 @@
 <script src="scripts/exporter/opengd77/mapper.js?v=__VERSION__"></script>
 <script src="scripts/help.js?v=__VERSION__"></script><script src="scripts/station-display.js?v=__VERSION__"></script>
 <script src="scripts/global-groups.js?v=__VERSION__"></script>
+<script src="scripts/shortwave-live.js?v=__VERSION__"></script>
+<script src="scripts/shortwave-loader.js?v=__VERSION__"></script>
+<script src="scripts/shortwave-filters.js?v=__VERSION__"></script>
+<script src="scripts/shortwave-list.js?v=__VERSION__"></script>
 <script defer src="scripts/analytics.js?v=__VERSION__"></script>
 <script src="scripts/coach-marks.js?v=__VERSION__"></script>
 <script src="scripts/list.js?v=__VERSION__"></script>

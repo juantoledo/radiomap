@@ -16,7 +16,7 @@ Node objects follow CSV-derived fields (see `data/README.md`); the generator may
 
 | Symbol | Role |
 |--------|------|
-| `SHORTWAVE` | Horario EiBi de onda corta (solo radiodifusión 1711–30000 kHz), generado por `scripts/eibi-to-shortwavejs.py` desde `data/shortwave/source/`. Diccionarios `sites`, `stations`, `days`, `langs`, `targets`, `countries` + `entries` compactas (formato en la cabecera del archivo). **No** se carga con la página: `shortwave-map.js` lo inyecta al activar el botón Onda corta. |
+| `SHORTWAVE` | Horario EiBi de onda corta (solo radiodifusión 1711–30000 kHz), generado por `scripts/eibi-to-shortwavejs.py` desde `data/shortwave/source/`. Diccionarios `sites`, `stations`, `days`, `langs`, `targets`, `countries` + `entries` compactas (formato en la cabecera del archivo). **No** se carga con la página: `shortwave-loader.js` lo inyecta al activar el botón Onda corta (mapa o lista). |
 
 ## CSV column order (one line)
 
@@ -45,8 +45,12 @@ Implemented in [`scripts/share-view.js`](../scripts/share-view.js) (build) and [
 | `sb` | `1` = panel lateral (#sidebar) abierto, `0` = cerrado (con `signal` seleccionado) |
 | `prop` | `1` = mapa de propagación activo para esa señal (si hay datos) |
 | `nosb` | Legado: equivalente a `sb=0` al abrir desde lista (sigue soportado) |
-| `sw` | `1` = capa Onda corta activa (vista mundial; `shortwave-map.js`) |
+| `sw` | `1` = Onda corta activa: en el mapa, capa con vista mundial (`shortwave-map.js`); en la lista, zona «ONDA CORTA» (`shortwave-list.js`) |
+| `swlang` | Con `sw=1` (mapa y lista): idiomas de los filtros de Onda corta, lista separada por comas (códigos EiBi, p. ej. `S,P`) |
+| `swband` | Con `sw=1`: bandas, lista separada por comas (`120m` … `11m`, u `oob` = fuera de banda; p. ej. `49m,31m`) |
+| `swtgt` | Con `sw=1`: «Dirigidas a», lista separada por comas de grupos de zonas (`am`, `eu`, `af`, `me`, `as`, `oc`, `otros`) |
 | `swnow` | Solo depuración: instante ISO UTC para evaluar «al aire» (p. ej. `2026-09-25T00:00Z`); no se comparte |
+| `cat` | Solo `estadisticas.html`: categoría que filtra los gráficos de estaciones (`amateur`, `broadcast`, `atc`, `global`; sin parámetro = todas). Lo lee y escribe `stats-page.js` |
 
 ## Propagation docs
 
@@ -69,8 +73,11 @@ Implemented in [`scripts/share-view.js`](../scripts/share-view.js) (build) and [
 | `theme.js` | Theme toggle / persistence |
 | `utils.js` | Shared helpers |
 | `csv-to-datajs.py` | CSV → `data/data.js` |
-| `shortwave-live.js` | Onda corta: lógica pura «al aire ahora» (horario, días, temporada, validez) sobre `SHORTWAVE`; exporta `window.radiomapShortwaveLive` (y `module.exports` para Node) |
-| `shortwave-map.js` | Onda corta: botón, carga diferida de `data/shortwave.js`, capa por sitio de transmisión, panel y popup; vista mundial al activar y restaura la vista previa al desactivar |
+| `shortwave-live.js` | Onda corta: lógica pura «al aire ahora» (horario, días, temporada, validez) sobre `SHORTWAVE`, emisiones de la próxima hora (`upcomingEntries`), bandas (`bandOf`, `bandLabel`), grupos de zona objetivo (`targetGroupOf`) y formatos (`slotLabel`, `langLabel`, `clockLabel`); exporta `window.radiomapShortwaveLive` (y `module.exports` para Node) |
+| `shortwave-loader.js` | Onda corta: carga diferida de `data/shortwave.js` y hora de evaluación (`?swnow=`); `window.radiomapShortwaveLoader`, compartido por mapa y lista |
+| `shortwave-filters.js` | Onda corta: filtros multiselección «Dirigidas a» / «Banda» / «Idioma» compartidos por mapa y lista (estado, conteos por faceta, desplegables, URL `swtgt`/`swband`/`swlang`, sesión `ra-shortwave-filters`); `window.radiomapShortwaveFilters` |
+| `shortwave-map.js` | Onda corta (mapa): botón, capa por sitio de transmisión, panel con filtros y popup; vista mundial al activar y restaura la vista previa al desactivar |
+| `shortwave-list.js` | Onda corta (lista): botón y zona «ONDA CORTA» (subsecciones por banda + próxima hora) que `list.js` agrega al final (luego `hydrate()`); filtra con `#search` y la barra de shortwave-filters.js; refresco cada minuto en su lugar |
 | `eibi-to-shortwavejs.py` | EiBi `sked-*.csv` + `README.TXT` → `data/shortwave.js` (mapeo de columnas por nombre de cabecera) |
 
 ## Helper scripts

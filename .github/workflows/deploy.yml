@@ -31,6 +31,7 @@ jobs:
       - name: Build shortwave.js from EiBi
         run: |
           python scripts/ci/test_eibi_mapper.py
+          node scripts/ci/test_shortwave_live.js
           python scripts/eibi-to-shortwavejs.py --strict
 
       - name: Bump version
@@ -97,6 +98,7 @@ jobs:
       - name: Build shortwave.js from EiBi
         run: |
           python scripts/ci/test_eibi_mapper.py
+          node scripts/ci/test_shortwave_live.js
           python scripts/eibi-to-shortwavejs.py --strict
 
       - name: Inject cache-busting version into HTML

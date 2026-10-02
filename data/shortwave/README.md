@@ -61,6 +61,20 @@ Cada fila se ubica así:
 4. El primer sitio conocido del país. La precisión queda como `country`: se dibuja con borde punteado y se rotula con el país. Es el caso de, por ejemplo, Sound of Hope.
 5. Si no hay coordenadas (p. ej. `XUU`), la fila se omite y se informa en el reporte.
 
+## Filtros (mapa y lista)
+
+El panel de onda corta solo muestra lo que está **al aire ahora** y permite filtrar por:
+
+- **Dirigidas a:** zonas objetivo EiBi agrupadas por región (`TARGET_GROUPS` en `scripts/shortwave-live.js`). Las zonas sin mapear quedan en «Otras / sin zona». Si EiBi agrega una zona, súmela al grupo que corresponda.
+- **Banda:** bandas de radiodifusión de la UIT (`BANDS`), de 120 m a 11 m. Lo que queda fuera de ellas aparece como «Fuera de banda».
+- **Idioma.**
+
+Cada filtro es de selección múltiple: dentro de un filtro, los valores elegidos se suman (O); entre filtros, se combinan (Y). Los conteos de cada desplegable consideran los otros filtros y la búsqueda del mapa. Los filtros se guardan en la URL con `swtgt`, `swband` y `swlang`, como listas separadas por comas (p. ej. `swband=49m,31m`), y en la sesión del navegador, así que la selección se mantiene al pasar del mapa a la lista y viceversa. Código: `scripts/shortwave-filters.js`. Tests: `node scripts/ci/test_shortwave_live.js`.
+
+## Vista Lista
+
+Con el mismo botón de onda corta, `lista.html` agrega al final la zona **ONDA CORTA** (`scripts/shortwave-list.js`). Muestra lo que está al aire ahora, en una subsección por banda ordenada por kHz, y además una subsección «Comienzan en la próxima hora». La filtran el buscador y los mismos tres filtros del mapa (barra bajo la cabecera de la zona); los filtros de repetidoras no aplican. Se actualiza cada minuto. El estado se comparte con el mapa (`sw=1` y la sesión del navegador).
+
 ## Actualizar
 
 - **Automático:** `.github/workflows/sync-shortwave.yml` corre cada lunes y también con *Run workflow*.

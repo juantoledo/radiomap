@@ -11,14 +11,14 @@
 <link rel="icon" href="images/favicon.svg?v=__VERSION__" type="image/svg+xml">
 <link rel="apple-touch-icon" href="images/favicon-og.png?v=__VERSION__">
 <link rel="manifest" href="manifest.json?v=__VERSION__">
-<title>Radiomap — Estadísticas de repetidoras en Chile</title>
-<meta name="description" content="Estadísticas de repetidoras de radioaficionados en Chile: distribución por banda, región, tipo y red.">
+<title>Radiomap — Estadísticas de estaciones de radio en Chile</title>
+<meta name="description" content="Estadísticas de estaciones de radio en Chile: repetidoras de radioaficionados, broadcast AM/FM y ATC por banda, región, tipo y red, más horarios de onda corta (EiBi).">
 <meta name="theme-color" content="#0d1520">
 <link rel="canonical" href="https://www.radiomap.cl/estadisticas.html">
 <meta property="og:site_name" content="Radiomap">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Radiomap — Estadísticas de repetidoras en Chile">
-<meta property="og:description" content="Estadísticas de repetidoras de radioaficionados en Chile: banda, región, tipo y red.">
+<meta property="og:title" content="Radiomap — Estadísticas de estaciones de radio en Chile">
+<meta property="og:description" content="Repetidoras de radioaficionados, broadcast AM/FM, ATC y onda corta en Chile: banda, región, tipo y red.">
 <meta property="og:url" content="https://www.radiomap.cl/estadisticas.html">
 <meta property="og:image" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
 <meta property="og:image:secure_url" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
@@ -28,8 +28,8 @@
 <meta property="og:image:alt" content="Radiomap — logotipo">
 <meta property="og:locale" content="es_CL">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Radiomap — Estadísticas de repetidoras en Chile">
-<meta name="twitter:description" content="Estadísticas de repetidoras de radioaficionados en Chile: banda, región, tipo y red.">
+<meta name="twitter:title" content="Radiomap — Estadísticas de estaciones de radio en Chile">
+<meta name="twitter:description" content="Repetidoras de radioaficionados, broadcast AM/FM, ATC y onda corta en Chile: banda, región, tipo y red.">
 <meta name="twitter:image" content="https://www.radiomap.cl/images/favicon-og.png?v=__VERSION__">
 <meta name="twitter:image:alt" content="Radiomap — logotipo">
 <meta name="twitter:site" content="@radiomap_cl">
@@ -42,7 +42,7 @@
 <link rel="stylesheet" href="css/theme.css?v=__VERSION__">
 </head>
 <body class="page-stats">
-<h1 class="sr-only">Radiomap — Estadísticas de repetidoras de radioaficionados en Chile</h1>
+<h1 class="sr-only">Radiomap — Estadísticas de estaciones de radio en Chile</h1>
 <div id="app">
 
 <!-- HEADER -->
@@ -77,21 +77,29 @@
 </header>
 
 <!-- STATS CONTENT -->
-<main class="stats-page" aria-label="Estadísticas de repetidoras">
+<main class="stats-page" aria-label="Estadísticas de estaciones de radio">
 
-  <!-- KPI row -->
+  <!-- KPI row (dataset completo) -->
   <div class="stats-overview">
     <div class="stats-kpi" style="--kpi-c:var(--text-bright)">
       <div class="stats-kpi__value" id="stats-total">—</div>
       <div class="stats-kpi__label">Total</div>
     </div>
     <div class="stats-kpi" style="--kpi-c:var(--vhf)">
-      <div class="stats-kpi__value" id="stats-vhf">—</div>
-      <div class="stats-kpi__label">VHF/FM</div>
+      <div class="stats-kpi__value" id="stats-amateur">—</div>
+      <div class="stats-kpi__label">Radioaficionados</div>
     </div>
-    <div class="stats-kpi" style="--kpi-c:var(--uhf)">
-      <div class="stats-kpi__value" id="stats-uhf">—</div>
-      <div class="stats-kpi__label">UHF</div>
+    <div class="stats-kpi" style="--kpi-c:#eab308">
+      <div class="stats-kpi__value" id="stats-broadcast">—</div>
+      <div class="stats-kpi__label">Broadcast AM/FM</div>
+    </div>
+    <div class="stats-kpi" style="--kpi-c:#64748b">
+      <div class="stats-kpi__value" id="stats-atc">—</div>
+      <div class="stats-kpi__label">ATC / Aéreo</div>
+    </div>
+    <div class="stats-kpi" style="--kpi-c:#a78bfa">
+      <div class="stats-kpi__value" id="stats-global">—</div>
+      <div class="stats-kpi__label">Globales</div>
     </div>
     <div class="stats-kpi" style="--kpi-c:var(--green)">
       <div class="stats-kpi__value" id="stats-echolink">—</div>
@@ -105,19 +113,18 @@
       <div class="stats-kpi__value" id="stats-propagation">—</div>
       <div class="stats-kpi__label">Con propagación</div>
     </div>
-    <div class="stats-kpi" style="--kpi-c:#a78bfa">
-      <div class="stats-kpi__value" id="stats-global">—</div>
-      <div class="stats-kpi__label">Globales</div>
-    </div>
   </div>
 
+  <!-- Categoría: filtra todos los gráficos de estaciones (?cat=) -->
+  <div class="stats-cat-chips" id="stats-cat-chips" role="radiogroup" aria-label="Categoría de estaciones"></div>
+
   <!-- Two-column: Banda + Tipo -->
-  <div class="stats-grid-2">
-    <section class="stats-section">
+  <div class="stats-grid-2" id="stats-grid-banda-tipo">
+    <section class="stats-section" id="stats-banda-section">
       <h2 class="stats-section__title">Por banda</h2>
       <div id="stats-banda-chart"></div>
     </section>
-    <section class="stats-section">
+    <section class="stats-section" id="stats-type-section">
       <h2 class="stats-section__title">Por tipo</h2>
       <div class="donut-wrap">
         <div class="donut-fig">
@@ -133,13 +140,13 @@
   </div>
 
   <!-- Por región -->
-  <section class="stats-section">
+  <section class="stats-section" id="stats-region-section">
     <h2 class="stats-section__title">Por región</h2>
     <div id="stats-region-chart"></div>
   </section>
 
   <!-- Por red / conferencia -->
-  <section class="stats-section">
+  <section class="stats-section" id="stats-conf-section">
     <h2 class="stats-section__title">Por red / conferencia</h2>
     <div id="stats-conf-chart"></div>
   </section>
@@ -148,6 +155,58 @@
   <section class="stats-section" id="stats-global-section" hidden>
     <h2 class="stats-section__title">Estaciones globales por categoría</h2>
     <div id="stats-global-chart"></div>
+  </section>
+
+  <!-- Onda corta (EiBi): data/shortwave.js se carga al acercarse a esta sección -->
+  <section class="stats-sw" id="stats-sw" hidden aria-labelledby="stats-sw-title">
+    <div class="stats-subhead">
+      <h2 class="stats-subhead__title" id="stats-sw-title">Onda corta</h2>
+      <span class="stats-subhead__meta" id="stats-sw-meta"></span>
+    </div>
+    <p class="stats-note">Horario de radiodifusión internacional según <a href="http://www.eibispace.de/" target="_blank" rel="noopener">EiBi</a>. Los conteos son filas del horario (frecuencia × franja), no horas al aire.</p>
+    <div class="stats-overview stats-overview--sw">
+      <div class="stats-kpi" style="--kpi-c:var(--accent2)">
+        <div class="stats-kpi__value" id="stats-sw-rows">—</div>
+        <div class="stats-kpi__label">Transmisiones</div>
+      </div>
+      <div class="stats-kpi" style="--kpi-c:var(--vhf)">
+        <div class="stats-kpi__value" id="stats-sw-stations">—</div>
+        <div class="stats-kpi__label">Emisoras</div>
+      </div>
+      <div class="stats-kpi" style="--kpi-c:var(--uhf)">
+        <div class="stats-kpi__value" id="stats-sw-sites">—</div>
+        <div class="stats-kpi__label">Sitios</div>
+      </div>
+      <div class="stats-kpi" style="--kpi-c:#a78bfa">
+        <div class="stats-kpi__value" id="stats-sw-langs">—</div>
+        <div class="stats-kpi__label">Idiomas</div>
+      </div>
+      <div class="stats-kpi" style="--kpi-c:var(--green)">
+        <div class="stats-kpi__value" id="stats-sw-live">—</div>
+        <div class="stats-kpi__label">Al aire ahora</div>
+        <div class="stats-kpi__sub" id="stats-sw-clock"></div>
+      </div>
+    </div>
+    <div class="stats-grid-2">
+      <section class="stats-section">
+        <h3 class="stats-section__title">Por banda</h3>
+        <div id="stats-sw-band-chart"></div>
+      </section>
+      <section class="stats-section">
+        <h3 class="stats-section__title">Dirigidas a</h3>
+        <div id="stats-sw-target-chart"></div>
+      </section>
+    </div>
+    <div class="stats-grid-2">
+      <section class="stats-section">
+        <h3 class="stats-section__title">Idiomas más frecuentes</h3>
+        <div id="stats-sw-lang-chart"></div>
+      </section>
+      <section class="stats-section">
+        <h3 class="stats-section__title">Emisoras con más transmisiones</h3>
+        <div id="stats-sw-station-chart"></div>
+      </section>
+    </div>
   </section>
 
 </main>
@@ -162,7 +221,10 @@
 <script defer src="data/data.js?v=__VERSION__"></script>
 <script defer src="scripts/my-stations.js?v=__VERSION__"></script>
 <script defer src="scripts/help.js?v=__VERSION__"></script>
-<script defer src="scripts/analytics.js?v=__VERSION__"></script><script defer src="scripts/global-groups.js?v=__VERSION__"></script>
+<script defer src="scripts/analytics.js?v=__VERSION__"></script>
+<script defer src="scripts/global-groups.js?v=__VERSION__"></script>
+<script defer src="scripts/shortwave-live.js?v=__VERSION__"></script>
+<script defer src="scripts/shortwave-loader.js?v=__VERSION__"></script>
 <script defer src="scripts/stats-page.js?v=__VERSION__"></script>
 </body>
 </html>

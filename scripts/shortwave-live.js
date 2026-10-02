@@ -141,8 +141,140 @@
     return false;
   }
 
+  /**
+   * Emisiones que NO están al aire en `now` pero comienzan dentro de `withinMin` minutos (por defecto 60).
+   * Reutiliza isOnAir en el minuto de inicio, así días/temporada/validez se evalúan igual que «al aire».
+   * opts: { withinMin } → [{ entry, startsIn }] (startsIn en minutos, 1..withinMin)
+   */
+  function upcomingEntries(sw, now, opts) {
+    var within = opts && opts.withinMin != null ? opts.withinMin : 60;
+    var nowMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+    var base = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes());
+    var out = [];
+    for (var i = 0; i < sw.entries.length; i++) {
+      var en = sw.entries[i];
+      var delta = (en[E.START] - nowMin + 1440) % 1440;
+      if (delta <= 0 || delta > within) continue;
+      if (isOnAir(en, sw.days, now)) continue;
+      if (!isOnAir(en, sw.days, new Date(base + delta * 60000))) continue;
+      out.push({ entry: en, startsIn: delta });
+    }
+    return out;
+  }
+
+  /** «S,Q» → ['S','Q'] (EiBi usa códigos combinados para emisiones bilingües). */
+  function langsOf(code) {
+    return String(code || '').split(',').map(function (c) { return c.trim(); }).filter(Boolean);
+  }
+
+  function langLabel(sw, code) {
+    return langsOf(code).map(function (c) { return sw.langs[c] || c; }).join(' / ');
+  }
+
+  /** Minutos desde 00:00 → «HH:MM» (1440 → «24:00»). */
+  function hhmm(min) {
+    if (min === 1440) return '24:00';
+    var h = Math.floor(min / 60) % 24;
+    var m = min % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  var fmtChile = null;
+  try {
+    fmtChile = new Intl.DateTimeFormat('es-CL', { timeZone: 'America/Santiago', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  } catch (e) {
+    fmtChile = null;
+  }
+
+  /** Hora de Chile del minuto UTC `min` en el día de `ref` ('' si Intl no soporta la zona). */
+  function chileTime(min, ref) {
+    if (!fmtChile) return '';
+    var d = new Date(Date.UTC(ref.getUTCFullYear(), ref.getUTCMonth(), ref.getUTCDate(), 0, min % 1440));
+    return fmtChile.format(d);
+  }
+
+  /** Horario de la emisión: «HH:MM–HH:MM UTC · HH:MM–HH:MM Chile» o «las 24 h». */
+  function slotLabel(entry, ref) {
+    var s = entry[E.START];
+    var e = entry[E.END];
+    if (s === 0 && e === 1440) return 'las 24 h';
+    var utc = hhmm(s) + '–' + hhmm(e) + ' UTC';
+    var cl = chileTime(s, ref);
+    return cl ? utc + ' · ' + cl + '–' + chileTime(e, ref) + ' Chile' : utc;
+  }
+
+  /** Reloj: «HH:MM UTC · HH:MM Chile». */
+  function clockLabel(ref) {
+    var utc = hhmm(ref.getUTCHours() * 60 + ref.getUTCMinutes()) + ' UTC';
+    return fmtChile ? utc + ' · ' + fmtChile.format(ref) + ' Chile' : utc;
+  }
+
+  /** Bandas de radiodifusión en onda corta (UIT), de menor a mayor frecuencia: [mínKHz, máxKHz, id]. */
+  var BANDS = [
+    [2300, 2495, '120m'], [3200, 3400, '90m'], [3900, 4000, '75m'], [4750, 5060, '60m'],
+    [5900, 6200, '49m'], [7200, 7450, '41m'], [9400, 9900, '31m'], [11600, 12100, '25m'],
+    [13570, 13870, '22m'], [15100, 15800, '19m'], [17480, 17900, '16m'], [18900, 19020, '15m'],
+    [21450, 21850, '13m'], [25670, 26100, '11m']
+  ];
+  var BAND_OOB = 'oob';
+
+  /** kHz → id de banda («49m») o 'oob' si cae fuera de las bandas de radiodifusión. */
+  function bandOf(khz) {
+    for (var i = 0; i < BANDS.length; i++) {
+      if (khz >= BANDS[i][0] && khz <= BANDS[i][1]) return BANDS[i][2];
+    }
+    return BAND_OOB;
+  }
+
+  /** «49m» → «49 m»; 'oob' → «Fuera de banda». */
+  function bandLabel(id) {
+    return id === BAND_OOB ? 'Fuera de banda' : String(id).replace(/m$/, ' m');
+  }
+
+  /** «49m» → «5900–6200 kHz» ('' para fuera de banda). */
+  function bandRange(id) {
+    for (var i = 0; i < BANDS.length; i++) {
+      if (BANDS[i][2] === id) return BANDS[i][0] + '–' + BANDS[i][1] + ' kHz';
+    }
+    return '';
+  }
+
+  /** Zonas objetivo EiBi agrupadas por región (orden = orden de presentación). */
+  var TARGET_GROUPS = [
+    { id: 'am', label: 'América', codes: ['SAm', 'LAm', 'Am', 'CAm', 'Car', 'NAm', 'ENA', 'WNA', 'CNA', 'B', 'BOL', 'CHL', 'CLM', 'CUB', 'PRU', 'VEN'] },
+    { id: 'eu', label: 'Europa', codes: ['Eu', 'WEu', 'CEu', 'EEu', 'NEu', 'SEu', 'SEE', 'Cau', 'UKR', 'E', 'I', 'HOL', 'IRL'] },
+    { id: 'af', label: 'África', codes: ['Af', 'NAf', 'WAf', 'CAf', 'EAf', 'SAf', 'AGL', 'COD', 'ETH', 'MDG', 'MOZ', 'NIG', 'SDN', 'SSD', 'EGY'] },
+    { id: 'me', label: 'Medio Oriente', codes: ['ME', 'IRN', 'ISR', 'AFG', 'PAK'] },
+    { id: 'as', label: 'Asia', codes: ['As', 'FE', 'CHN', 'TWN', 'KRE', 'J', 'MNG', 'SEA', 'INS', 'MLA', 'PHL', 'MYA', 'SAs', 'NIn', 'SIn', 'IND', 'CLN', 'NPL', 'BTN', 'Tib', 'CAs', 'Sib'] },
+    { id: 'oc', label: 'Oceanía', codes: ['Oc', 'WOc', 'AUS', 'NZL', 'VUT', 'SLM'] },
+    { id: 'otros', label: 'Otras / sin zona', codes: [] }
+  ];
+  var TARGET_OTHER = 'otros';
+  var targetIndex = {};
+  TARGET_GROUPS.forEach(function (g) {
+    g.codes.forEach(function (c) { targetIndex[c] = g.id; });
+  });
+
+  /** Código de zona objetivo EiBi → id de grupo regional ('otros' si no está mapeado o viene vacío). */
+  function targetGroupOf(code) {
+    return (code && targetIndex[code]) || TARGET_OTHER;
+  }
+
   var api = {
     FIELDS: E,
+    BANDS: BANDS,
+    BAND_OOB: BAND_OOB,
+    bandOf: bandOf,
+    bandLabel: bandLabel,
+    bandRange: bandRange,
+    TARGET_GROUPS: TARGET_GROUPS,
+    targetGroupOf: targetGroupOf,
+    upcomingEntries: upcomingEntries,
+    langsOf: langsOf,
+    langLabel: langLabel,
+    hhmm: hhmm,
+    slotLabel: slotLabel,
+    clockLabel: clockLabel,
     foldText: foldText,
     matchesQuery: matchesQuery,
     isOnAir: isOnAir,

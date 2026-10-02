@@ -29,7 +29,7 @@ Sitio estático — sin framework, sin bundler. Leaflet + vanilla JS.
 | **Mis Estaciones** | Agrega, edita y elimina estaciones propias. Se almacenan en el navegador (`localStorage`); exporta el CSV desde el diálogo de importar/exportar para conservarlas. Las estaciones personalizadas son responsabilidad del operador. |
 | **Exportar** | CSV con las estaciones visibles o para radios específicas (CHIRP, Yaesu FT5DR, FTM-150, OpenGD77 — experimental). |
 | **Compartir** | URL con los filtros activos codificados en el query string. |
-| **Stats** | Distribución de estaciones por banda, tipo, región y red. |
+| **Stats** | Distribución por categoría (radioaficionados, broadcast AM/FM, ATC, globales) — filtrable con `?cat=` —, banda, tipo, región y red; estadísticas del horario de onda corta (EiBi). |
 
 ## Datos
 

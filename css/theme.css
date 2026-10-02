@@ -2395,8 +2395,8 @@ body.page-list main { padding: 24px 32px; }
   align-self: center;
   line-height: 0;
 }
-/* Tabla ancha: botón un poco más compacto junto al indicativo */
-@media (min-width: 769px) {
+/* Tabla ancha: botón un poco más compacto junto al indicativo (≤900px usa tarjetas) */
+@media (min-width: 901px) {
   body.page-list .rpt-table .cell-signal-share .share-btn {
     width: 34px;
     height: 34px;
@@ -3458,6 +3458,24 @@ body.page-list .app-footer,
 body.page-stats .app-footer {
   position: static;
 }
+/* Lista: columna flex → con pocos resultados el pie queda al fondo de la pantalla (no flotando a media altura).
+   Sin el relleno inferior del body (pensado para el pie fijo del mapa): el área segura va dentro del pie. */
+body.page-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: 0;
+}
+body.page-list main { flex: 1 0 auto; }
+body.page-list .app-footer {
+  gap: 2px 12px;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  line-height: 1.5;
+}
+body.page-list .app-footer span { margin: 0; }
+/* Área táctil más alta para el mailto sin mover el texto (padding en línea) */
+body.page-list .app-footer a { padding: 8px 0; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
 .app-footer span { margin: 0 4px; }
 .app-footer a { color: inherit; text-decoration: none; }
 .app-footer a:hover { color: var(--accent); text-decoration: underline; }
@@ -4571,7 +4589,6 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
   body.page-list .header-stats { display: none; }
-  body.page-list .cell-club small { display: none; }
 }
 @media (max-width: 480px) {
   body.page-list header {
@@ -4585,243 +4602,270 @@ html[data-theme="light"] .rpt-table tbody tr { border-bottom-color: rgba(0,0,0,0
     padding-right: max(6px, env(safe-area-inset-right, 0px));
   }
 }
-@media (max-width: 900px) and (min-width: 769px) {
-  body.page-list main { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-}
-/* ── Mobile: card-style rows, 2-column grid ───────────────────────────────── */
 @media (max-width: 768px) {
   .radiomap-toolbar-host .controls .search-wrap input[type="text"] { min-height: 38px; font-size: var(--fs-sm); padding: 6px 8px 6px 32px; }
   .radiomap-toolbar-host .controls select { min-height: 38px; font-size: var(--fs-sm); width: 100%; padding: 6px 8px; }
+  /* La lista permite pinch-zoom: ≥16px en campos evita el zoom automático de iOS al enfocar. */
+  body.page-list :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) { font-size: max(16px, var(--fs-sm)); }
   body.page-list main { padding: 12px; width: 100%; box-sizing: border-box; }
-  body.page-list .zone-group { width: 100%; margin-bottom: 20px; }
-  body.page-list .rpt-table { font-size: var(--fs-xs); display: block; width: 100%; border: none; }
-  body.page-list .rpt-table thead { display: none; }
-  body.page-list .rpt-table tbody { display: flex; flex-direction: column; gap: 6px; }
-  /* Card grid: fila 1 = señal+banda+compartir (ancho completo); RF RX/TX/Tono en 3 cols */
-  body.page-list .rpt-table tbody tr.rpt-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-    row-gap: 2px;
-    column-gap: 6px;
-    padding: 6px 10px 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-sizing: border-box;
-    min-height: 0;
-    align-items: start;
-    -webkit-tap-highlight-color: transparent;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
-    padding: 0;
-    border: none;
-    min-height: 0;
-    min-width: 0;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-empty {
-    display: none !important;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--text-dim);
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.15;
-  }
-  /* Fila 1: señal (texto+banda a la izquierda, compartir a la derecha) */
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Señal"] {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 4px;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--border);
-    font-size: var(--fs-md);
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: var(--text-bright);
-    font-family: var(--font-mono);
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Señal"]::before { display: none; }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Señal"] .badge-banda {
-    font-size: var(--fs-xxs);
-    padding: 2px 6px;
-  }
-  /* Distancia (solo con 📍) */
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td[data-label="Distancia"] {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    padding-bottom: 2px;
-    margin-bottom: 0;
-    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-    font-weight: 600;
-    color: var(--accent);
-  }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td[data-label="Distancia"]::before { font-size: 0.65rem; }
-  /* RF: fila compacta, valores destacados */
-  body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td[data-label="RX (MHz)"] { grid-column: 1; grid-row: 2; }
-  body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td[data-label="TX (MHz)"] { grid-column: 2; grid-row: 2; }
-  body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td[data-label="Tono"] { grid-column: 3; grid-row: 2; }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td[data-label="RX (MHz)"] { grid-column: 1; grid-row: 3; }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td[data-label="TX (MHz)"] { grid-column: 2; grid-row: 3; }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td[data-label="Tono"] { grid-column: 3; grid-row: 3; }
-  /* RX/TX/Tono: etiqueta en la misma línea que el valor + columnas alineadas al inicio (menos hueco) */
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="RX (MHz)"],
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="TX (MHz)"],
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Tono"] {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: baseline;
-    gap: 4px;
-    justify-self: start;
-    width: max-content;
-    max-width: 100%;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="RX (MHz)"]::before,
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="TX (MHz)"]::before,
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Tono"]::before {
-    content: attr(data-label);
-    font-size: 0.72rem;
-    flex-shrink: 0;
-    text-transform: none;
-    letter-spacing: 0;
-    font-weight: 700;
-    opacity: 0.85;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="RX (MHz)"]::before { content: 'RX'; }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="TX (MHz)"]::before { content: 'TX'; }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Tono"]::before { content: 'Tono'; }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="RX (MHz)"],
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="TX (MHz)"] {
-    font-family: var(--font-mono);
-    font-size: var(--fs-lg);
-    font-weight: 700;
-    color: var(--accent);
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Tono"] {
-    font-family: var(--font-mono);
-    font-size: var(--fs-lg);
-    font-weight: 700;
-    color: var(--accent);
-  }
-  /* Potencia oculta en móvil (ahorra línea) */
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-pot { display: none; }
-  /* Ubicación: ancho completo, texto íntegro (varias líneas) */
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-ub {
-    display: flex;
-    grid-column: 1 / -1;
-    grid-row: 3;
-    white-space: normal;
-    overflow: visible;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    max-width: none;
-    font-size: var(--fs-xxs);
-    line-height: 1.4;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px solid rgba(30, 45, 61, 0.45);
-  }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td.cell-ub {
-    grid-row: 4;
-  }
-  /* Club + fila comuna */
-  body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td.cell-club {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    margin-top: 2px;
-    padding-top: 2px;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td.cell-club {
-    grid-column: 1 / -1;
-    grid-row: 5;
-    margin-top: 2px;
-    padding-top: 2px;
-  }
-  /* Comuna: ancho completo */
-  body.page-list .rpt-table tbody tr.rpt-row:not(:has(> td[data-label="Distancia"])) td.cell-comuna {
-    grid-column: 1 / -1;
-    grid-row: 5;
-    align-self: start;
-    min-width: 0;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row:has(> td[data-label="Distancia"]) td.cell-comuna {
-    grid-column: 1 / -1;
-    grid-row: 6;
-    align-self: start;
-    min-width: 0;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-club {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 8px;
-    line-height: 1.2;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-club::before {
-    flex: 0 0 auto;
-    font-size: 0.6rem;
-    line-height: 1.2;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-club strong {
-    font-size: var(--fs-xs);
-    font-weight: 500;
-    flex: 1 1 10rem;
-    min-width: 0;
-  }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-comuna { font-size: var(--fs-xxs); flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px; }
+  body.page-list .zone-group { width: 100%; margin-bottom: 16px; }
 }
-
-/* Medium phones: tighter cards */
-@media (max-width: 600px) {
-  body.page-list .rpt-table tbody { gap: 5px; }
-  body.page-list .rpt-table tbody tr.rpt-row {
-    padding: 6px 8px;
-    row-gap: 2px;
-    column-gap: 6px;
-  }
-}
-
-/* ── Small mobile: ultra-compact cards ────────────────────────────────────── */
 @media (max-width: 480px) {
   .radiomap-toolbar-host .controls .search-wrap input[type="text"] { min-height: 36px; padding: 6px 8px 6px 28px; }
   .radiomap-toolbar-host .controls select { min-height: 36px; padding: 6px 8px; }
-  body.page-list main { padding: 8px 6px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-  body.page-list .zone-group { margin-bottom: 12px; }
+  body.page-list main { padding: 8px 6px 12px; }
+  body.page-list .zone-group { margin-bottom: 10px; }
   body.page-list .global-group__summary { padding: 6px 8px; }
   body.page-list .zone-badge { font-size: var(--fs-xxs); padding: 1px 4px; }
-  body.page-list .rpt-table tbody { gap: 4px; }
-  body.page-list .rpt-table tbody tr.rpt-row {
-    padding: 6px 8px;
-    gap: 3px 6px;
-    min-height: 0;
-    border-radius: 6px;
+}
+
+/* Encabezados de región pegajosos bajo .sticky-top (--list-sticky-top lo mide list.js).
+   `overflow: clip` (no `hidden`) para no romper `position: sticky`; la zona Onda corta queda
+   `visible` por sus desplegables de filtros. content-visibility: las regiones fuera de pantalla no se maquetan. */
+body.page-list .zone-group:not(.zone-group--sw),
+body.page-list .zone-group:not(.zone-group--sw) > .global-group { overflow: clip; }
+body.page-list .zone-group:not(.zone-group--sw) { content-visibility: auto; contain-intrinsic-size: auto 480px; }
+body.page-list .zone-group > .global-group > .global-group__summary {
+  position: sticky;
+  top: var(--list-sticky-top, 0px);
+  z-index: 5;
+  background: var(--surface2);
+}
+body.page-list .zone-group > .global-group[open] > .global-group__summary { border-bottom: 1px solid var(--border); }
+body.page-list .rpt-table tbody tr.rpt-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* ── Tarjetas ≤900px: lista (regiones, GLOBAL, Onda corta) + panel Global del mapa ──────────────
+   Flex + `order` en vez de columnas fijas: las celdas vacías (.cell-empty → display:none) no ocupan
+   lugar, así una emisora con solo TX o un ATC con solo RX no dejan huecos.
+   Orden: 0 titular · 1 RF (Banda/RX/TX/Tono/Pot) · 2 club / emisora · 3 lugar · 4 notas / horario · 5 distancia. */
+:root {
+  --card-pad: clamp(8px, 2.4vw, 12px);
+  --card-gap: 6px;
+  --card-radius: 10px;
+  --card-title: clamp(1rem, 0.92rem + 0.5vw, 1.125rem);
+  --card-freq: clamp(1.0625rem, 0.96rem + 0.7vw, 1.25rem);
+  --card-meta: max(13px, var(--fs-xs));
+  --card-label: var(--fs-xxs);
+}
+/* Nombre como titular (emisoras / ATC): solo en tarjetas; la tabla de escritorio conserva sus columnas. */
+.cell-signal-title { display: none; }
+
+@media (max-width: 900px) {
+  :is(body.page-list, .global-subgroup) .global-panel-table-wrap { overflow-x: visible; }
+  :is(body.page-list, .global-subgroup) .rpt-table {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    table-layout: auto;
+    border: none;
+    font-size: var(--card-meta);
   }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Señal"] {
-    font-size: var(--fs-sm);
-    padding-bottom: 4px;
+  :is(body.page-list, .global-subgroup) .rpt-table thead { display: none; }
+  /* 1 columna en teléfonos, 2+ en tablet / horizontal */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: var(--card-gap);
+    padding: var(--card-gap);
   }
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="RX (MHz)"],
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="TX (MHz)"],
-  body.page-list .rpt-table tbody tr.rpt-row td[data-label="Tono"] {
-    font-size: var(--fs-md);
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    align-content: flex-start;
+    column-gap: 14px;
+    row-gap: 4px;
+    min-width: 0;
+    padding: var(--card-pad);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-club strong { font-size: var(--fs-xxs); line-height: 1.25; }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-club small { display: none; }
-  body.page-list .rpt-table tbody tr.rpt-row td.cell-comuna { display: none; }
-  body.page-list .rpt-table .share-btn { min-width: 36px; min-height: 36px; }
+  .global-panel-overlay .global-subgroup .rpt-table tbody tr { background: rgba(255, 255, 255, 0.05); }
+  html[data-theme="light"] .global-panel-overlay .global-subgroup .rpt-table tbody tr { background: rgba(0, 0, 0, 0.03); }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr.row-shared-highlight {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr.rpt-row--user { border-left: 3px solid rgba(255, 215, 0, 0.55); }
+
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td {
+    display: block;
+    min-width: 0;
+    max-width: none;
+    padding: 0;
+    border: none;
+    line-height: 1.3;
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-empty { display: none !important; }
+  /* Etiqueta pequeña delante del valor solo donde el valor no se explica solo */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td:is(.freq-rx, .freq-tx, .cell-tone, .sw-cell-target, .sw-cell-site)::before {
+    content: attr(data-label);
+    margin-right: 5px;
+    font-family: var(--font-sans);
+    font-size: var(--card-label);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.freq-rx::before { content: 'RX'; }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.freq-tx::before { content: 'TX'; }
+
+  /* 0 · Titular: indicativo (o nombre) + insignias + banda, compartir a la derecha */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-signal {
+    order: 0;
+    flex: 1 1 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--card-title);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.25;
+    color: var(--text-bright);
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-left { column-gap: 8px; row-gap: 2px; }
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal .badge-banda { font-size: var(--fs-xxs); padding: 2px 6px; }
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    flex: 0 1 auto;
+    min-width: 0;
+    font-family: var(--font-sans);
+    font-size: var(--card-title);
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--text-bright);
+    overflow-wrap: anywhere;
+  }
+  /* Con nombre como titular, el indicativo pasa a subtítulo y la celda club sobra */
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-title + .cell-signal-main {
+    font-size: var(--card-meta);
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--text-dim);
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr:has(.cell-signal-title) td.cell-club { display: none; }
+  /* La insignia AM/FM · ATC repite lo que ya dicen el icono y la banda: fuera, para que titular + banda quepan en una línea */
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-title + .cell-signal-main .badge-service { display: none; }
+  /* Compartir: icono compacto; el área táctil de 40px no agranda la fila (márgenes negativos) */
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-share { align-self: flex-start; margin: -9px -8px -9px 0; }
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-share .share-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-dim);
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-share .share-btn:is(:hover, :focus-visible) {
+    color: var(--accent);
+    background: rgba(0, 212, 255, 0.1);
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table .cell-signal-share .share-btn .material-symbols-outlined { font-size: 20px; }
+
+  /* 1 · RF en una sola línea que fluye */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td:is(.freq-rx, .freq-tx, .cell-tone) {
+    order: 1;
+    flex: 0 0 auto;
+    font-family: var(--font-mono);
+    font-size: var(--card-freq);
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td:is(.cell-pot, .cell-banda) {
+    order: 1;
+    flex: 0 0 auto;
+    font-family: var(--font-mono);
+    font-size: var(--card-meta);
+    color: var(--text-dim);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  /* 2 · Club / titular */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-club {
+    order: 2;
+    flex: 1 1 100%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    font-size: var(--card-meta);
+    color: var(--text);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-club strong { display: inline; font-weight: 500; }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-club small { display: none; }
+
+  /* 3 · Lugar: «Comuna · Ubicación» (sigue a la RF si no hay club, p. ej. emisoras) */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td:is(.cell-comuna, .cell-ub) {
+    order: 3;
+    flex: 0 1 auto;
+    font-size: var(--card-meta);
+    line-height: 1.35;
+    color: var(--text-dim);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-comuna:not(.cell-empty) ~ td.cell-ub:not(.cell-empty) { margin-left: -8px; }
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-comuna:not(.cell-empty) ~ td.cell-ub:not(.cell-empty)::before { content: '·'; margin-right: 6px; }
+
+  /* 4 · Notas (GLOBAL) */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-notes {
+    order: 4;
+    flex: 1 1 100%;
+    margin-top: 2px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--border);
+    font-size: var(--card-meta);
+    color: var(--text-dim);
+    white-space: normal;
+  }
+
+  /* 5 · Distancia («cerca de mí»): al extremo derecho de la última línea */
+  :is(body.page-list, .global-subgroup) .rpt-table tbody tr td.cell-dist {
+    order: 5;
+    flex: 0 0 auto;
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--card-meta);
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* Onda corta: «kHz · Emisora» como titular; idioma / destino / transmisor; horario en una línea */
+  :is(body.page-list, .global-subgroup) .sw-table tbody tr td.sw-cell-khz { flex: 0 0 auto; align-items: baseline; gap: 2px; }
+  :is(body.page-list, .global-subgroup) .sw-table .sw-khz { font-size: var(--card-freq); }
+  :is(body.page-list, .global-subgroup) .sw-table tbody tr td.sw-cell-station {
+    order: 0;
+    flex: 1 1 8rem;
+    font-size: var(--card-title);
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+  :is(body.page-list, .global-subgroup) .sw-table tbody tr td:is(.sw-cell-lang, .sw-cell-target, .sw-cell-site) {
+    order: 3;
+    flex: 0 1 auto;
+    font-size: var(--card-meta);
+    color: var(--text-dim);
+  }
+  :is(body.page-list, .global-subgroup) .sw-table tbody tr td.sw-cell-time { order: 4; flex: 1 1 100%; font-size: var(--card-label); }
+  :is(body.page-list, .global-subgroup) .sw-table .sw-slot { display: inline; }
+  :is(body.page-list, .global-subgroup) .sw-table .sw-slot + .sw-slot::before { content: ' · '; }
+  :is(body.page-list, .global-subgroup) .sw-table .sw-chip { margin: 0 6px 0 0; }
 }
 
 /* ── Footer responsive (shared) ───────────────────────────────────────────── */
@@ -5322,88 +5366,7 @@ body.page-list .global-subgroup .rpt-table thead tr { background: var(--surface)
   .global-group__summary { padding: 8px 10px; font-size: var(--fs-sm); }
 }
 
-/* GLOBAL-only sub-tables: card rows instead of a horizontally-scrolled table — same technique as
-   body.page-list .rpt-table (which already handles the standard 8-column region tables on its own).
-   Breakpoint matches lista.html's own card breakpoint. */
-@media (max-width: 768px) {
-  .global-subgroup .global-panel-table-wrap { overflow-x: visible; padding: 6px; }
-  .global-subgroup .rpt-table {
-    display: block;
-    table-layout: auto;
-    min-width: 0;
-    width: 100%;
-    font-size: var(--fs-xs);
-  }
-  .global-subgroup .rpt-table thead { display: none; }
-  .global-subgroup .rpt-table tbody { display: flex; flex-direction: column; gap: 6px; }
-  .global-subgroup .rpt-table tbody tr {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    row-gap: 2px;
-    column-gap: 8px;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  html[data-theme="light"] .global-subgroup .rpt-table tbody tr { background: rgba(0, 0, 0, 0.03); }
-  body.page-list .global-subgroup .rpt-table tbody tr { background: var(--surface); }
-  .global-subgroup .rpt-table tbody tr td {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    padding: 0;
-    border: none;
-    min-height: 0;
-    min-width: 0;
-  }
-  .global-subgroup .rpt-table tbody tr td.cell-empty { display: none !important; }
-  .global-subgroup .rpt-table tbody tr td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--text-dim);
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  .global-subgroup .rpt-table tbody tr td.cell-signal {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--fs-md);
-    font-weight: 700;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .global-subgroup .rpt-table tbody tr td.cell-signal::before { display: none; }
-  .global-subgroup .rpt-table tbody tr td.cell-banda { grid-column: 1 / -1; }
-  .global-subgroup .rpt-table tbody tr td.cell-banda::before { display: inline; }
-  .global-subgroup .rpt-table tbody tr td.freq-rx { grid-column: 1; }
-  .global-subgroup .rpt-table tbody tr td.freq-tx { grid-column: 2; }
-  .global-subgroup .rpt-table tbody tr td.cell-tone { grid-column: 3; }
-  .global-subgroup .rpt-table tbody tr td.freq-rx,
-  .global-subgroup .rpt-table tbody tr td.freq-tx,
-  .global-subgroup .rpt-table tbody tr td.cell-tone {
-    font-family: var(--font-mono);
-    color: var(--accent);
-    font-weight: 700;
-  }
-  .global-subgroup .rpt-table tbody tr td.cell-club,
-  .global-subgroup .rpt-table tbody tr td.cell-notes {
-    grid-column: 1 / -1;
-    white-space: normal;
-    max-width: none;
-    min-width: 0;
-  }
-  .global-subgroup .rpt-table tbody tr td.cell-notes {
-    color: var(--text-dim);
-    font-size: var(--fs-xs);
-    border-top: 1px dashed var(--border);
-    padding-top: 4px;
-    margin-top: 2px;
-  }
-}
+/* GLOBAL-only sub-tables ≤900px: tarjetas — ver «Tarjetas ≤900px» (bloque compartido con la lista). */
 
 /* Route panel — left sidebar on desktop, bottom sheet on mobile */
 #route-panel {
@@ -5656,10 +5619,11 @@ body.page-stats { min-height: 100vh; }
 /* ── KPI cards ────────────────────────────────────────────────────────────── */
 .stats-overview {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
+.stats-overview--sw { grid-template-columns: repeat(5, 1fr); }
 .stats-kpi {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -5697,6 +5661,85 @@ body.page-stats { min-height: 100vh; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+.stats-kpi__sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ── Category chips (filtran los gráficos de estaciones) ──────────────────── */
+.stats-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.stats-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--text-dim);
+  font: 500 var(--fs-xs) var(--font-sans);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.stats-cat-chip:hover { color: var(--text-bright); border-color: var(--chip-c, var(--accent)); }
+.stats-cat-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stats-cat-chip[aria-checked="true"] {
+  color: var(--text-bright);
+  border-color: var(--chip-c, var(--accent));
+  box-shadow: inset 0 0 0 1px var(--chip-c, var(--accent));
+}
+.stats-cat-chip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-c, var(--accent));
+  flex-shrink: 0;
+}
+.stats-cat-chip__count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xxs);
+  color: var(--text-dim);
+}
+
+/* ── Onda corta ───────────────────────────────────────────────────────────── */
+.stats-sw {
+  margin-top: 16px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.stats-subhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 6px;
+}
+.stats-subhead__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-bright);
+}
+.stats-subhead__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xxs);
+  color: var(--text-dim);
+}
+.stats-note {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.stats-note a { color: var(--accent); }
 
 /* ── Two-column grid ──────────────────────────────────────────────────────── */
 .stats-grid-2 {
@@ -5705,6 +5748,7 @@ body.page-stats { min-height: 100vh; }
   gap: 32px;
   align-items: start;
 }
+.stats-grid-2--single { grid-template-columns: 1fr; }
 
 /* ── Sections ───────────────────────────────────────────────────────────────── */
 .stats-section {
@@ -5872,11 +5916,15 @@ html[data-theme="light"] .stats-kpi:hover {
 
 /* ── Responsive ──────────────────────────────────────────────────────────────── */
 @media (max-width: 700px) {
-  .stats-overview { grid-template-columns: repeat(3, 1fr); }
+  .stats-overview { grid-template-columns: repeat(4, 1fr); }
+  .stats-overview--sw { grid-template-columns: repeat(3, 1fr); }
   .stats-grid-2 { grid-template-columns: 1fr; gap: 0; }
 }
 @media (max-width: 640px) {
   .stats-page { padding: 20px 16px 48px; }
+  .stats-overview, .stats-overview--sw { grid-template-columns: repeat(2, 1fr); }
+  .stats-overview--sw .stats-kpi:last-child { grid-column: 1 / -1; }
+  .stats-cat-chip { padding: 5px 10px; }
   .stat-row { grid-template-columns: 110px 1fr 56px; }
 }
 @media (max-width: 400px) {
@@ -6707,27 +6755,172 @@ html[data-theme="light"] .sw-marker--approx { color: #3e1204; }
   color: var(--text-bright);
 }
 .sw-panel__clock { font-family: var(--font-mono); font-weight: 400; color: var(--text-dim); }
-.sw-panel__lang {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.sw-panel__filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 8px;
   margin-top: 8px;
+}
+.sw-panel__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
   color: var(--text-dim);
 }
-.sw-panel__lang select {
-  flex: 1;
-  min-width: 0;
+.sw-panel__filter--wide { grid-column: 1 / -1; }
+.sw-ms { position: relative; min-width: 0; }
+.sw-ms__summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 6px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface2);
   color: var(--text);
-  font: inherit;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
 }
-.sw-panel__lang select:focus { outline: 2px solid var(--accent2); outline-offset: 1px; }
+.sw-ms__summary::-webkit-details-marker { display: none; }
+.sw-ms__summary::after {
+  content: '';
+  flex-shrink: 0;
+  margin-left: auto;
+  border: 4px solid transparent;
+  border-top-color: var(--text-dim);
+  border-bottom-width: 0;
+  transition: transform 0.15s;
+}
+.sw-ms[open] > .sw-ms__summary::after { transform: rotate(180deg); }
+.sw-ms__summary:focus-visible { outline: 2px solid var(--accent2); outline-offset: 1px; }
+.sw-ms__summary-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* El panel está abajo en pantalla: la lista se abre hacia arriba. */
+.sw-ms__panel.filter-checkbox-list {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  z-index: 2;
+  min-width: 100%;
+  max-height: min(50vh, 320px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 4px;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.sw-panel__filter:nth-child(2) .sw-ms__panel { left: auto; right: 0; }
+.sw-ms__panel .filter-checkbox-row {
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 8px;
+  font-size: var(--fs-xxs);
+  white-space: nowrap;
+}
+.sw-ms__panel .filter-checkbox-row input { width: 0.95rem; height: 0.95rem; accent-color: var(--accent2); }
+.sw-ms__count { margin-left: auto; padding-left: 10px; font-family: var(--font-mono); color: var(--text-dim); }
 .sw-panel__note, .sw-panel__attr { margin: 8px 0 0; color: var(--text-dim); line-height: 1.35; }
 .sw-panel__attr { margin-top: 4px; }
 .sw-panel__attr a { color: var(--accent); }
+
+/* Lista: zona «ONDA CORTA» (scripts/shortwave-list.js) — mismas secciones .global-group / .global-subgroup que GLOBAL. */
+.zone-badge--sw { border-color: var(--accent2); color: var(--accent2); }
+/* Identidad naranja (--accent2, como kHz e insignia) para no perderse dentro de la zona Onda corta:
+   marco y cabecera teñidos, barra de filtros pegajosa con borde naranja, filtros activos rellenos. */
+body.page-list .zone-group--sw > .global-group {
+  border-color: color-mix(in srgb, var(--accent2) 45%, var(--border));
+  border-left: 3px solid var(--accent2);
+}
+body.page-list .zone-group--sw > .global-group > .global-group__summary,
+body.page-list .sw-zone__filters {
+  background: color-mix(in srgb, var(--accent2) 9%, var(--surface2));
+}
+body.page-list .sw-zone__filters {
+  border-bottom: 2px solid color-mix(in srgb, var(--accent2) 55%, transparent);
+  box-shadow: 0 6px 12px -8px rgba(0, 0, 0, 0.45);
+}
+.sw-panel__filter-label { color: var(--accent2); font-weight: 600; letter-spacing: 0.02em; }
+.sw-ms__summary { border-color: color-mix(in srgb, var(--accent2) 35%, var(--border)); }
+.sw-ms__summary:hover { border-color: var(--accent2); }
+.sw-ms--active > .sw-ms__summary {
+  border-color: var(--accent2);
+  background: color-mix(in srgb, var(--accent2) 18%, var(--surface2));
+  color: var(--text-bright);
+  font-weight: 600;
+}
+.sw-ms--active > .sw-ms__summary::before {
+  content: '';
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent2);
+}
+.sw-ms--active > .sw-ms__summary::after { border-top-color: var(--accent2); }
+.sw-zone__note { margin: 0; padding: 0 14px 10px; color: var(--text-dim); font-size: var(--fs-xs); line-height: 1.4; }
+.sw-zone__note a { color: var(--accent); }
+.zone-group--sw .sw-subgroup { margin: 0 10px 10px; }
+/* Barra de filtros (shortwave-filters.js) bajo la cabecera: las listas abren hacia abajo, así que la zona
+   no puede recortar su contenido (.zone-group / .global-group usan overflow: hidden). */
+.zone-group--sw,
+.zone-group--sw > .global-group { overflow: visible; }
+.sw-zone__filters { padding: 0 14px 12px; font-size: var(--fs-xxs); }
+/* Lista larga: la barra de filtros queda pegada bajo la cabecera «ONDA CORTA» (también pegajosa) mientras
+   se recorre la zona. --sw-summary-h lo mide shortwave-list.js (la cabecera envuelve en móvil). */
+body.page-list .sw-zone__filters {
+  position: sticky;
+  top: calc(var(--list-sticky-top, 0px) + var(--sw-summary-h, 44px));
+  z-index: 4;
+  padding-top: 8px;
+  margin-bottom: 10px;
+}
+.sw-zone__filters .sw-panel__filters { grid-template-columns: repeat(3, minmax(0, 240px)); margin-top: 0; }
+.sw-zone__filters .sw-panel__filter--wide { grid-column: auto; }
+.sw-zone__filters .sw-ms__panel.filter-checkbox-list { top: calc(100% + 4px); bottom: auto; z-index: 20; }
+.sw-zone__empty { margin: 0; padding: 4px 14px 14px; color: var(--text-dim); font-size: var(--fs-sm); }
+.sw-table .sw-col-khz { width: 124px; }
+.sw-table .sw-col-station { width: 210px; }
+.sw-table .sw-col-lang { width: 130px; }
+.sw-table .sw-col-target { width: 150px; }
+.sw-table .sw-col-time { width: 190px; }
+.sw-table td { white-space: normal; word-break: break-word; vertical-align: top; }
+.sw-table .sw-cell-khz { white-space: nowrap; }
+.sw-khz { font-family: var(--font-mono); font-weight: 700; font-size: var(--fs-md); color: var(--accent2); }
+.sw-khz-unit { margin-left: 4px; font-size: var(--fs-xxs); color: var(--text-dim); }
+.sw-cell-station { font-weight: 600; color: var(--text-bright); }
+.sw-cell-time { font-family: var(--font-mono); font-size: var(--fs-xxs); color: var(--text-dim); }
+.sw-slot { display: block; white-space: nowrap; }
+.sw-row--upcoming { opacity: 0.72; }
+.sw-chip {
+  display: inline-block;
+  margin-bottom: 2px;
+  padding: 0 6px;
+  border: 1px solid var(--accent2);
+  border-radius: 999px;
+  color: var(--accent2);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .zone-group--sw .sw-subgroup { margin: 0 6px 8px; }
+  /* «N al aire · reloj UTC · Chile» no cabe en una línea: que envuelva en vez de aplastar la insignia */
+  .zone-group--sw .zone-badge--sw { flex-shrink: 0; }
+  .zone-group--sw .zone-count { flex-shrink: 1; min-width: 0; white-space: normal; text-align: right; line-height: 1.3; }
+  .sw-zone__note { padding: 0 10px 8px; }
+  .sw-zone__filters { padding: 0 10px 10px; }
+  /* Una sola fila de 3 en móvil: la barra pegajosa ocupa menos alto */
+  .sw-zone__filters .sw-panel__filters { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .sw-zone__filters .sw-panel__filter--wide { grid-column: auto; }
+  .sw-zone__filters .sw-panel__filter-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sw-zone__filters .sw-panel__filter:last-child .sw-ms__panel { left: auto; right: 0; }
+  .sw-zone__empty { padding: 4px 10px 12px; }
+}
 
 #map .sw-popup .leaflet-popup-content-wrapper,
 #map .sw-popup .leaflet-popup-tip {
