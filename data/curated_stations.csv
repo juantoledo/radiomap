@@ -181,6 +181,7 @@ CE2BMA-L,Red Chile - Villa Alemana,Villa Alemana,,-33.05,-71.3666667,,,VHF/FM,14
 CE2BMA-R,Red Chile - Limache,Limache,,-32.9833333,-71.2833333,,,VHF/FM,145.220,145.220,67,REGIÓN DE VALPARAÍSO,,,1,Red Chile,,,,,,https://redchile.org/,,valparaiso vhf simplex
 CE3LWV-L,Red Chile - El Monte,El Monte,,-33.6833333,-71.0166667,,,VHF/FM,146.500,146.500,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Chile,,,,,,https://redchile.org/,,rm vhf simplex
 CE3LWV-R,Red Chile - María Pinto,María Pinto,,-33.5333333,-71.1333333,,,VHF/FM,146.550,146.550,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Chile,,,,,,https://redchile.org/,,rm vhf simplex
+CA3AHT-L,Red Chile - Colina,Colina,,-33.08,-70.68,,,VHF/FM,145.350,145.350,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Chile,,,,,,https://redchile.org/,,rm vhf simplex
 CA3AMG-L,Red Chile - Renca,Renca,,-33.4,-70.7333333,,,VHF/FM,145.550,145.550,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Chile,,,,,,https://redchile.org/,,rm vhf simplex
 CE3PBR-L,Red Chile - San Joaquín,San Joaquín,,-33.5,-70.6166667,,,VHF/FM,147.540,147.540,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Chile,,,,,,https://redchile.org/,,rm vhf simplex
 CE3IME-L,Red Chile - Las Condes,Las Condes,,-33.4166667,-70.5833333,,,VHF/FM,146.180,146.180,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Chile,,,,,,https://redchile.org/,,rm vhf simplex
@@ -514,9 +515,12 @@ CD5HXO-L,RCDR - Chicureo,Colina,Chicureo,-33.2864,-70.6494,,,VHF/FM,145.550,145.
 CA3MJJ-L,Red Echolink Zello - Conchalí,Conchalí,,-33.3897,-70.6672,,,VHF/FM,146.440,146.440,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
 CE3ESO-L,Red Echolink Zello - Puente Alto,Puente Alto,,-33.6109,-70.5755,,,VHF/FM,146.245,146.245,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
 CA3NEB-L,Red Echolink Zello - Las Condes,Las Condes,,-33.4166667,-70.5833333,,,UHF/FM,432.500,432.500,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm uhf simplex
+CE3TZW-L,Red Echolink Zello - Independencia,Independencia,,-33.4166667,-70.6166667,,,VHF/FM,147.320,147.320,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
+CD3CIN-L,Red Echolink Zello - Ñuñoa,Ñuñoa,,-33.4333333,-70.5666667,,,VHF/FM,146.740,146.740,,REGIÓN METROPOLITANA DE SANTIAGO,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,rm vhf simplex
 CD4PQW-L,Red Echolink Zello - Rancagua,Rancagua,,-34.1749722222,-70.7455361111,,,VHF/FM,145.530,145.530,,REGIÓN DEL LIBERTADOR GENERAL BERNARDO O'HIGGINS,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro vhf simplex
 CE4NBE-L,Red Echolink Zello - Curicó,Curicó,,-34.9828,-71.2394,,,VHF/FM,146.500,146.500,,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro vhf simplex
 CE4NBE-R,Red Echolink Zello - Curicó,Curicó,,-34.9828,-71.2394,,,UHF/FM,432.500,432.500,77.0,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro uhf
+XQ4ER-L,Red Echolink Zello - Talca,Talca,,-35.4333333,-71.6666667,,,UHF/FM,432.700,432.700,88.5,REGIÓN DEL MAULE,,,1,Red Echolink Zello,,,,,,https://www.redecholinkzello.cl/,,centro uhf simplex
 
 CE3AAA-HF,Red de Emergencia de Radioaficionados Defensa Civil de Chile,,,,,,,HF,7.095,7.095,,GLOBAL,,,,,,,,,,https://www.defensacivil.cl,7.095 MHz,emergencia hf simplex
 CE3AAA-VHF,Red de Emergencia de Radioaficionados Defensa Civil de Chile,,,,,,,VHF/FM,147.320,147.320,,GLOBAL,,,,,,,,,,https://www.defensacivil.cl,147.320 MHz,emergencia vhf simplex
