@@ -101,6 +101,11 @@ jobs:
           node scripts/ci/test_shortwave_live.js
           python scripts/eibi-to-shortwavejs.py --strict
 
+      - name: Build static frequency API (api/v1)
+        run: |
+          python scripts/ci/test_freq_api.py
+          python scripts/build-freq-api.py
+
       - name: Inject cache-busting version into HTML
         run: |
           V=$(grep "const VERSION" data/data.js | sed "s/.*'\([^']*\)'.*/\1/")

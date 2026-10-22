@@ -52,6 +52,15 @@ Implemented in [`scripts/share-view.js`](../scripts/share-view.js) (build) and [
 | `swnow` | Solo depuración: instante ISO UTC para evaluar «al aire» (p. ej. `2026-09-25T00:00Z`); no se comparte |
 | `cat` | Solo `estadisticas.html`: categoría que filtra los gráficos de estaciones (`amateur`, `broadcast`, `atc`, `global`; sin parámetro = todas). Lo lee y escribe `stats-page.js` |
 
+## Static frequency API (`api/v1/`)
+
+Generated at deploy by `scripts/build-freq-api.py`, never committed. Contract (schema, rounding, 404 semantics, `days`/`season` codes) in [`README.md`](../README.md) → «API por frecuencia».
+
+| Path | Content |
+|------|---------|
+| `api/v1/index.json` | `version`, `generated`, `units` (`kHz`), `shortwaveSeason`, `counts`, `freqs` (sorted int kHz) |
+| `api/v1/freq/{kHz}.json` | `kHz`, `version`, `stations` (NODES matched on rx or tx, whitelist `STATION_FIELDS`), `shortwave` (expanded EiBi entries) |
+
 ## Propagation docs
 
 - **User-facing:** [`propagacion.html`](../propagacion.html) (deployed as `/propagacion.html`). **Contributors:** [`data/propagation/README.md`](../data/propagation/README.md) (Signal-Server, SRTM/OpenTopography citation pointer, experimental note).
@@ -79,6 +88,7 @@ Implemented in [`scripts/share-view.js`](../scripts/share-view.js) (build) and [
 | `shortwave-map.js` | Onda corta (mapa): botón, capa por sitio de transmisión, panel con filtros y popup; vista mundial al activar y restaura la vista previa al desactivar |
 | `shortwave-list.js` | Onda corta (lista): botón y zona «ONDA CORTA» (subsecciones por banda + próxima hora) que `list.js` agrega al final (luego `hydrate()`); filtra con `#search` y la barra de shortwave-filters.js; refresco cada minuto en su lugar |
 | `eibi-to-shortwavejs.py` | EiBi `sked-*.csv` + `README.TXT` → `data/shortwave.js` (mapeo de columnas por nombre de cabecera) |
+| `build-freq-api.py` | `data/data.js` + `data/shortwave.js` → API estática `api/v1/freq/{kHz}.json` + `api/v1/index.json` (solo en deploy; `api/` está en `.gitignore`) |
 
 ## Helper scripts
 
@@ -86,5 +96,6 @@ Implemented in [`scripts/share-view.js`](../scripts/share-view.js) (build) and [
 |--------|---------|
 | Regenerate `data.js` + `shortwave.js` | `./scripts/sync-data.sh` |
 | Test EiBi mapper | `python scripts/ci/test_eibi_mapper.py` |
+| Build / test frequency API | `python scripts/build-freq-api.py` (→ `api/v1/`) · `python scripts/ci/test_freq_api.py` |
 | Local HTTP server | `./scripts/serve.sh [PORT]` (default `8080`) |
 | Regenerate exporters | `python scripts/generate-exporter-mapper.py` — rewrites `exporter/*/mapper.js` and `exporter/registry.js` from each format's `reference.csv`; see [`scripts/exporter/README.md`](../scripts/exporter/README.md) for how to add a new format |

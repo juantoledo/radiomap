@@ -37,6 +37,26 @@ Sitio estático — sin framework, sin bundler. Leaflet + vanilla JS.
 - Generado: [`data/data.js`](data/data.js) — producido por [`scripts/csv-to-datajs.py`](scripts/csv-to-datajs.py).
 - Los datos **no reemplazan** la ficha oficial del titular ni la autorización SUBTEL.
 
+## API por frecuencia
+
+JSON estático, generado en cada deploy por [`scripts/build-freq-api.py`](scripts/build-freq-api.py) (no se versiona). Lo sirve GitHub Pages con `Access-Control-Allow-Origin: *`, así que se puede consultar con `fetch()` desde cualquier sitio.
+
+| URL | Contenido |
+|---|---|
+| `https://www.radiomap.cl/api/v1/freq/{kHz}.json` | Todo lo que hay en esa frecuencia: `{ kHz, version, stations: […], shortwave: […] }` |
+| `https://www.radiomap.cl/api/v1/index.json` | `{ version, generated, units, shortwaveSeason, counts, freqs: [kHz…] }`, para buscar la frecuencia más cercana del lado del cliente |
+
+- **Clave**: kHz **entero**, redondeado al kHz más cercano (mitades hacia arriba). 146,730 MHz → `146730.json` · AM 720 kHz → `720.json` · OC 9580 kHz → `9580.json` · PMR446 446,00625 MHz → `446006.json`.
+- **Sin datos** → HTTP **404**: interprétalo como «nada en esta frecuencia».
+- **`stations`**: estaciones de `curated_stations.csv`, indexadas por `rx` **y** `tx`. `matchedOn` (`["rx"]`, `["tx"]` o ambos) indica cuál coincidió. En repetidoras, `rx` es la salida que se escucha y `tx` la entrada. Las broadcast solo traen `tx` y las ATC solo `rx`. `rxKHz`/`txKHz` son exactos (pueden tener decimales). `category` ∈ `amateur` · `broadcast` · `atc` · `global`. `dmr: { colorCode, slot, tg }` cuando `isDMR`. `url` abre la estación en el mapa. Los campos vacíos se omiten.
+- **`shortwave`**: horario EiBi **completo** de ese kHz (no solo lo que está al aire), ordenado por inicio: `station`, `country`, `lang`/`langLabel`, `target`/`targetLabel`, `startUTC`/`endUTC` (`HHMM`; si `start > end` cruza medianoche), `days`, `season`, `validFrom`/`validTo` (ISO), `lastHeard` (`MMYY`) y `site { name, itu, lat, lon, precision }`. «Al aire ahora» lo calcula el cliente con las mismas reglas que `isOnAir` en [`scripts/shortwave-live.js`](scripts/shortwave-live.js):
+  - `days.t`: `d` diario · `w` máscara de días `m` (bit 0 = lunes) · `n` n-ésimo `wd` del mes · `l` último `wd` del mes · `date` día `d` del mes `m` · `irr` irregular.
+  - `season`: `0` todo el año · `4` solo invierno boreal · `5` solo verano boreal (último domingo de marzo → último domingo de octubre).
+
+```bash
+curl -s https://www.radiomap.cl/api/v1/freq/146730.json | jq '.stations[].signal'
+```
+
 ## Desarrollo local
 
 ```bash
